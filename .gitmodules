@@ -1,0 +1,6 @@
+[submodule "fastmd/ext/cub"]
+	path = fastmd/ext/cub
+	url = https://github.com/NVIDIA/cub
+[submodule "fastmd/ext/thrust"]
+	path = fastmd/ext/thrust
+	url = https://github.com/NVIDIA/thrust
