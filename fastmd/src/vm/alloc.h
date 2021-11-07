@@ -3,8 +3,24 @@
 
 namespace fastmd {
     template<typename T>
-    struct cu_allocator {
-        ANY T *allocate(int n) const;
+    struct no_allocator {
+        using size_type = int;
+
+        ANY T *allocate(size_type n) const;
+        ANY void deallocate(T *ptr) const;
+    };
+
+    template<typename T>
+    struct device_allocator {
+        using size_type = int;
+
+        ANY T *allocate(size_type n) const;
+        ANY void deallocate(T *ptr) const;
+    };
+
+    template<typename T>
+    struct host_allocator {
+        ANY T *allocate(size_t n) const;
         ANY void deallocate(T *ptr) const;
     };
 }
