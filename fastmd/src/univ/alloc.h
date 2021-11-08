@@ -23,6 +23,7 @@ namespace fastmd {
     template<typename T>
     struct host_allocator {
         using value_type = T;
+
         ANY value_type *allocate(size_t n) const;
         ANY void deallocate(value_type *ptr) const;
     };

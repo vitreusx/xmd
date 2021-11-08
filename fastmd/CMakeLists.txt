@@ -22,7 +22,7 @@ target_include_directories(${TARGET_NAME}
 
 target_compile_options(${TARGET_NAME}
     PRIVATE
-    $<$<CONFIG:Debug>:-g;$<$<COMPILE_LANGUAGE:CXX>:-Og>>
+    $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-Ofast;-march=native>;$<$<COMPILE_LANGUAGE:CUDA>:-O2>>
     $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 

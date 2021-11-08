@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "config.h"
+#include <thrust/tuple.h>
 
 namespace fastmd {
     namespace detail {
