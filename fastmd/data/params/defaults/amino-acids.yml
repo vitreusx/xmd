@@ -1,4 +1,4 @@
-atom-radii:
+def-atom-radii:
   C: 1.61
   CA: 1.88
   CB: 1.88
@@ -39,7 +39,7 @@ atom-radii:
 
 amino-acids:
   ALA:
-    short: A
+    letter: A
     mass: 71.037113805
     side: [CB]
     radius: 3.35
@@ -50,7 +50,7 @@ amino-acids:
       side-nonpolar: 1
       side-polar: 1
   ARG:
-    short: R
+    letter: R
     mass: 156.101111050
     side: [CB, CG, CD, NE, CZ, NH1, NH2]
     radius: 3.95
@@ -61,7 +61,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   ASN:
-    short: N
+    letter: N
     mass: 114.042927470
     side: [CB, CG, OD1, ND2]
     radius: 3.65
@@ -72,9 +72,9 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   ASP:
-    short: D
+    letter: D
     mass: 115.026943065
-    alt-radii:
+    alt-atom-radii:
       CG: 1.61
       OD1: 1.46
     side: [CB, CG, OD1, OD2]
@@ -86,7 +86,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   CYS:
-    short: C
+    letter: C
     mass: 103.009184505
     side: [CG, SG]
     radius: 3.7
@@ -97,9 +97,9 @@ amino-acids:
       side-nonpolar: 2
       side-polar: 2
   GLU:
-    short: E
+    letter: E
     mass: 129.042593135
-    alt-radii:
+    alt-atom-radii:
       CD: 1.88
       OE1: 1.46
     side: [CB, CG, CD, OE1, OE2]
@@ -111,7 +111,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   GLN:
-    short: Q
+    letter: Q
     mass: 128.058577540
     side: [CB, CG, CD, OE1, NE2]
     radius: 3.9
@@ -122,7 +122,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   GLY:
-    short: G
+    letter: G
     mass: 57.021463735
     side: []
     radius: 3.15
@@ -133,7 +133,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 0
   HIS:
-    short: H
+    letter: H
     mass: 137.058911875
     side: [CB, CG, ND1, CD2, CE1, NE2]
     radius: 4.0
@@ -144,9 +144,9 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   ILE:
-    short: I
+    letter: I
     mass: 113.084064015
-    alt-radii:
+    alt-atom-radii:
       CD1: 1.88
     side: [CB, CG1, CG2, CD1]
     radius: 4.5
@@ -157,9 +157,9 @@ amino-acids:
       side-nonpolar: 4
       side-polar: 2
   LEU:
-    short: L
+    letter: L
     mass: 113.084064015
-    alt-radii:
+    alt-atom-radii:
       CD2: 1.88
     side: [CB, CG, CD1, CD2]
     radius: 4.6
@@ -170,7 +170,7 @@ amino-acids:
       side-nonpolar: 4
       side-polar: 2
   LYS:
-    short: K
+    letter: K
     mass: 128.094963050
     side: [CB, CG, CD, CE, NZ]
     radius: 3.65
@@ -181,7 +181,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   MET:
-    short: M
+    letter: M
     mass: 131.040484645
     side: [CB, CG, SD, CE]
     radius: 4.5
@@ -192,9 +192,9 @@ amino-acids:
       side-nonpolar: 1
       side-polar: 1
   PHE:
-    short: F
+    letter: F
     mass: 147.068413945
-    alt-radii:
+    alt-atom-radii:
       CZ: 1.76
     side: [CB, CG, CD1, CD2, CE1, CE2, CZ]
     radius: 4.6
@@ -205,7 +205,7 @@ amino-acids:
       side-nonpolar: 4
       side-polar: 2
   PRO:
-    short: P
+    letter: P
     mass: 97.052763875
     side: [CB, CG, CD]
     radius: 3.7
@@ -216,7 +216,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 0
   SER:
-    short: S
+    letter: S
     mass: 87.032028435
     side: [CB, OG]
     radius: 3.3
@@ -227,7 +227,7 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   THR:
-    short: T
+    letter: T
     mass: 101.047678505
     side: [CB, OG1, CG2]
     radius: 3.6
@@ -238,9 +238,9 @@ amino-acids:
       side-nonpolar: 0
       side-polar: 2
   TRP:
-    short: W
+    letter: W
     mass: 186.079312980
-    alt-radii:
+    alt-atom-radii:
       CD1: 1.76
       CD2: 1.61
       CE2: 1.64
@@ -253,9 +253,9 @@ amino-acids:
       side-nonpolar: 4
       side-polar: 3
   TYR:
-    short: Y
+    letter: Y
     mass: 163.063328575
-    alt-radii:
+    alt-atom-radii:
       CD1: 1.76
       CG: 1.61
     side: [CB, CG, CD1, CD2, CE1, CE2, CZ, OH]
@@ -267,7 +267,7 @@ amino-acids:
       side-nonpolar: 2
       side-polar: 2
   VAL:
-    short: V
+    letter: V
     mass: 99.068413945
     side: [CB, CG1, CG2]
     radius: 4.0
