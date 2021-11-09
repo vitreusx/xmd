@@ -26,7 +26,7 @@ namespace fastmd {
     ANY typename host_allocator<T>::value_type *
     host_allocator<T>::allocate(size_t n) const {
 #ifdef __CUDA_ARCH__
-        static_assert("host allocator can only be used on host");
+        static_assert(false, "Host allocator can only be used on host");
 #else
         return (T *)malloc(n * sizeof(T));
 #endif
@@ -35,7 +35,7 @@ namespace fastmd {
     template<typename T>
     ANY void host_allocator<T>::deallocate(T *ptr) const {
 #ifdef __CUDA_ARCH__
-        static_assert("host_allocator<T> can only be used on host");
+        static_assert(false, "Host allocator can only be used on host");
 #else
         free((void*)ptr);
 #endif

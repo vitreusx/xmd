@@ -4,3 +4,9 @@
 [submodule "fastmd/ext/thrust"]
 	path = fastmd/ext/thrust
 	url = https://github.com/NVIDIA/thrust
+[submodule "fastmd/ext/vcl"]
+	path = fastmd/ext/vcl
+	url = https://github.com/vectorclass/version2
+[submodule "fastmd/ext/yaml-cpp"]
+	path = fastmd/ext/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp

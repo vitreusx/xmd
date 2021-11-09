@@ -37,5 +37,13 @@ set(CUB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ext/cub/cub/cmake")
 find_package(Thrust REQUIRED CONFIG)
 thrust_create_target(Thrust)
 
+add_subdirectory(ext/ESBTL)
+add_subdirectory(ext/vcl)
+find_package(yaml-cpp REQUIRED)
+
 target_link_libraries(${TARGET_NAME}
-    PRIVATE CUDA::cudart Thrust)
+    PRIVATE
+    CUDA::cudart CUDA::cuda_driver Thrust
+    ESBTL vcl yaml-cpp)
+
+file(COPY data DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")

@@ -1,0 +1,16 @@
+parameters:
+  lj:
+    default-sigma-values:
+      bb: 5.0
+      ss: 7.5
+      bs: 6.58
+    ss-pair-sigma-values:
+      from-file: ss-pairs.csv
+  amino-acids:
+    from-file: amino-acids.yml
+  heurestic-angles:
+    coefficients:
+      from-file: angle.csv
+  dihedral-angles:
+    coefficients:
+      from-file: dihedral.csv
