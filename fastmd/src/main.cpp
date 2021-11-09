@@ -1,7 +1,6 @@
 #include <iostream>
-#include "files/map_file.h"
-#include "types/amino_acid.h"
+#include "model/model.h"
 
 int main() {
-    return EXIT_SUCCESS;
+    return 0;
 }

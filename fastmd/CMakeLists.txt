@@ -39,11 +39,12 @@ thrust_create_target(Thrust)
 
 add_subdirectory(ext/ESBTL)
 add_subdirectory(ext/vcl)
+add_subdirectory(ext/eigen-3.4.0)
 find_package(yaml-cpp REQUIRED)
 
 target_link_libraries(${TARGET_NAME}
     PRIVATE
     CUDA::cudart CUDA::cuda_driver Thrust
-    ESBTL vcl yaml-cpp)
+    ESBTL vcl yaml-cpp eigen)
 
 file(COPY data DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
