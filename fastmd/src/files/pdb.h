@@ -14,7 +14,7 @@ namespace fastmd {
         void add_snapshot(fastmd::model const& m);
 
         enum class contact_deriv {
-            DO_NOTHING, DERIVE_FROM_ATOMS, DERIVE_FROM_RESIDUES
+            NONE, FROM_ATOMS, FROM_RESIDUES
         };
         fastmd::model to_model(contact_deriv const& deriv) const;
 

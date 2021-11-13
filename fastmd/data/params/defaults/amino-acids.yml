@@ -46,7 +46,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 4
-      side-nonpolar: 1
+      side-hydrophobic: 1
       side-polar: 1
   ARG:
     mass: 156.101111050
@@ -56,7 +56,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 4
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   ASN:
     mass: 114.042927470
@@ -66,7 +66,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 3
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   ASP:
     mass: 115.026943065
@@ -79,7 +79,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 2
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   CYS:
     mass: 103.009184505
@@ -89,7 +89,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 5
-      side-nonpolar: 2
+      side-hydrophobic: 2
       side-polar: 2
   GLU:
     mass: 129.042593135
@@ -102,7 +102,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 2
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   GLN:
     mass: 128.058577540
@@ -112,7 +112,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 3
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   GLY:
     mass: 57.021463735
@@ -122,7 +122,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 0
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 0
   HIS:
     mass: 137.058911875
@@ -132,7 +132,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 4
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   ILE:
     mass: 113.084064015
@@ -144,7 +144,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 7
-      side-nonpolar: 4
+      side-hydrophobic: 4
       side-polar: 2
   LEU:
     mass: 113.084064015
@@ -156,7 +156,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 7
-      side-nonpolar: 4
+      side-hydrophobic: 4
       side-polar: 2
   LYS:
     mass: 128.094963050
@@ -166,7 +166,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 3
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   MET:
     mass: 131.040484645
@@ -176,7 +176,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 7
-      side-nonpolar: 1
+      side-hydrophobic: 1
       side-polar: 1
   PHE:
     mass: 147.068413945
@@ -188,7 +188,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 7
-      side-nonpolar: 4
+      side-hydrophobic: 4
       side-polar: 2
   PRO:
     mass: 97.052763875
@@ -198,7 +198,7 @@ amino-acids:
     contact-limits:
       back: 1
       side: 0
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 0
   SER:
     mass: 87.032028435
@@ -208,7 +208,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 2
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   THR:
     mass: 101.047678505
@@ -218,7 +218,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 3
-      side-nonpolar: 0
+      side-hydrophobic: 0
       side-polar: 2
   TRP:
     mass: 186.079312980
@@ -232,7 +232,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 8
-      side-nonpolar: 4
+      side-hydrophobic: 4
       side-polar: 3
   TYR:
     mass: 163.063328575
@@ -245,7 +245,7 @@ amino-acids:
     contact-limits:
       back: 2
       side: 7
-      side-nonpolar: 2
+      side-hydrophobic: 2
       side-polar: 2
   VAL:
     mass: 99.068413945
@@ -255,5 +255,5 @@ amino-acids:
     contact-limits:
       back: 2
       side: 6
-      side-nonpolar: 4
+      side-hydrophobic: 4
       side-polar: 1

@@ -1,6 +1,6 @@
-#include <iostream>
-#include "model/model.h"
+#include "tasks/forces/qa.h"
 
 int main() {
+    using namespace fastmd;
     return 0;
 }

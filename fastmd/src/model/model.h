@@ -2,7 +2,7 @@
 #include <vector>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "univ/amino_acid.h"
+#include "utils/amino_acid.h"
 
 namespace fastmd {
     class model {
