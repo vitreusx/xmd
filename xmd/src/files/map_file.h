@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace fastmd {
+namespace xmd {
     class map_file {
     public:
         explicit map_file(std::filesystem::path const& path);

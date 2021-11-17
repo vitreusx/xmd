@@ -1,12 +1,14 @@
 #pragma once
 #include <cmath>
+#include "types/array.h"
 
-namespace fastmd {
+namespace xmd {
     template<typename U>
     class vector3 {
     public:
         U x, y, z;
 
+        inline vector3() = default;
         inline vector3(U x, U y, U z);
 
         template<typename V>
@@ -78,6 +80,16 @@ namespace fastmd {
 
     template<typename U>
     inline auto unit(vector3<U> const& u);
+
+    template<typename U>
+    class vector3_array {
+    public:
+        inline vector3<U&> operator[](size_t idx);
+        inline vector3<U> operator[](size_t idx) const;
+
+    private:
+        array<U> x, y, z;
+    };
 
     using vector3f = vector3<float>;
     using vector3d = vector3<double>;

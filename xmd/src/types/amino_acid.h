@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
-#include "config.h"
 
-namespace fastmd {
+namespace xmd {
     enum aa_code: char {
         ALA, ARG, ASN, ASP, CYS, GLU, GLN, GLY, HIS, ILE,
         LEU, LYS, MET, PHE, PRO, SER, THR, TRP, TYR, VAL
@@ -31,9 +30,9 @@ namespace fastmd {
 
 namespace std {
     template<>
-    struct hash<fastmd::amino_acid> {
-        size_t operator()(fastmd::amino_acid const& aa) const {
-            return hash<fastmd::aa_code>()((fastmd::aa_code)aa);
+    struct hash<xmd::amino_acid> {
+        size_t operator()(xmd::amino_acid const& aa) const {
+            return hash<xmd::aa_code>()((xmd::aa_code)aa);
         }
     };
 }

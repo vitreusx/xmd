@@ -1,6 +1,6 @@
 #pragma once
 
-namespace fastmd {
+namespace xmd {
     template<typename U>
     vector3<U>::vector3(U x, U y, U z):
         x{x}, y{y}, z{z} {}
@@ -150,4 +150,23 @@ namespace fastmd {
     auto unit(vector3<U> const& u) {
         return rnorm(u) * u;
     }
+}
+
+namespace xmd {
+    template<typename U>
+    vector3<U&> vector3_array<U>::operator[](size_t idx) {
+        return { x[idx], y[idx], z[idx] };
+    }
+
+    template<typename U>
+    vector3<U> vector3_array<U>::operator[](size_t idx) const {
+        return { x[idx], y[idx], z[idx] };
+    }
+}
+
+namespace xmd::detail {
+    template<typename U>
+    struct array_impl<vector3<U>> {
+        using type = vector3_array<U>;
+    };
 }

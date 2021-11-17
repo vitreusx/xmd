@@ -2,11 +2,11 @@ file(GLOB_RECURSE PRIVATE_SOURCES CONFIGURE_DEPENDS
     src/*.cpp src/*.cxx src/*.cu
     src/*.hpp src/*.h src/*.cuh src/*.inl)
 
-set(TARGET_NAME "fastmd")
+set(TARGET_NAME "xmd")
 
 set(CUDAToolkit_ROOT "/opt/cuda")
-enable_language(CUDA)
 set(CMAKE_CUDA_COMPILER "/opt/cuda/bin/nvcc")
+enable_language(CUDA)
 
 add_executable(${TARGET_NAME})
 

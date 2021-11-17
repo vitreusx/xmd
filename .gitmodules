@@ -1,12 +1,12 @@
-[submodule "fastmd/ext/cub"]
-	path = fastmd/ext/cub
+[submodule "xmd/ext/cub"]
+	path = xmd/ext/cub
 	url = https://github.com/NVIDIA/cub
-[submodule "fastmd/ext/thrust"]
-	path = fastmd/ext/thrust
+[submodule "xmd/ext/thrust"]
+	path = xmd/ext/thrust
 	url = https://github.com/NVIDIA/thrust
-[submodule "fastmd/ext/vcl"]
-	path = fastmd/ext/vcl
+[submodule "xmd/ext/vcl"]
+	path = xmd/ext/vcl
 	url = https://github.com/vectorclass/version2
-[submodule "fastmd/ext/yaml-cpp"]
-	path = fastmd/ext/yaml-cpp
+[submodule "xmd/ext/yaml-cpp"]
+	path = xmd/ext/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp

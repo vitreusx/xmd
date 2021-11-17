@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 
-namespace fastmd {
+namespace xmd {
     constexpr amino_acid::amino_acid(aa_code code) :
         code{code} {}
 
@@ -14,7 +14,7 @@ namespace fastmd {
             { 'T', THR }, { 'W', TRP }, { 'Y', TYR }, { 'V', VAL }
         };
         
-        code = letter_to_code[letter];
+        code = letter_to_code.at(letter);
     }
 
     amino_acid::amino_acid(const std::string &name) {
@@ -26,7 +26,7 @@ namespace fastmd {
             { "THR", THR }, { "TRP", TRP }, { "TYR", TYR }, { "VAL", VAL }
         };
 
-        code = name_to_code[name];
+        code = name_to_code.at(name);
     }
 
     constexpr amino_acid::operator aa_code() const {
@@ -42,7 +42,7 @@ namespace fastmd {
             { THR, 'T' }, { TRP, 'W' }, { TYR, 'Y' }, { VAL, 'V' }
         };
         
-        return code_to_letter[code];
+        return code_to_letter.at(code);
     }
 
     std::string const& amino_acid::name() const {
@@ -54,6 +54,6 @@ namespace fastmd {
             { THR, "THR" }, { TRP, "TRP" }, { TYR, "TYR" }, { VAL, "VAL" }
         };
 
-        return code_to_name[code];
+        return code_to_name.at(code);
     }
 }

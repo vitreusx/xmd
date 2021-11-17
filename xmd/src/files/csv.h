@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
 
-namespace fastmd {
+namespace xmd {
     class csv_record;
     class csv_iterator;
     class csv_file;

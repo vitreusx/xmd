@@ -1,4 +1,4 @@
 cmake_minimum_required(VERSION 3.20)
-project(fastmd)
+project(xmd)
 
-add_subdirectory(fastmd)
+add_subdirectory(xmd)

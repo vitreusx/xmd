@@ -2,9 +2,9 @@
 #include <vector>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "utils/amino_acid.h"
+#include "types/amino_acid.h"
 
-namespace fastmd {
+namespace xmd {
     class model {
     public:
         static model random(int num_res);

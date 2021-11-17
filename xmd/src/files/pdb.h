@@ -5,18 +5,18 @@
 #include <Eigen/Core>
 #include "model/model.h"
 
-namespace fastmd {
+namespace xmd {
     class pdb {
     public:
         explicit pdb(std::istream& is);
         friend std::ostream& operator<<(std::ostream& os, pdb const& p);
 
-        void add_snapshot(fastmd::model const& m);
+        void add_snapshot(xmd::model const& m);
 
         enum class contact_deriv {
             NONE, FROM_ATOMS, FROM_RESIDUES
         };
-        fastmd::model to_model(contact_deriv const& deriv) const;
+        xmd::model to_model(contact_deriv const& deriv) const;
 
         struct atom;
         struct residue;
