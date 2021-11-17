@@ -1,5 +1,5 @@
 #pragma once
-#include "types/vector3.h"
+#include "types/vec3.h"
 #include "types/functors.h"
 
 namespace xmd {

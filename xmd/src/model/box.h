@@ -1,6 +1,6 @@
 #pragma once
 #include <cmath>
-#include "types/vector3.h"
+#include "types/vec3.h"
 
 namespace xmd {
     template<typename U>
