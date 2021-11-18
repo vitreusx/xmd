@@ -13,7 +13,7 @@ namespace xmd {
         gen_lj(field<float> depth, field<float> r_min):
             depth{depth}, r_min{r_min} {};
 
-        inline std::tuple<float, float> operator()(float rnorm) const;
+        inline std::tuple<float, float> operator()(float r_inv) const;
 
     public:
         using field_types = std::tuple<field<float>, field<float>>;

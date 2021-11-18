@@ -10,6 +10,7 @@
 #include "forces/es/relative.h"
 #include "forces/go.h"
 #include "forces/pauli.h"
+#include "forces/pid.h"
 #include <iostream>
 
 int main() {

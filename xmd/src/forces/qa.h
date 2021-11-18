@@ -5,7 +5,7 @@
 #include "meta/functors.h"
 #include "meta/list.h"
 #include "model/box.h"
-#include "forces/lj.h"
+#include "forces/primitives/lj.h"
 
 namespace xmd::qa {
     template<typename Functor>
