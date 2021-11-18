@@ -2,8 +2,9 @@
 
 namespace xmd::qa {
     template<typename Functor>
+    template<typename F2>
     inline auto &gen_sync_numbers<Functor>::operator+=(
-        const gen_sync_numbers <Functor> &diff) {
+        const gen_sync_numbers <F2> &diff) {
 
         back += diff.back;
         side_all += diff.side_all;
@@ -13,8 +14,9 @@ namespace xmd::qa {
     }
 
     template<typename Functor>
+    template<typename F2>
     inline auto &gen_sync_numbers<Functor>::operator-=(
-        const gen_sync_numbers <Functor> &diff) {
+        const gen_sync_numbers <F2> &diff) {
 
         back -= diff.back;
         side_all -= diff.side_all;
@@ -133,6 +135,9 @@ namespace xmd::qa {
                 cont.ref_time = *t;
                 cont.status = FORMING_OR_FORMED;
                 contacts.push_back(cont);
+
+                sync_ns[cand.i1] -= cand.sync_diff1;
+                sync_ns[cand.i2] -= cand.sync_diff2;
             }
         }
     }
@@ -166,11 +171,9 @@ namespace xmd::qa {
             }
             else if (cont.status == BREAKING && saturation == 0.0f) {
                 marked_for_erasure.push_back(i);
+                sync_ns[cont.i1] += cont.sync_diff1;
+                sync_ns[cont.i2] += cont.sync_diff2;
             }
-        }
-
-        for (ssize_t i = (ssize_t)marked_for_erasure.size()-1; i >= 0; --i) {
-            contacts.erase(marked_for_erasure[i]);
         }
     }
 }

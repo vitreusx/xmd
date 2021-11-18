@@ -61,8 +61,11 @@ namespace xmd::qa {
     public:
         gen_sync_numbers() = default;
 
-        inline auto& operator+=(gen_sync_numbers const &diff);
-        inline auto& operator-=(gen_sync_numbers const &diff);
+        template<typename F2>
+        inline auto& operator+=(gen_sync_numbers<F2> const &diff);
+
+        template<typename F2>
+        inline auto& operator-=(gen_sync_numbers<F2> const &diff);
 
         inline operator bool() const;
 
@@ -258,6 +261,7 @@ namespace xmd::qa {
 
         xmd::list<vec3f> F;
         float *V, *t;
+        xmd::list<sync_numbers> sync_ns;
 
     public:
         inline void operator()();
