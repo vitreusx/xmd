@@ -1,5 +1,6 @@
 #pragma once
 #include "meta/functors.h"
+#include <tuple>
 
 namespace xmd {
     struct generic_tag {};
@@ -7,18 +8,18 @@ namespace xmd {
 #define FUNCTOR(name) name##_functor
 #define IMPL(name) name##_impl
 
-#define MAKE_FUNCTOR(name, def_value) \
-    template<typename T, bool = std::is_base_of_v<generic_tag, T>>\
+#define MAKE_FUNCTOR(name, tparam, def_value) \
+    template<typename tparam, bool = std::is_base_of_v<generic_tag, tparam>>\
     struct name##_impl {           \
         using type = def_value;        \
         };                             \
                                        \
-    template<typename T>    \
-    using name = typename name##_impl<T>::type; \
+    template<typename tparam>    \
+    using name = typename name##_impl<tparam>::type; \
                                        \
     struct name##_functor {\
-        template<typename T>     \
-        using type = name<T>; \
+        template<typename tparam>     \
+        using type = name<tparam>; \
     }
 
 #define GEN_IMPL(name) name##_gen_impl
@@ -33,29 +34,4 @@ namespace xmd {
         static constexpr size_t num_fields = std::tuple_size_v<decltype(std::declval<GenT>().fields())>;\
         using type = decltype(name##_gen_impl_ctor<GenT>(std::make_index_sequence<num_fields>()));                                      \
     }
-
-#define FIELDS(...) \
-    using field_types = decltype(std::make_tuple(__VA_ARGS__));                               \
-                                    \
-    inline auto fields() {          \
-        return std::tie(__VA_ARGS__);                                \
-    }                               \
-                                    \
-    inline auto fields() const {    \
-        return std::tie(__VA_ARGS__);                                \
-    }
-
-#define GENERIC_FROM_MEMBER(member) \
-    using field_types = typename decltype(member)::field_types;                               \
-                                    \
-    inline auto fields() {          \
-        return member.fields();                                \
-    }                               \
-                                    \
-    inline auto fields() const {    \
-        return member.fields();                                \
-    }                               \
-                                    \
-    template<typename Functor>      \
-    using lift = typename decltype(member)::template lift<Functor>
 }

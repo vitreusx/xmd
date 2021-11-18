@@ -10,6 +10,7 @@ namespace xmd {
         inline vec3() = default;
         inline vec3(U&& x, U&& y, U&& z);
 
+        using field_types = std::tuple<U, U, U>;
         auto fields();
         auto fields() const;
 

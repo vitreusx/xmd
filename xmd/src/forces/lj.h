@@ -8,18 +8,6 @@ namespace xmd {
     public:
         field<float> depth, r_min;
     };
-
-    template<>
-    class lj<xmd::identity> {
-    public:
-        void operator()(float rnorm, float *V, float *dV_dr);
-    };
-
-    template<>
-    class array<lj> {
-    public:
-
-    };
 }
 
 #include "detail/lj.inl"
