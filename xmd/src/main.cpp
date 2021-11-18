@@ -8,7 +8,8 @@
 #include "forces/dihedral/complex_native.h"
 #include "forces/es/const.h"
 #include "forces/es/relative.h"
-#include "forces/go_model.h"
+#include "forces/go.h"
+#include "forces/pauli.h"
 #include <iostream>
 
 int main() {

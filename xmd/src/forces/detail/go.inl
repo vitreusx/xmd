@@ -1,7 +1,7 @@
 #pragma once
 
 namespace xmd {
-    void compute_go_model::operator()() {
+    void compute_go::operator()() {
         for (size_t idx = 0; idx < contacts.size(); ++idx) {
             const_ref<go_contact> cont = contacts[idx];
             auto r1 = r[cont.i1], r2 = r[cont.i2];

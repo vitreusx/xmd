@@ -24,7 +24,7 @@ namespace xmd {
 
     using go_contact = gen_go_contact<identity>;
 
-    class compute_go_model {
+    class compute_go {
     public:
         float depth;
 
@@ -40,4 +40,4 @@ namespace xmd {
     };
 }
 
-#include "detail/go_model.inl"
+#include "detail/go.inl"
