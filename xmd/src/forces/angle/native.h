@@ -3,7 +3,7 @@
 
 namespace xmd {
     template<typename Functor>
-    class gen_native_angle {
+    class gen_native_angle: public generic_tag {
     public:
         template<typename T>
         using field = typename Functor::template type<T>;
@@ -17,7 +17,7 @@ namespace xmd {
 
     public:
         using field_types = std::tuple<field<int>, field<int>, field<int>,
-            field<heurestic_angle_type>>;
+            field<float>>;
 
         FIELDS(i1, i2, i3, native_theta);
 

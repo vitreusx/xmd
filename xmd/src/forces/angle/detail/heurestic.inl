@@ -1,6 +1,19 @@
 #pragma once
 
 namespace xmd {
+    heurestic_angle_type::heurestic_angle_type(const amino_acid &a1,
+        const amino_acid &a2) {
+
+        auto code1 = (aa_code)a1, code2 = (aa_code)a2;
+        char type1 = (code1 == GLY ? 0 : (code1 == PRO ? 1 : 2));
+        char type2 = (code2 == GLY ? 0 : (code2 == PRO ? 1 : 2));
+        code = static_cast<heurestic_angle_code>(3 * type1 + type2);
+    }
+
+    heurestic_angle_type::operator char() const {
+        return static_cast<char>(code);
+    }
+
     void compute_heurestic_angles::operator()() {
         for (size_t i = 0; i < angles.size(); ++i) {
             const_ref<heurestic_angle> a = angles[i];

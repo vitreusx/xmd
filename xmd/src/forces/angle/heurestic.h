@@ -2,19 +2,24 @@
 #include "types/amino_acid.h"
 
 namespace xmd {
+    enum heurestic_angle_code: char {
+        G_G, G_P, G_X,
+        P_G, P_P, P_X,
+        X_G, X_P, X_X
+    };
+
     class heurestic_angle_type {
     public:
-        heurestic_angle_type(amino_acid const& a1, amino_acid const& a2,
-            amino_acid const& a3);
+        inline heurestic_angle_type(amino_acid const& a1, amino_acid const& a2);
 
-        operator char();
+        inline operator char() const;
 
     private:
-        char type;
+        heurestic_angle_code code;
     };
 
     template<typename Functor>
-    class gen_heurestic_angle {
+    class gen_heurestic_angle: public generic_tag {
     public:
         template<typename T>
         using field = typename Functor::template type<T>;
