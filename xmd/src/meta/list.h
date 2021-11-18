@@ -5,7 +5,42 @@
 #include "meta/ref.h"
 
 namespace xmd {
-    MAKE_FUNCTOR(list, T, std::vector<T>);
+    template<typename T>
+    class def_list {
+    public:
+        inline def_list() = default;
+        inline def_list(size_t size, T const& x):
+            data(size, x) {};
+
+        inline ref<T> operator[](size_t idx) {
+            return data[idx];
+        }
+
+        inline const_ref<T> operator[](size_t idx) const {
+            return data[idx];
+        }
+
+        inline size_t size() const {
+            return data.size();
+        }
+
+        inline void push_back(const_ref<T> const& x) {
+            data.push_back(x);
+        }
+
+        inline void erase(size_t idx) {
+            data.erase(data.begin() + idx);
+        }
+
+        inline void clear() {
+            data.clear();
+        }
+
+    private:
+        std::vector<T> data;
+    };
+
+    MAKE_FUNCTOR(list, T, def_list<T>);
 
     template<typename GenT, size_t... I>
     class GEN_IMPL(list): public GenT::template lift<FUNCTOR(list)> {
@@ -13,15 +48,13 @@ namespace xmd {
         using super_t = typename GenT::template lift<FUNCTOR(list)>;
 
         inline GEN_IMPL(list)() = default;
-        inline GEN_IMPL(list)(size_t size, const_ref<GenT> const& init = GenT()):
-            super_t(typename std::tuple_element_t<I, typename super_t::field_types>(
-                size, std::get<I>(init.fields()))...),
+        inline GEN_IMPL(list)(size_t size, const_ref<GenT> init = GenT()):
+            super_t{typename std::tuple_element_t<I, typename super_t::field_types>(
+                size, std::get<I>(init.fields()))...},
             size_{size} {};
 
         inline ref<GenT> operator[](size_t idx) {
-            auto fields = this->fields();
-            ref<GenT> _ref = {std::get<I>(fields)[idx]...};
-            return _ref;
+            return {std::get<I>(this->fields())[idx]...};
         }
 
         inline const_ref<GenT> operator[](size_t idx) const {
@@ -35,6 +68,11 @@ namespace xmd {
         inline void push_back(const_ref<GenT> const& x) {
             (..., std::get<I>(this->fields()).push_back(std::get<I>(x.fields())));
             ++size_;
+        }
+
+        inline void erase(size_t idx) {
+            (..., std::get<I>(this->fields()).erase(idx));
+            --size_;
         }
 
         inline void clear() {

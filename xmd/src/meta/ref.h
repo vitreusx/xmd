@@ -18,11 +18,18 @@ namespace xmd {
         inline GEN_IMPL(ref)(GenT& x):
             super_t(std::get<I>(x.fields())...) {};
 
+        inline GEN_IMPL(ref)(GEN_IMPL(ref)& x):
+            super_t(x) {};
+
         inline GEN_IMPL(ref)(typename std::tuple_element_t<I, typename super_t::field_types>... xs):
-            super_t(xs...) {};
+            super_t{xs...} {};
 
         inline operator const_ref<GenT>() const {
             return { std::get<I>(this->fields())... };
+        }
+
+        inline operator GenT() const {
+            return (GenT)(const_ref<GenT>)*this;
         }
 
         inline auto& operator=(GenT const& x) {

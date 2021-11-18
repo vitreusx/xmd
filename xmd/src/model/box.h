@@ -6,8 +6,8 @@ namespace xmd {
     template<typename U>
     class box {
     public:
-        vector3<U> cell, cell_inv;
-        inline vector3<U> uv(vector3<U> const& u, vector3<U> const& v);
+        vec3<U> cell, cell_inv;
+        inline vec3<U> uv(vec3<U> const& u, vec3<U> const& v);
     };
 
     using boxf = box<float>;

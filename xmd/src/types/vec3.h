@@ -8,11 +8,14 @@ namespace xmd {
         U x, y, z;
 
         inline vec3() = default;
-        inline vec3(U&& x, U&& y, U&& z);
 
+        inline vec3(U x, U y, U z):
+            x{x}, y{y}, z{z} {};
+
+    public:
         using field_types = std::tuple<U, U, U>;
-        auto fields();
-        auto fields() const;
+
+        FIELDS(x, y, z);
 
         template<typename Functor>
         using lift = vec3<apply<Functor, U>>;

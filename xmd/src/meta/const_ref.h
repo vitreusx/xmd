@@ -16,7 +16,7 @@ namespace xmd {
             super_t(xs...) {};
 
         operator GenT() const {
-            return { std::get<I>(this->fields())... };
+            return { std::tuple_element_t<I, typename GenT::field_types>(std::get<I>(this->fields()))... };
         }
     };
 

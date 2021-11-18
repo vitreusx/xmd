@@ -1,52 +1,66 @@
 #pragma once
 #include "types/vec3.h"
 #include "types/amino_acid.h"
-#include "types/array.h"
-#include "types/functors.h"
+#include "meta/generics.h"
+#include "meta/functors.h"
+#include "meta/list.h"
 #include "model/box.h"
+#include "forces/lj.h"
 
 namespace xmd::qa {
-    struct unformed_pair {
-        int i1, i2;
-    };
-}
-
-namespace xmd {
-    template<>
-    class array<qa::unformed_pair> {
+    template<typename Functor>
+    class gen_unformed_pair : public generic_tag {
     public:
-        inline qa::unformed_pair operator[](size_t idx) const;
-        inline size_t size() const;
+        template<typename T>
+        using field = typename Functor::template type<T>;
 
-    public:
-        xmd::array<int> i1, i2;
-        size_t size_;
-    };
-}
+        field<int> i1, i2;
 
-namespace xmd::qa {
-    struct nh_bundle {
-        int iprev, i, inext;
-    };
-}
-
-namespace xmd {
-    template<>
-    class array<qa::nh_bundle> {
-    public:
-        inline qa::nh_bundle operator[](size_t idx) const;
-        inline size_t size() const;
+        inline gen_unformed_pair(field<int> i1, field<int> i2) :
+            i1{i1}, i2{i2} {};
 
     public:
-        xmd::array<int> iprev, i, inext;
-        size_t size_;
+        using field_types = std::tuple<field<int>, field<int>>;
+
+        FIELDS(i1, i2);
+
+        template<typename F2>
+        using lift = gen_unformed_pair<compose<F2, Functor>>;
     };
+
+    using unformed_pair = gen_unformed_pair<identity>;
 }
 
 namespace xmd::qa {
-    template<template<typename> typename field>
-    class gen_sync_numbers {
+    template<typename Functor>
+    class gen_nh_bundle : public generic_tag {
     public:
+        template<typename T>
+        using field = typename Functor::template type<T>;
+
+        field<int> iprev, i, inext;
+
+        inline gen_nh_bundle(field<int> iprev, field<int> i, field<int> inext):
+            iprev{iprev}, i{i}, inext{inext} {};
+
+    public:
+        using field_types = std::tuple<field<int>, field<int>, field<int>>;
+
+        FIELDS(iprev, i, inext);
+
+        template<typename F2>
+        using lift = gen_nh_bundle<compose<F2, Functor>>;
+    };
+
+    using nh_bundle = gen_nh_bundle<identity>;
+}
+
+namespace xmd::qa {
+    template<typename Functor>
+    class gen_sync_numbers : public generic_tag {
+    public:
+        gen_sync_numbers() = default;
+
         inline gen_sync_numbers operator+(gen_sync_numbers const &diff) const;
 
         inline gen_sync_numbers &operator+=(gen_sync_numbers const &diff);
@@ -58,51 +72,48 @@ namespace xmd::qa {
         inline operator bool() const;
 
     public:
-        gen_sync_numbers() = default;
+        template<typename T>
+        using field = typename Functor::template type<T>;
 
         field<short> back, side_all, side_p, side_h;
-    };
 
-    using sync_numbers = gen_sync_numbers<xmd::identity>;
-    using sync_numbers_ref = gen_sync_numbers<std::add_lvalue_reference>;
-}
-
-namespace xmd {
-    template<>
-    class array<qa::sync_numbers> {
-    public:
-        inline qa::sync_numbers operator[](size_t idx) const;
-        inline qa::sync_numbers_ref operator[](size_t idx);
-        inline size_t size() const;
+        inline gen_sync_numbers(field<short> back, field<short> side_all,
+            field<short> side_p, field<short> side_h):
+            back{back}, side_all{side_all}, side_p{side_p}, side_h{side_h} {};
 
     public:
-        xmd::array<short> back, side_all, side_p, side_h;
-        size_t size_;
+        using field_types = std::tuple<field<short>, field<short>,
+            field<short>, field<short>>;
+
+        FIELDS(back, side_all, side_p, side_h);
+
+        template<typename F2>
+        using lift = gen_sync_numbers<compose<F2, Functor>>;
     };
+
+    using sync_numbers = gen_sync_numbers<identity>;
 }
 
 namespace xmd::qa {
     class contact_type {
     public:
-        static inline contact_type None();
+        static constexpr inline contact_type NA();
 
-        static inline contact_type BB();
+        static constexpr inline contact_type BB();
 
-        static inline contact_type BS();
+        static constexpr inline contact_type BS();
 
-        static inline contact_type SB();
+        static constexpr inline contact_type SB();
 
-        static inline contact_type
-        SS(amino_acid const &a1, amino_acid const &a2);
+        static constexpr inline contact_type SS(
+            amino_acid const &a1, amino_acid const &a2);
 
         inline operator bool() const;
 
         inline operator short() const;
 
     public:
-        contact_type() = default;
-
-        contact_type(short type);
+        contact_type(short type = NA());
 
         short type;
     };
@@ -111,117 +122,127 @@ namespace xmd::qa {
         FORMING_OR_FORMED, BREAKING
     };
 
-    template<template<typename> typename field>
-    struct gen_contact {
+    template<typename Functor>
+    class gen_contact : public generic_tag {
+    public:
+        template<typename T>
+        using field = typename Functor::template type<T>;
+
         field<int> i1, i2;
         field<contact_type> type;
         field<contact_status> status;
         field<float> ref_time;
         field<sync_numbers> sync_diff1, sync_diff2;
-    };
 
-    using contact = gen_contact<xmd::identity>;
-    using contact_ref = gen_contact<std::add_lvalue_reference>;
-}
+        inline gen_contact() = default;
 
-namespace xmd {
-    template<>
-    class array<qa::contact> {
-    public:
-        inline qa::contact operator[](size_t idx) const;
-        inline qa::contact_ref operator[](size_t idx);
-        inline size_t size() const;
+        inline gen_contact(field<int> i1, field<int> i2, field<contact_type> type,
+            field<contact_status> status, field<float> ref_time,
+            field<sync_numbers> sync_diff1, field<sync_numbers> sync_diff2):
+            i1{i1}, i2{i2}, type{type}, status{status}, ref_time{ref_time},
+            sync_diff1{sync_diff1}, sync_diff2{sync_diff2} {};
 
     public:
-        xmd::array<int> i1, i2;
-        xmd::array<qa::contact_type> type;
-        xmd::array<qa::contact_status> status;
-        xmd::array<float> ref_time;
-        xmd::array<qa::sync_numbers> sync_diff1, sync_diff2;
-        size_t size_;
+        using field_types = std::tuple<field<int>, field<int>, field<contact_type>,
+            field<contact_status>, field<float>, field<sync_numbers>, field<sync_numbers>>;
+
+        FIELDS(i1, i2, type, status, ref_time, sync_diff1, sync_diff2);
+
+        template<typename F2>
+        using lift = gen_contact<compose<F2, Functor>>;
     };
+
+    using contact = gen_contact<identity>;
 }
 
 namespace xmd::qa {
-    struct candidate {
-        int i1, i2;
-        contact_type type;
-        sync_numbers sync_diff1, sync_diff2;
-    };
-}
-
-namespace xmd {
-    template<>
-    class array<qa::candidate> {
+    template<typename Functor>
+    class gen_candidate: public generic_tag {
     public:
-        inline qa::candidate operator[](size_t idx) const;
-        inline size_t size() const;
+        template<typename T>
+        using field = typename Functor::template type<T>;
+
+        field<int> i1, i2;
+        field<contact_type> type;
+        field<sync_numbers> sync_diff1, sync_diff2;
+
+        inline gen_candidate() = default;
+
+        inline gen_candidate(field<int> i1, field<int> i2, field<contact_type> type,
+            field<sync_numbers> sync_diff1, field<sync_numbers> sync_diff2):
+            i1{i1}, i2{i2}, type{type}, sync_diff1{sync_diff1}, sync_diff2{sync_diff2} {};
 
     public:
-        xmd::array<int> i1, i2;
-        xmd::array<qa::contact_type> type;
-        xmd::array<qa::sync_numbers> sync_diff1, sync_diff2;
-        size_t size_;
+        using field_types = std::tuple<field<int>, field<int>,
+            field<contact_type>, field<sync_numbers>, field<sync_numbers>>;
+
+        FIELDS(i1, i2, type, sync_diff1, sync_diff2);
+
+        template<typename F2>
+        using lift = gen_candidate<compose<F2, Functor>>;
     };
+
+    using candidate = gen_candidate<identity>;
 }
 
 namespace xmd::qa {
     class precompute_nh {
     public:
-        array<vector3f> r;
+        xmd::list<vec3f> r;
         boxf *box;
-        array<nh_bundle> bundles;
+        xmd::list<nh_bundle> bundles;
 
-        array<vector3f> n, h;
+        xmd::list<vec3f> n, h;
 
     public:
-        inline void operator()() const;
+        inline void operator()();
     };
 
     class sift_formation_candidates {
     public:
         float min_abs_cos_hr, min_abs_cos_hh, max_cos_nr;
-        array<float> r_min;
-        array<polarization_type> ptype;
+        xmd::list<float> r_min;
+        xmd::list<polarization_type> ptype;
 
-        array<vector3f> r, n, h;
+        xmd::list<vec3f> r, n, h;
         boxf *box;
-        array<amino_acid> atype;
-        array<sync_numbers> sync_ns;
-        array<unformed_pair> pairs;
+        xmd::list<amino_acid> atype;
+        xmd::list<sync_numbers> sync_ns;
+        xmd::list<unformed_pair> pairs;
 
-        array<candidate> candidates;
+        xmd::list<candidate> candidates;
 
     public:
-        inline void operator()() const;
+        inline void operator()();
     };
 
     class process_candidates {
     public:
-        array<candidate> candidates;
-        array<sync_numbers> sync_ns;
+        xmd::list<candidate> candidates;
+        xmd::list<sync_numbers> sync_ns;
 
         float *t;
-        array<contact> contacts;
+        xmd::list<contact> contacts;
 
     public:
-        inline void operator()() const;
+        inline void operator()();
     };
 
     class process_contacts {
     public:
-        array<float> r_min_inv, lj_depth;
-        float cycle_time, cycle_time_inv;
+        xmd::list<lj> lj_forces;
+        float cycle_time, cycle_time_inv, breaking_factor;
 
-        array<vector3f> r;
+        xmd::list<vec3f> r;
         boxf *box;
-        array<contact> contacts;
+        xmd::list<contact> contacts;
+        xmd::list<size_t> marked_for_erasure;
 
-        array<vector3f> F;
+        xmd::list<vec3f> F;
         float *V, *t;
 
     public:
-        inline void operator()() const;
+        inline void operator()();
     };
 }
 
