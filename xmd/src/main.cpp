@@ -3,6 +3,9 @@
 #include "forces/angle/heurestic.h"
 #include "forces/angle/native.h"
 #include "forces/chiral.h"
+#include "forces/dihedral/heurestic.h"
+#include "forces/dihedral/simple_native.h"
+#include "forces/dihedral/complex_native.h"
 #include <iostream>
 
 int main() {

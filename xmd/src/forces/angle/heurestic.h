@@ -2,7 +2,7 @@
 #include "types/amino_acid.h"
 
 namespace xmd {
-    enum heurestic_angle_code: char {
+    enum class heurestic_angle_code: char {
         G_G, G_P, G_X,
         P_G, P_P, P_X,
         X_G, X_P, X_X
