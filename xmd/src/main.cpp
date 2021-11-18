@@ -6,6 +6,8 @@
 #include "forces/dihedral/heurestic.h"
 #include "forces/dihedral/simple_native.h"
 #include "forces/dihedral/complex_native.h"
+#include "forces/es/const.h"
+#include "forces/es/relative.h"
 #include <iostream>
 
 int main() {
