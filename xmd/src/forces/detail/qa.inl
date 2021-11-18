@@ -1,6 +1,55 @@
 #pragma once
 
 namespace xmd::qa {
+    template<typename Functor>
+    inline auto &gen_sync_numbers<Functor>::operator+=(
+        const gen_sync_numbers <Functor> &diff) {
+
+        back += diff.back;
+        side_all += diff.side_all;
+        side_p += diff.side_p;
+        side_h += diff.side_h;
+        return *this;
+    }
+
+    template<typename Functor>
+    inline auto &gen_sync_numbers<Functor>::operator-=(
+        const gen_sync_numbers <Functor> &diff) {
+
+        back -= diff.back;
+        side_all -= diff.side_all;
+        side_p -= diff.side_p;
+        side_h -= diff.side_h;
+        return *this;
+    }
+
+    template<typename Functor>
+    inline gen_sync_numbers<Functor>::operator bool() const {
+        return (back >= 0) && (side_all >= 0) && (side_p >= 0) && (side_h >= 0);
+    }
+
+    template<typename Functor>
+    inline auto operator+(gen_sync_numbers<Functor> const& sync1,
+        gen_sync_numbers<Functor> const& sync2) {
+
+        return gen_sync_numbers(
+            sync1.back+sync2.back,
+            sync1.side_all+sync2.side_all,
+            sync1.side_p+sync2.side_p,
+            sync1.side_h+sync2.side_h);
+    }
+
+    template<typename Functor>
+    inline auto operator-(gen_sync_numbers<Functor> const& sync1,
+        gen_sync_numbers<Functor> const& sync2) {
+
+        return gen_sync_numbers(
+            sync1.back-sync2.back,
+            sync1.side_all-sync2.side_all,
+            sync1.side_p-sync2.side_p,
+            sync1.side_h-sync2.side_h);
+    }
+
     void precompute_nh::operator()() {
         for (size_t i = 0 ; i < bundles.size(); ++i) {
             const_ref<nh_bundle> b = bundles[i];

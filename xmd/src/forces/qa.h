@@ -61,13 +61,8 @@ namespace xmd::qa {
     public:
         gen_sync_numbers() = default;
 
-        inline gen_sync_numbers operator+(gen_sync_numbers const &diff) const;
-
-        inline gen_sync_numbers &operator+=(gen_sync_numbers const &diff);
-
-        inline gen_sync_numbers operator-(gen_sync_numbers const &diff) const;
-
-        inline gen_sync_numbers &operator-=(gen_sync_numbers const &diff);
+        inline auto& operator+=(gen_sync_numbers const &diff);
+        inline auto& operator-=(gen_sync_numbers const &diff);
 
         inline operator bool() const;
 
@@ -91,29 +86,52 @@ namespace xmd::qa {
         using lift = gen_sync_numbers<compose<F2, Functor>>;
     };
 
+    template<typename Functor>
+    inline auto operator+(gen_sync_numbers<Functor> const& sync1,
+        gen_sync_numbers<Functor> const& sync2);
+
+    template<typename Functor>
+    inline auto operator-(gen_sync_numbers<Functor> const& sync1,
+        gen_sync_numbers<Functor> const& sync2);
+
     using sync_numbers = gen_sync_numbers<identity>;
 }
 
 namespace xmd::qa {
     class contact_type {
     public:
-        static constexpr inline contact_type NA();
+        static constexpr inline contact_type NA() {
+            return 0;
+        }
 
-        static constexpr inline contact_type BB();
+        static constexpr inline contact_type BB() {
+            return 1;
+        }
 
-        static constexpr inline contact_type BS();
+        static constexpr inline contact_type BS() {
+            return 2;
+        }
 
-        static constexpr inline contact_type SB();
+        static constexpr inline contact_type SB() {
+            return 3;
+        }
 
         static constexpr inline contact_type SS(
-            amino_acid const &a1, amino_acid const &a2);
+            amino_acid const &a1, amino_acid const &a2) {
+            return (short)4 + (short)a1 + (short)a2 * (short)amino_acid::NUM_AA;
+        }
 
-        inline operator bool() const;
+        constexpr inline operator bool() const {
+            return type != (short)NA();
+        }
 
-        inline operator short() const;
+        inline operator short() const {
+            return type;
+        }
 
     public:
-        contact_type(short type = NA());
+        constexpr contact_type(short type = NA()):
+            type{type} {};
 
         short type;
     };
