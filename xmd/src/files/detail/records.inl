@@ -2,12 +2,12 @@
 
 namespace xmd::records {
     template<typename Record>
-    Record *record::as() {
+    Record *record::cast() {
         return std::get_if<Record>(&rec);
     }
 
     template<typename Record>
-    Record const *record::as() const {
+    Record const *record::cast() const {
         return std::get_if<Record>(&rec);
     }
 }

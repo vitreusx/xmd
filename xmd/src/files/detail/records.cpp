@@ -151,6 +151,10 @@ namespace xmd::records {
 
         if (!fields::record_name("TER   ").read(line))
             return std::nullopt;
+        t.serial = fields::integer(7, 11).read(line);
+        t.res_name = fields::residue_name(18, 20).read(line);
+        t.chain_id = fields::achar(22).read(line);
+        t.res_seq_num = fields::integer(23, 26).read(line);
 
         return t;
     }
@@ -159,6 +163,10 @@ namespace xmd::records {
         std::string line(80, ' ');
 
         fields::record_name("TER   ").write(line);
+        fields::integer(7, 11).write(line, serial);
+        fields::residue_name(18, 20).write(line, res_name);
+        fields::achar(22).write(line, chain_id);
+        fields::integer(23, 26).write(line, res_seq_num);
 
         return line;
     }

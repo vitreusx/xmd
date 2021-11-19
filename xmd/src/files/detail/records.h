@@ -69,6 +69,12 @@ namespace xmd::records {
 
     class ter {
     public:
+        int serial;
+        std::string res_name;
+        char chain_id;
+        int res_seq_num;
+
+    public:
         static std::optional<ter> try_parse(std::string const& line);
         std::string write() const;
     };
@@ -105,10 +111,10 @@ namespace xmd::records {
         std::string write() const;
 
         template<typename Record>
-        Record *as();
+        Record *cast();
 
         template<typename Record>
-        Record const *as() const;
+        Record const *cast() const;
 
     private:
         explicit record(record_variant_t rec);
