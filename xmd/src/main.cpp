@@ -1,13 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include "files/pdb.h"
+#include "files/seq_file.h"
 
 int main() {
-    std::ifstream _1ubq_pdb_file("data/models/1ubq.pdb");
-    xmd::pdb _1ubq_pdb(_1ubq_pdb_file);
-
-    std::ofstream saved_1ubq("1ubq.saved.pdb");
-    saved_1ubq << _1ubq_pdb;
+    auto glut_sf = xmd::seq_file("data/models/glut.yml");
+    auto const& glut_m = glut_sf.to_model();
 
     return 0;
 }

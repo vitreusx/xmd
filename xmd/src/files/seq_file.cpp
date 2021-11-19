@@ -3,22 +3,27 @@
 #include <fstream>
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
+#include <regex>
 
 namespace xmd {
     seq_file::seq_file(const std::filesystem::path &seq_file_path) {
         auto seq_file_node = YAML::LoadFile(seq_file_path);
         for (auto const& chain_node: seq_file_node["model"]["chains"]) {
             auto res_codes = chain_node["seq"].template as<std::string>();
+            res_codes = std::regex_replace(res_codes, std::regex("\\s+"), "");
 
             auto chain_ref = m.chains.emplace(m.chains.end());
-            for (auto const& res_code: res_codes) {
+            chain_ref->residues.resize(res_codes.size());
+
+            for (size_t idx = 0; idx < res_codes.size(); ++idx) {
+                auto res_code = res_codes[idx];
+
                 model::residue res;
                 res.type = amino_acid(res_code);
-                res.parent_chain = chain_ref;
                 res.pos = { 0.0, 0.0, 0.0 };
 
                 auto res_ref = m.residues.insert(m.residues.end(), res);
-                chain_ref->residues.push_back(res_ref);
+                chain_ref->residues[idx] = res_ref;
             }
 
             auto maps_node = chain_node["maps"];

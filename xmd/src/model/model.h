@@ -20,18 +20,13 @@ namespace xmd {
             float min_res_dist, bool set_geometry);
 
     public:
-        struct residue;
-        using residue_ref = std::list<residue>::iterator;
-
-        struct chain;
-        using chain_ref = std::list<chain>::iterator;
-
         struct residue {
-            chain_ref parent_chain;
             amino_acid type;
             Eigen::Vector3d pos;
         };
         std::list<residue> residues;
+
+        using residue_ref = std::list<model::residue>::iterator;
 
         struct chain {
             std::vector<residue_ref> residues;
