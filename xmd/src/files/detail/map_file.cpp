@@ -3,6 +3,28 @@
 #include <sstream>
 #include "csv.h"
 
+namespace xmd {
+    void map_file::shift(int shift_val) {
+        for (auto& cont: contacts) {
+            cont.i1 += shift_val;
+            cont.i2 += shift_val;
+        }
+
+        for (auto& ang: angles) {
+            ang.i1 += shift_val;
+            ang.i2 += shift_val;
+            ang.i3 += shift_val;
+        }
+
+        for (auto& dih: dihedrals) {
+            dih.i1 += shift_val;
+            dih.i2 += shift_val;
+            dih.i3 += shift_val;
+            dih.i4 += shift_val;
+        }
+    }
+}
+
 namespace YAML {
     Node convert<xmd::map_file>::encode(const xmd::map_file &mf) {
         Node node;

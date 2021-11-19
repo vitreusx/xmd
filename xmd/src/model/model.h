@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <unordered_set>
+#include <list>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "types/amino_acid.h"
@@ -21,37 +21,40 @@ namespace xmd {
 
     public:
         struct residue;
+        using residue_ref = std::list<residue>::iterator;
+
         struct chain;
+        using chain_ref = std::list<chain>::iterator;
 
         struct residue {
-            chain *parent_chain;
+            chain_ref parent_chain;
             amino_acid type;
             Eigen::Vector3d pos;
         };
-        std::unordered_set<residue> residues;
+        std::list<residue> residues;
 
         struct chain {
-            std::vector<residue*> residues;
+            std::vector<residue_ref> residues;
         };
-        std::unordered_set<chain> chains;
+        std::list<chain> chains;
 
         struct contact {
-            residue *r1, *r2;
-            double def_dist;
+            residue_ref res1, res2;
+            double def_length;
         };
-        std::unordered_set<contact> contacts, disulfide_bonds;
+        std::list<contact> contacts, disulfide_bonds;
 
         struct angle {
-            residue *r1, *r2, *r3;
+            residue_ref res1, res2, res3;
             double def_theta;
         };
-        std::unordered_set<angle> angles;
+        std::list<angle> angles;
 
         struct dihedral {
-            residue *r1, *r2, *r3, *r4;
+            residue_ref res1, res2, res3, res4;
             double def_phi;
         };
-        std::unordered_set<dihedral> dihedrals;
+        std::list<dihedral> dihedrals;
 
         Eigen::Vector3f cell;
     };

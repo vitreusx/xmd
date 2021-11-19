@@ -24,6 +24,8 @@ namespace xmd {
             double phi;
         };
         std::vector<dihedral> dihedrals;
+
+        void shift(int shift_val);
     };
 }
 
