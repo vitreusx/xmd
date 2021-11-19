@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <unordered_set>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "types/amino_acid.h"
@@ -25,37 +26,33 @@ namespace xmd {
         struct residue {
             chain *parent_chain;
             amino_acid type;
-            Eigen::Vector3f pos;
+            Eigen::Vector3d pos;
         };
-        auto residues();
+        std::unordered_set<residue> residues;
 
         struct chain {
-            std::vector<residue> residues;
-            model to_model();
+            std::vector<residue*> residues;
         };
-        std::vector<chain> chains;
+        std::unordered_set<chain> chains;
 
         struct contact {
             residue *r1, *r2;
-            float def_dist;
+            double def_dist;
         };
-        std::vector<contact> contacts, disulfide_bonds;
+        std::unordered_set<contact> contacts, disulfide_bonds;
 
         struct angle {
             residue *r1, *r2, *r3;
-            float def_theta;
+            double def_theta;
         };
-        std::vector<angle> angles;
+        std::unordered_set<angle> angles;
 
         struct dihedral {
             residue *r1, *r2, *r3, *r4;
-            float def_phi;
+            double def_phi;
         };
-        std::vector<dihedral> dihedrals;
+        std::unordered_set<dihedral> dihedrals;
 
-        struct geometry {
-            Eigen::Vector3f cell;
-        };
-        geometry geom;
+        Eigen::Vector3f cell;
     };
 }

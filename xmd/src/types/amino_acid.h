@@ -13,6 +13,7 @@ namespace xmd {
 
     class amino_acid {
     public:
+        inline constexpr amino_acid() = default;
         inline constexpr explicit amino_acid(aa_code code);
         inline explicit amino_acid(char letter);
         inline explicit amino_acid(std::string const& name);
@@ -24,7 +25,7 @@ namespace xmd {
         static inline constexpr int NUM_AA = 20;
 
     private:
-        aa_code code;
+        aa_code code = ALA;
     };
 }
 

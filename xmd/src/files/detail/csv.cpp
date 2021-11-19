@@ -1,0 +1,136 @@
+#include "csv.h"
+
+namespace xmd {
+    csv_record::csv_record(std::vector<std::string> fields):
+        fields{std::move(fields)}, header{nullptr} {};
+
+    std::string const&csv_record::operator[](size_t col_idx) const {
+        return fields[col_idx];
+    }
+
+    std::string const& csv_record::operator[](const std::string &col_name) const {
+        return fields[(*header)[col_name]];
+    }
+
+    // https://stackoverflow.com/a/30338543
+    enum class CSVState {
+        UnquotedField,
+        QuotedField,
+        QuotedQuote
+    };
+
+    std::vector<std::string> readCSVRow(const std::string &row) {
+        CSVState state = CSVState::UnquotedField;
+        std::vector<std::string> fields {""};
+        size_t i = 0; // index of the current field
+        for (char c : row) {
+            switch (state) {
+            case CSVState::UnquotedField:
+                switch (c) {
+                case ',': // end of field
+                    fields.push_back(""); i++;
+                    break;
+                case '"': state = CSVState::QuotedField;
+                    break;
+                default:  fields[i].push_back(c);
+                    break; }
+                break;
+            case CSVState::QuotedField:
+                switch (c) {
+                case '"': state = CSVState::QuotedQuote;
+                    break;
+                default:  fields[i].push_back(c);
+                    break; }
+                break;
+            case CSVState::QuotedQuote:
+                switch (c) {
+                case ',': // , after closing quote
+                    fields.push_back(""); i++;
+                    state = CSVState::UnquotedField;
+                    break;
+                case '"': // "" -> "
+                    fields[i].push_back('"');
+                    state = CSVState::QuotedField;
+                    break;
+                default:  // end of quote
+                    state = CSVState::UnquotedField;
+                    break; }
+                break;
+            }
+        }
+        return fields;
+    }
+
+    csv_record::csv_record(const std::string &line, csv_header *header) {
+        this->header = header;
+        fields = readCSVRow(line);
+    }
+
+    std::ostream& operator<<(std::ostream& os, csv_record const& record) {
+        for (size_t i = 0; i < record.fields.size(); ++i) {
+            os << record[i];
+            if (i+1 < record.fields.size()) os << ",";
+        }
+        return os;
+    }
+
+    std::string const& csv_header::operator[](size_t idx) const {
+        return header_record[idx];
+    }
+
+    size_t csv_header::operator[](const std::string &s) const {
+        return name_to_idx.at(s);
+    }
+
+    std::ostream& operator<<(std::ostream& os, csv_header const& header) {
+        os << header.header_record;
+        return os;
+    }
+
+    csv_header::csv_header(std::vector<std::string> fields):
+        csv_header(csv_record(std::move(fields))) {};
+
+    csv_header::csv_header(csv_record &&record) {
+        header_record = std::move(record);
+        for (size_t i = 0; i < header_record.fields.size(); ++i) {
+            name_to_idx[header_record[i]] = i;
+        }
+    }
+
+    csv_file::csv_file(std::istream &&file, bool header) {
+        csv_header *header_ptr = nullptr;
+        for (std::string line; std::getline(file, line); ) {
+            if (header) {
+                this->header = csv_header(csv_record(line));
+                header = false;
+                header_ptr = &this->header.value();
+            }
+            else {
+                records.push_back(csv_record(line, header_ptr));
+            }
+        }
+    }
+
+    csv_file::csv_file(const std::string &text, bool header):
+        csv_file(std::stringstream(text), header) {};
+
+    std::ostream& csv_file::print(std::ostream& os, bool header) {
+        if (header && this->header)
+            os << this->header.value() << '\n';
+
+        for (auto const& record: records)
+            os << record << '\n';
+
+        return os;
+    }
+
+    std::string csv_file::print(bool header) {
+        std::stringstream ss {};
+        print(ss, header);
+        return ss.str();
+    }
+
+    csv_file& csv_file::operator<<(csv_record record) {
+        records.emplace_back(std::move(record));
+    }
+}
