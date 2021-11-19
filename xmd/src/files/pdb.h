@@ -28,7 +28,6 @@ namespace xmd {
             std::unordered_map<size_t, Eigen::Vector3d> pos_for_model;
             residue *parent_res;
         };
-        std::unordered_map<size_t, atom> atoms;
 
         struct residue {
             chain *parent_chain;
@@ -38,13 +37,13 @@ namespace xmd {
 
             atom *find_by_name(std::string const& name);
         };
-        std::unordered_map<size_t, residue> residues;
 
         struct chain {
             char chain_id;
             std::unordered_map<size_t, atom> atoms;
             std::unordered_map<size_t, residue> residues;
             std::vector<residue*> order;
+            size_t ter_serial;
         };
         std::unordered_map<char, chain> chains;
 
@@ -53,13 +52,13 @@ namespace xmd {
         struct disulfide_bond {
             size_t serial;
             atom *a1, *a2;
-            double dist;
+            double length;
         };
         std::unordered_map<size_t, disulfide_bond> disulfide_bonds;
 
         struct link {
             atom *a1, *a2;
-            double dist;
+            double length;
         };
         std::vector<link> links;
 

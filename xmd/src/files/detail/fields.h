@@ -62,7 +62,7 @@ namespace xmd::fields {
 
     class lstring {
     public:
-        lstring(size_t i, size_t j, int n = -1);
+        lstring(size_t i, size_t j);
         std::string read(std::string const& line) const;
         void write(std::string& line, std::string const& ls) const;
 
@@ -118,7 +118,7 @@ namespace xmd::fields {
 
     class string {
     public:
-        string(size_t i, size_t j, int n = -1);
+        string(size_t i, size_t j);
 
         string& add(std::string const& line);
         std::string read() const;

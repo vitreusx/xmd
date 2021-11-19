@@ -24,10 +24,18 @@ static std::string strip(std::string const& s) {
 
 template<typename... Args>
 std::string format(const char *fmt, Args const&... args) {
-    int req_len = snprintf(nullptr, 0, fmt, args...);
+    auto req_len = snprintf(nullptr, 0, fmt, args...);
     std::string s(req_len, '\0');
     snprintf(s.data(), req_len, fmt, args...);
     return s;
+}
+
+template<typename... Args>
+void inplace_format(char *buf, const char *fmt, Args const&... args) {
+    auto req_len = snprintf(nullptr, 0, fmt, args...);
+    std::string s(req_len, '\0');
+    snprintf(s.data(), req_len+1, fmt, args...);
+    memcpy(buf, s.data(), req_len);
 }
 
 namespace xmd::fields {
@@ -51,7 +59,7 @@ namespace xmd::fields {
 
     void atom::write(std::string &line, std::string const& atom) const {
         auto cut_atom = format("%*s", len, atom.c_str());
-        std::string_view(line.data() + beg, len) = cut_atom;
+        inplace_format(line.data() + beg, "%*s", len, atom.c_str());
     }
 
     character::character(size_t i):
@@ -74,10 +82,10 @@ namespace xmd::fields {
 
     void integer::write(std::string &line, int n) const {
         auto cut_n = format("%*d", len, n);
-        std::string_view(line.data() + beg, len) = cut_n;
+        inplace_format(line.data() + beg, "%*d", len, n);
     }
 
-    lstring::lstring(size_t i, size_t j, int n):
+    lstring::lstring(size_t i, size_t j):
         beg{i-1}, len{j-i+1} {}
 
     std::string lstring::read(const std::string &line) const {
@@ -85,7 +93,7 @@ namespace xmd::fields {
     }
 
     void lstring::write(std::string &line, std::string const& ls) const {
-        std::string_view(line.data() + beg, len) = ls;
+        inplace_format(line.data() + beg, "%*s", len, ls.c_str());
     }
 
     real::real(size_t i, size_t j, int n, int m):
@@ -97,8 +105,7 @@ namespace xmd::fields {
 
     void real::write(std::string &line, double x) const {
         auto x_str = format("%*.*f", n, m, x);
-        auto cut_x_str = format("%*s", len, x_str.c_str());
-        std::string_view(line.data() + beg, len) = cut_x_str;
+        inplace_format(line.data() + beg, "%*s", len, x_str.c_str());
     }
 
     record_name::record_name(const std::string &name):
@@ -122,11 +129,10 @@ namespace xmd::fields {
 
     void
     residue_name::write(std::string &line, std::string const& res_name) const {
-        auto cut_res_name = format("%*s", len, res_name.c_str());
-        std::string_view(line.data() + beg, len) = cut_res_name;
+        inplace_format(line.data() + beg, "%*s", len, res_name.c_str());
     }
 
-    string::string(size_t i, size_t j, int n):
+    string::string(size_t i, size_t j):
         beg{i-1}, len{j-i+1} {}
 
     string &string::add(const std::string &line) {
@@ -148,7 +154,7 @@ namespace xmd::fields {
         for (size_t line_idx = 0, text_idx = 0; text_idx < text.size();
         ++line_idx, text_idx += len) {
             auto& line = *lines[line_idx];
-            std::string_view(line.data() + beg, len) = text.substr(text_idx, len);
+            inplace_format(line.data() + beg, "%*s", len, &text[text_idx]);
         }
     }
 
@@ -161,6 +167,6 @@ namespace xmd::fields {
     }
 
     void literal::write(std::string& line) const {
-        std::string_view(line.data() + beg, len) = text;
+        inplace_format(line.data() + beg, "%*s", len, text.begin());
     }
 }
