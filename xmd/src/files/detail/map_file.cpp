@@ -86,7 +86,7 @@ namespace YAML {
             xmd::map_file::contact contact = {};
             contact.i1 = std::stoi(record["i1"]);
             contact.i2 = std::stoi(record["i2"]);
-            contact.length = std::stod(record["d"]);
+            contact.length = std::stod(record["length"]);
             mf.contacts.push_back(contact);
         }
 

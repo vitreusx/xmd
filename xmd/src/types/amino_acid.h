@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <string>
 
 namespace xmd {
@@ -23,6 +24,7 @@ namespace xmd {
         inline std::string const& name() const;
 
         static inline constexpr int NUM_AA = 20;
+        static std::vector<amino_acid> all();
 
     private:
         aa_code code = ALA;
