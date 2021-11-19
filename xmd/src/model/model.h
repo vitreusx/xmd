@@ -55,7 +55,6 @@ namespace xmd {
 
         struct geometry {
             Eigen::Vector3f cell;
-            // TODO: figure out ORIGXn and SCALEn
         };
         geometry geom;
     };

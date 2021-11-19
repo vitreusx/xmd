@@ -25,25 +25,33 @@ namespace xmd {
 
         struct atom {
             std::string name;
+            size_t seq_num;
             Eigen::Vector3f pos;
             residue *parent_res;
         };
+        std::unordered_map<size_t, atom> atoms;
 
         struct residue {
             chain *parent_chain;
+            size_t seq_num;
             std::string name;
-            std::vector<atom> atoms;
+            std::vector<atom*> atoms;
         };
+        std::unordered_map<size_t, residue> residues;
 
         struct chain {
             model *parent_model;
-            std::vector<residue> residues;
+            char chain_id;
+            std::vector<residue*> residues;
         };
+        std::unordered_map<char, chain> chains;
 
         struct model {
-            std::vector<chain> chains;
+            size_t serial;
+            std::vector<residue*> residues;
+            std::vector<chain*> chains;
         };
-        std::vector<model> models;
+        std::unordered_map<size_t, model> models;
 
         struct disulfide_bond {
             atom *a1, *a2;
@@ -57,10 +65,6 @@ namespace xmd {
         };
         std::vector<link> links;
 
-        struct geometry {
-            Eigen::Vector3f cell;
-            // TODO: figure out ORIGXn and SCALEn
-        };
-        geometry geom;
+        Eigen::Vector3f cryst1;
     };
 }
