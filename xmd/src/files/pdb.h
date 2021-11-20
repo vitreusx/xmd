@@ -4,18 +4,23 @@
 #include <string>
 #include <Eigen/Core>
 #include "model/model.h"
+#include "param_file.h"
 
 namespace xmd {
     class pdb {
     public:
         explicit pdb(std::istream& is);
-        explicit pdb(xmd::model const& m);
+        explicit pdb(xmd::model const& xmd_model);
+
         friend std::ostream& operator<<(std::ostream& os, pdb const& p);
+
+        void add_contacts(params::amino_acids const& amino_acids,
+            bool all_atoms = true);
 
         enum class contact_deriv {
             NONE, FROM_ATOMS, FROM_RESIDUES
         };
-        xmd::model to_model(contact_deriv const& deriv) const;
+        xmd::model to_model() const;
 
         struct atom;
         struct residue;
@@ -25,7 +30,7 @@ namespace xmd {
         struct atom {
             std::string name;
             size_t serial;
-            std::unordered_map<size_t, Eigen::Vector3d> pos_for_model;
+            Eigen::Vector3d pos;
             residue *parent_res;
         };
 
@@ -35,7 +40,7 @@ namespace xmd {
             std::string name;
             std::vector<atom*> atoms;
 
-            atom *find_by_name(std::string const& name);
+            atom *find_by_name(std::string const& name) const;
         };
 
         struct chain {
@@ -46,8 +51,6 @@ namespace xmd {
             size_t ter_serial;
         };
         std::unordered_map<char, chain> chains;
-
-        std::vector<size_t> models;
 
         struct disulfide_bond {
             size_t serial;

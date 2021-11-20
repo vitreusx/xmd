@@ -41,6 +41,7 @@ namespace xmd::params {
         std::unordered_map<xmd::amino_acid, amino_acid_data> data;
 
         void load_from(YAML::Node const& node, std::filesystem::path const& pwd);
+        double atom_radius(xmd::amino_acid res, std::string const& atom) const;
     };
 
     struct heurestic_angles {

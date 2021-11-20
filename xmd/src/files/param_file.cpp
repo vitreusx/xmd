@@ -130,6 +130,19 @@ namespace xmd {
         }
     }
 
+    double params::amino_acids::atom_radius(xmd::amino_acid res,
+        const std::string &atom) const {
+
+        double radius = def_atom_radii.at(atom);
+
+        auto alt_atom_radii = data.at(res).alt_atom_radii;
+        if (auto iter = alt_atom_radii.find(atom); iter != alt_atom_radii.end()) {
+            radius = iter->second;
+        }
+
+        return radius;
+    }
+
     void params::heurestic_angles::load_from(const YAML::Node &node,
         const std::filesystem::path &pwd) {
 

@@ -51,6 +51,6 @@ namespace xmd {
         };
         std::list<dihedral> dihedrals;
 
-        Eigen::Vector3f cell;
+        Eigen::Vector3d cell;
     };
 }
