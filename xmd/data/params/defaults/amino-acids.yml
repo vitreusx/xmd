@@ -118,7 +118,7 @@ amino-acids:
     mass: 57.021463735
     side: []
     radius: 3.15
-    polarization:
+    polarization: NA
     contact-limits:
       back: 2
       side: 0
@@ -194,7 +194,7 @@ amino-acids:
     mass: 97.052763875
     side: [CB, CG, CD]
     radius: 3.7
-    polarization:
+    polarization: NA
     contact-limits:
       back: 1
       side: 0

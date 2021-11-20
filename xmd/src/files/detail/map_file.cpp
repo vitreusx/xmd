@@ -30,7 +30,7 @@ namespace YAML {
         Node node;
 
         auto contacts_csv = xmd::csv_file();
-        contacts_csv.header = xmd::csv_header({"i1", "i2", "length"});
+        contacts_csv.set_header({"i1", "i2", "length"});
         for (auto const& cont: mf.contacts) {
             contacts_csv << xmd::csv_record({
                 std::to_string(cont.i1),
@@ -41,7 +41,7 @@ namespace YAML {
         node["contacts"] = contacts_csv.print();
 
         auto angles_csv = xmd::csv_file();
-        angles_csv.header = xmd::csv_header({"i1", "i2", "i3", "theta"});
+        angles_csv.set_header({"i1", "i2", "i3", "theta"});
         for (auto const& angle: mf.angles) {
             contacts_csv << xmd::csv_record({
                 std::to_string(angle.i1),
@@ -53,7 +53,7 @@ namespace YAML {
         node["angles"] = angles_csv.print();
 
         auto dihedrals_csv = xmd::csv_file();
-        dihedrals_csv.header = xmd::csv_header({"i1", "i2", "i3", "i4", "phi"});
+        dihedrals_csv.set_header({"i1", "i2", "i3", "i4", "phi"});
         for (auto const& dihedral: mf.dihedrals) {
             contacts_csv << xmd::csv_record({
                 std::to_string(dihedral.i1),

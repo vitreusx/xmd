@@ -1,11 +1,9 @@
-parameters:
-  inherit:
-    - ../defaults/parameters.yml
-  override:
-    lj:
-      ss:
-        pairwise:
-          sigma:
-            from-file: ss-pairs.csv
-          depth:
-            from-file: mj-matrix.csv
+inherit:
+  - ../defaults/parameters.yml
+lj:
+  ss:
+    pairwise:
+      sigma:
+        from-file: ss-pairs.csv
+      depth:
+        from-file: mj-matrix.csv

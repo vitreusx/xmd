@@ -6,6 +6,7 @@
 #include <optional>
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
+#include <memory>
 
 namespace xmd {
     class csv_record;
@@ -28,11 +29,11 @@ namespace xmd {
         friend class csv_file;
         friend class csv_header;
 
+        std::shared_ptr<csv_header> header;
+
         csv_record() = default;
         explicit csv_record(const std::string& line,
-            csv_header *header = nullptr);
-
-        csv_header* header;
+            std::shared_ptr<csv_header> header = nullptr);
     };
 
     class csv_header {
@@ -65,7 +66,10 @@ namespace xmd {
 
         csv_file& operator<<(csv_record record);
 
-        std::optional<csv_header> header;
+        std::shared_ptr<csv_header> header;
         std::vector<csv_record> records;
+
+        void set_header(std::vector<std::string> col_names);
     };
+
 }

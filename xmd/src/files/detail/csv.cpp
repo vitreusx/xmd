@@ -2,13 +2,14 @@
 
 namespace xmd {
     csv_record::csv_record(std::vector<std::string> fields):
-        fields{std::move(fields)}, header{nullptr} {};
+        fields{std::move(fields)} {};
 
     std::string const&csv_record::operator[](size_t col_idx) const {
         return fields[col_idx];
     }
 
-    std::string const& csv_record::operator[](const std::string &col_name) const {
+    std::string const &
+    csv_record::operator[](const std::string &col_name) const {
         return fields[(*header)[col_name]];
     }
 
@@ -61,9 +62,11 @@ namespace xmd {
         return fields;
     }
 
-    csv_record::csv_record(const std::string &line, csv_header *header) {
-        this->header = header;
+    csv_record::csv_record(const std::string &line,
+        std::shared_ptr<csv_header> header) {
+
         fields = readCSVRow(line);
+        this->header = std::move(header);
     }
 
     std::ostream& operator<<(std::ostream& os, csv_record const& record) {
@@ -98,15 +101,14 @@ namespace xmd {
     }
 
     csv_file::csv_file(std::istream &&file, bool header) {
-        csv_header *header_ptr = nullptr;
         for (std::string line; std::getline(file, line); ) {
             if (header) {
-                this->header = csv_header(csv_record(line));
+                auto _header = csv_header(csv_record(line));
+                this->header = std::make_shared<csv_header>(_header);
                 header = false;
-                header_ptr = &this->header.value();
             }
             else {
-                records.push_back(csv_record(line, header_ptr));
+                records.push_back(csv_record(line, this->header));
             }
         }
     }
@@ -116,7 +118,7 @@ namespace xmd {
 
     std::ostream& csv_file::print(std::ostream& os, bool header) {
         if (header && this->header)
-            os << this->header.value() << '\n';
+            os << *this->header << '\n';
 
         for (auto const& record: records)
             os << record << '\n';
@@ -132,5 +134,11 @@ namespace xmd {
 
     csv_file& csv_file::operator<<(csv_record record) {
         records.emplace_back(std::move(record));
+        return *this;
+    }
+
+    void csv_file::set_header(std::vector<std::string> col_names) {
+        auto _header = csv_header(std::move(col_names));
+        header = std::make_shared<csv_header>(_header);
     }
 }
