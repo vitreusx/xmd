@@ -8,16 +8,16 @@
 namespace xmd {
     class model {
     public:
-        static model random(int num_res);
+        model() = default;
+        model(model const& other);
+        model& operator=(model const& other);
 
         friend model operator+(model const& m1, model const& m2);
         model& operator+=(model const& m2);
 
-        model& apply(Eigen::Affine3f const& T);
-
         template<typename Random>
         model& morph_into_saw(Random& rand, float res_bond_length,
-            float min_res_dist, bool set_geometry);
+            float min_res_dist, bool infer_cell);
 
     public:
         struct residue {
