@@ -8,17 +8,24 @@
 namespace xmd {
     seq_file::seq_file(const std::filesystem::path &seq_file_path) {
         auto seq_file_node = YAML::LoadFile(seq_file_path);
+
+        int res_seq_num = 1;
+
         for (auto const& chain_node: seq_file_node["model"]["chains"]) {
             auto res_codes = chain_node["seq"].template as<std::string>();
             res_codes = std::regex_replace(res_codes, std::regex("\\s+"), "");
 
-            auto& xmd_chain = m.chains.emplace_back();
+            auto& xmd_chain = m.chains.emplace_back(
+                std::make_unique<xmd::model::chain>());
             xmd_chain->residues.resize(res_codes.size());
 
             for (size_t idx = 0; idx < res_codes.size(); ++idx) {
                 auto res_code = res_codes[idx];
 
-                auto& xmd_res = m.residues.emplace_back();
+                auto& xmd_res = m.residues.emplace_back(
+                    std::make_unique<xmd::model::residue>());
+                xmd_res->seq_num = res_seq_num++;
+                xmd_res->parent = &*xmd_chain;
                 xmd_res->type = amino_acid(res_code);
                 xmd_res->pos = { 0.0, 0.0, 0.0 };
 

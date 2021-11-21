@@ -47,10 +47,11 @@ namespace xmd {
                         double around_angle = rand.uniform(-M_PI, M_PI);
                         auto around = Eigen::AngleAxisd(around_angle, dir);
 
-                        dir = around * spread * dir;
+                        dir = (around * spread * dir).normalized();
                     }
 
                     xmd_chain->residues[res_idx]->pos = pos;
+                    pos = next;
                 }
             }
 
@@ -80,21 +81,21 @@ namespace xmd {
             }
 
             loop = false;
-            for (auto& res1: residues) {
-                for (auto& res2: residues) {
-                    bool viable_for_check =
-                        (res1->parent != res2->parent) ||
-                        (abs(res1->seq_num - res2->seq_num) >= 3);
-
-                    if (viable_for_check) {
-                        auto r12 = model_box.uv(res1->pos, res2->pos);
-                        if (r12.norm() < min_res_dist) {
-                            loop = true;
-                            break;
-                        }
-                    }
-                }
-            }
+//            for (auto& res1: residues) {
+//                for (auto& res2: residues) {
+//                    bool viable_for_check =
+//                        (res1->parent != res2->parent) ||
+//                        (abs(res1->seq_num - res2->seq_num) >= 3);
+//
+//                    if (viable_for_check) {
+//                        auto r12 = model_box.uv(res1->pos, res2->pos);
+//                        if (r12.norm() < min_res_dist) {
+//                            loop = true;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 }
