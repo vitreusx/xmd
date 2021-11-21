@@ -1,9 +1,12 @@
 #include <iostream>
 #include <fstream>
-#include "files/param_file.h"
+//#include "files/param_file.h"
+#include "random/nr_device.h"
 
 int main() {
-    auto pf = xmd::param_file("data/params/MDCG/parameters.yml");
+    auto nr = xmd::nr_device(448);
+    for (size_t i = 0; i < 10; ++i)
+        std::cout << nr.normal() << '\n';
 
     return 0;
 }
