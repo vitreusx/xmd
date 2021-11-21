@@ -4,6 +4,9 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include "types/amino_acid.h"
+#include "box.h"
+#include <optional>
+#include <memory>
 
 namespace xmd {
     class model {
@@ -16,41 +19,46 @@ namespace xmd {
         model& operator+=(model const& m2);
 
         template<typename Random>
-        model& morph_into_saw(Random& rand, float res_bond_length,
-            float min_res_dist, bool infer_cell);
+        inline void morph_into_saw(Random& rand, std::optional<double> res_bond_length,
+            double min_res_dist, double res_dens, bool infer_cell);
 
     public:
+        struct residue;
+        struct chain;
+
         struct residue {
+            chain* parent;
+            int seq_num;
             amino_acid type;
             Eigen::Vector3d pos;
         };
-        std::list<residue> residues;
-
-        using residue_ref = std::list<model::residue>::iterator;
+        std::vector<std::unique_ptr<residue>> residues;
 
         struct chain {
-            std::vector<residue_ref> residues;
+            std::vector<residue*> residues;
         };
-        std::list<chain> chains;
+        std::vector<std::unique_ptr<chain>> chains;
 
         struct contact {
-            residue_ref res1, res2;
-            double def_length;
+            residue *res1, *res2;
+            double length;
         };
-        std::list<contact> contacts, disulfide_bonds;
+        std::vector<contact> contacts, disulfide_bonds;
 
         struct angle {
-            residue_ref res1, res2, res3;
-            double def_theta;
+            residue *res1, *res2, *res3;
+            double theta;
         };
-        std::list<angle> angles;
+        std::vector<angle> angles;
 
         struct dihedral {
-            residue_ref res1, res2, res3, res4;
-            double def_phi;
+            residue *res1, *res2, *res3, *res4;
+            double phi;
         };
-        std::list<dihedral> dihedrals;
+        std::vector<dihedral> dihedrals;
 
-        Eigen::Vector3d cell;
+        box model_box;
     };
 }
+
+#include "detail/model.inl"

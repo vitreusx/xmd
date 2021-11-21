@@ -7,18 +7,23 @@ namespace xmd {
     }
 
     model &model::operator=(const model &other) {
-        std::unordered_map<residue const*, residue_ref> res_map;
+        std::unordered_map<residue const*, residue*> res_map;
 
-        residues = {};
+        residues.clear();
         for (auto const& other_res: other.residues) {
-            auto res_ref = residues.emplace(residues.end(), other_res);
-            res_map[&other_res] = res_ref;
+            auto& res = residues.emplace_back(
+                std::make_unique<residue>(*other_res));
+
+            res_map[&*other_res] = &*res;
         }
 
-        chains = other.chains;
-        for (auto& _chain: chains) {
-            for (auto& res_ref: _chain.residues) {
-                res_ref = res_map[&*res_ref];
+        chains.clear();
+        for (auto const& other_chain: other.chains) {
+            auto& xmd_chain = chains.emplace_back(
+                std::make_unique<chain>(*other_chain));
+
+            for (residue*& res: xmd_chain->residues) {
+                res = res_map[res];
             }
         }
 
@@ -43,7 +48,7 @@ namespace xmd {
             _dihedral.res4 = res_map[&*_dihedral.res4];
         }
 
-        cell = other.cell;
+        model_box = other.model_box;
 
         return *this;
     }
@@ -51,11 +56,17 @@ namespace xmd {
     model &model::operator+=(const model &m2) {
         auto m2_copy = m2;
 
-        residues.splice(residues.end(), std::move(m2_copy.residues));
-        chains.splice(chains.end(), std::move(m2_copy.chains));
-        contacts.splice(contacts.end(), std::move(m2_copy.contacts));
-        angles.splice(angles.end(), std::move(m2_copy.angles));
-        dihedrals.splice(dihedrals.end(), std::move(m2_copy.dihedrals));
+        for (auto& res: m2_copy.residues)
+            residues.emplace_back(std::move(res));
+        for (auto& chain: m2_copy.chains)
+            chains.emplace_back(std::move(chain));
+
+        contacts.insert(contacts.end(),
+            m2_copy.contacts.begin(), m2_copy.contacts.end());
+        angles.insert(angles.end(),
+            m2_copy.angles.begin(), m2_copy.angles.end());
+        dihedrals.insert(dihedrals.end(),
+            m2_copy.dihedrals.begin(), m2_copy.dihedrals.end());
 
         return *this;
     }

@@ -9,6 +9,9 @@
 namespace xmd {
     class pdb {
     public:
+        pdb(pdb const& other);
+        pdb& operator=(pdb const& other);
+
         explicit pdb(std::istream& is);
         explicit pdb(xmd::model const& xmd_model);
 

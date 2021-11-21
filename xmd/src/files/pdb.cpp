@@ -115,7 +115,7 @@ namespace xmd {
             auto& pdb_chain = chains[chain_id];
             pdb_chain.chain_id = chain_id;
 
-            for (auto const& xmd_res_ref: xmd_chain.residues) {
+            for (auto const& xmd_res_ref: xmd_chain->residues) {
                 auto& xmd_res = *xmd_res_ref;
 
                 auto& ca_atom = pdb_chain.atoms[atom_serial];
@@ -147,7 +147,7 @@ namespace xmd {
             link pdb_cont;
             pdb_cont.a1 = pdb_res1->atoms[0];
             pdb_cont.a2 = pdb_res2->atoms[0];
-            pdb_cont.length = xmd_cont.def_length;
+            pdb_cont.length = xmd_cont.length;
 
             links.push_back(pdb_cont);
         }
@@ -161,13 +161,13 @@ namespace xmd {
             pdb_ss.a1 = pdb_res1->atoms[0];
             pdb_ss.a2 = pdb_res2->atoms[0];
             pdb_ss.serial = ss_serial;
-            pdb_ss.length = xmd_ss.def_length;
+            pdb_ss.length = xmd_ss.length;
 
             disulfide_bonds[ss_serial] = pdb_ss;
             ++ss_serial;
         }
 
-        cryst1 = xmd_model.cell;
+        cryst1 = xmd_model.model_box.cell;
     }
 
     pdb::atom *pdb::residue::find_by_name(const std::string &name) const {
@@ -262,27 +262,25 @@ namespace xmd {
     xmd::model pdb::to_model() const {
         xmd::model xmd_model;
 
-        std::unordered_map<residue const*, xmd::model::residue_ref> res_map;
+        std::unordered_map<residue const*, xmd::model::residue*> res_map;
 
         for (auto const& [chain_id, pdb_chain]: chains) {
-            auto xmd_chain_ref = xmd_model.chains.emplace(xmd_model.chains.end());
-            auto& xmd_chain = *xmd_chain_ref;
+            auto& xmd_chain = xmd_model.chains.emplace_back();
 
             for (auto const& [res_seq_num, pdb_res]: pdb_chain.residues) {
-                auto xmd_res_ref = xmd_model.residues.emplace(xmd_model.residues.end());
-                auto& xmd_res = *xmd_res_ref;
+                auto& xmd_res = xmd_model.residues.emplace_back();
 
-                xmd_res.type = amino_acid(pdb_res.name);
-                xmd_res.pos = pdb_res.find_by_name("CA")->pos;
+                xmd_res->type = amino_acid(pdb_res.name);
+                xmd_res->pos = pdb_res.find_by_name("CA")->pos;
 
-                xmd_chain.residues.push_back(xmd_res_ref);
-                res_map[&pdb_res] = xmd_res_ref;
+                xmd_chain->residues.push_back(&*xmd_res);
+                res_map[&pdb_res] = &*xmd_res;
             }
 
-            for (size_t res_idx = 0; res_idx + 2 < xmd_chain.residues.size(); ++res_idx) {
-                auto res1 = xmd_chain.residues[res_idx];
-                auto res2 = xmd_chain.residues[res_idx+1];
-                auto res3 = xmd_chain.residues[res_idx+2];
+            for (size_t res_idx = 0; res_idx + 2 < xmd_chain->residues.size(); ++res_idx) {
+                auto res1 = xmd_chain->residues[res_idx];
+                auto res2 = xmd_chain->residues[res_idx+1];
+                auto res3 = xmd_chain->residues[res_idx+2];
 
                 auto r1 = res1->pos, r2 = res2->pos, r3 = res3->pos;
                 auto r12_u = (r2 - r1).normalized(), r23_u = (r3 - r2).normalized();
@@ -292,16 +290,16 @@ namespace xmd {
                 xmd_angle.res1 = res1;
                 xmd_angle.res2 = res2;
                 xmd_angle.res3 = res3;
-                xmd_angle.def_theta = theta;
+                xmd_angle.theta = theta;
 
                 xmd_model.angles.push_back(xmd_angle);
             }
 
-            for (size_t res_idx = 0; res_idx + 3 < xmd_chain.residues.size(); ++res_idx) {
-                auto res1 = xmd_chain.residues[res_idx];
-                auto res2 = xmd_chain.residues[res_idx+1];
-                auto res3 = xmd_chain.residues[res_idx+2];
-                auto res4 = xmd_chain.residues[res_idx+3];
+            for (size_t res_idx = 0; res_idx + 3 < xmd_chain->residues.size(); ++res_idx) {
+                auto res1 = xmd_chain->residues[res_idx];
+                auto res2 = xmd_chain->residues[res_idx+1];
+                auto res3 = xmd_chain->residues[res_idx+2];
+                auto res4 = xmd_chain->residues[res_idx+3];
 
                 auto r1 = res1->pos, r2 = res2->pos, r3 = res3->pos,
                      r4 = res4->pos;
@@ -319,7 +317,7 @@ namespace xmd {
                 xmd_dihedral.res2 = res2;
                 xmd_dihedral.res3 = res3;
                 xmd_dihedral.res4 = res4;
-                xmd_dihedral.def_phi = phi;
+                xmd_dihedral.phi = phi;
 
                 xmd_model.dihedrals.push_back(xmd_dihedral);
             }
@@ -339,7 +337,7 @@ namespace xmd {
             auto const& [res1, res2] = res1_res2;
             xmd_cont.res1 = res_map[res1];
             xmd_cont.res2 = res_map[res2];
-            xmd_cont.def_length = length;
+            xmd_cont.length = length;
 
             xmd_model.contacts.push_back(xmd_cont);
         }
@@ -358,10 +356,15 @@ namespace xmd {
             auto const& [res1, res2] = res1_res2;
             xmd_ss.res1 = res_map[res1];
             xmd_ss.res2 = res_map[res2];
-            xmd_ss.def_length = length;
+            xmd_ss.length = length;
 
             xmd_model.disulfide_bonds.push_back(xmd_ss);
         }
+
+        xmd_model.model_box.cell = cryst1;
+        xmd_model.model_box.cell_inv = {
+            1.0 / cryst1.x(), 1.0 / cryst1.y(), 1.0 / cryst1.z()
+        };
 
         return xmd_model;
     }
@@ -438,5 +441,67 @@ namespace xmd {
                 links.push_back(pdb_link);
             }
         }
+    }
+
+    pdb::pdb(const pdb &other) {
+        *this = other;
+    }
+
+    pdb &pdb::operator=(const pdb &other) {
+        std::unordered_map<atom const*, atom*> atom_map;
+        std::unordered_map<residue const*, residue*> res_map;
+        std::unordered_map<chain const*, chain*> chain_map;
+
+        chains = {};
+        for (auto const& [chain_idx, other_chain]: other.chains) {
+            auto& xmd_chain = chains[chain_idx];
+            chain_map[&other_chain] = &xmd_chain;
+            xmd_chain = other_chain;
+
+            xmd_chain.atoms = {};
+            for (auto const& [atom_ser, other_atom]: other_chain.atoms) {
+                auto& xmd_atom = xmd_chain.atoms[atom_ser];
+                atom_map[&other_atom] = &xmd_atom;
+                xmd_atom = other_atom;
+            }
+
+            xmd_chain.residues = {};
+            for (auto const& [seq_num, other_res]: other_chain.residues) {
+                auto& xmd_res = xmd_chain.residues[seq_num];
+                res_map[&other_res] = &xmd_res;
+                xmd_res = other_res;
+            }
+
+            for (auto& [atom_ser, atom]: xmd_chain.atoms) {
+                atom.parent_res = res_map[atom.parent_res];
+            }
+
+            for (auto& [seq_num, res]: xmd_chain.residues) {
+                res.parent_chain = chain_map[res.parent_chain];
+                for (auto& atom_ptr: res.atoms) {
+                    atom_ptr = atom_map[atom_ptr];
+                }
+            }
+
+            for (auto& res_ptr: xmd_chain.order) {
+                res_ptr = res_map[res_ptr];
+            }
+        }
+
+        disulfide_bonds = other.disulfide_bonds;
+        for (auto& [serial, ss]: disulfide_bonds) {
+            ss.a1 = atom_map[ss.a1];
+            ss.a2 = atom_map[ss.a2];
+        }
+
+        links = other.links;
+        for (auto& xmd_link: links) {
+            xmd_link.a1 = atom_map[xmd_link.a1];
+            xmd_link.a2 = atom_map[xmd_link.a2];
+        }
+
+        cryst1 = other.cryst1;
+
+        return *this;
     }
 }
