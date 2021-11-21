@@ -1,12 +1,11 @@
 #include <iostream>
 #include <fstream>
-//#include "files/param_file.h"
-#include "random/nr_device.h"
+#include "files/pdb.h"
+#include "model/model.h"
 
 int main() {
-    auto nr = xmd::nr_device(448);
-    for (size_t i = 0; i < 10; ++i)
-        std::cout << nr.normal() << '\n';
-
+    std::ifstream _1ubq_pdb_file("data/models/1ubq.pdb");
+    xmd::pdb _1ubq_pdb_model(_1ubq_pdb_file);
+    xmd::model _1ubq_xmd_model = _1ubq_pdb_model.to_model();
     return 0;
 }

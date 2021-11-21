@@ -285,8 +285,8 @@ namespace xmd {
                 auto res3 = xmd_chain.residues[res_idx+2];
 
                 auto r1 = res1->pos, r2 = res2->pos, r3 = res3->pos;
-                auto r12 = r2 - r1, r23 = r3 - r2;
-                auto theta = acos(r12.dot(r23));
+                auto r12_u = (r2 - r1).normalized(), r23_u = (r3 - r2).normalized();
+                auto theta = acos(r12_u.dot(r23_u));
 
                 xmd::model::angle xmd_angle;
                 xmd_angle.res1 = res1;
@@ -308,8 +308,7 @@ namespace xmd {
                 auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
                 auto x12_23 = r12.cross(r23), x23_34 = r23.cross(r34);
 
-                auto x12_23_rn = 1.0 / x12_23.norm(), x23_34_rn = 1.0 / x23_34.norm();
-                auto x12_23_u = x12_23 * x12_23_rn, x23_34_u = x23_34 * x23_34_rn;
+                auto x12_23_u = x12_23.normalized(), x23_34_u = x23_34.normalized();
 
                 auto cos_phi = x12_23_u.dot(x23_34_u);
                 auto phi = acos(cos_phi);
