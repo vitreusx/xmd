@@ -1,5 +1,5 @@
 #pragma once
-#include "meta/functors.h"
+#include <xmd/meta/functors.h>
 #include <tuple>
 #include <string_view>
 
@@ -17,18 +17,13 @@ namespace xmd {
                                        \
     template<typename tparam>    \
     using name = typename IMPL(name)<tparam>::type; \
-                                       \
-    struct FUNCTOR(name) {\
-        template<typename tparam>     \
-        using type = name<tparam>; \
-    }
+                                              \
+    using FUNCTOR(name) = xmd::as_functor<name>
 
-#define GEN_IMPL(name) name##_gen_impl
-
-#define USE_GEN_IMPL(name) \
+#define USE_GEN_IMPL(name, gen_impl) \
     template<typename GenT, size_t... I> \
     auto name##_gen_impl_ctor(std::index_sequence<I...>) -> \
-        GEN_IMPL(name)<GenT, I...>; \
+        gen_impl<GenT, I...>; \
                                           \
     template<typename GenT> \
     struct IMPL(name)<GenT, true> {                                                                  \
@@ -45,29 +40,15 @@ namespace xmd {
         return std::tie(__VA_ARGS__);                \
     }
 
-    template <typename T>
-    constexpr auto get_type_name() -> std::string_view
-    {
-#if defined(__clang__)
-        constexpr auto prefix = std::string_view{"[T = "};
-        constexpr auto suffix = "]";
-        constexpr auto function = std::string_view{__PRETTY_FUNCTION__};
-#elif defined(__GNUC__)
-        constexpr auto prefix = std::string_view{"with T = "};
-    constexpr auto suffix = "; ";
-    constexpr auto function = std::string_view{__PRETTY_FUNCTION__};
-#elif defined(__MSC_VER)
-    constexpr auto prefix = std::string_view{"get_type_name<"};
-    constexpr auto suffix = ">(void)";
-    constexpr auto function = std::string_view{__FUNCSIG__};
-#else
-# error Unsupported compiler
-#endif
+#define USING_FIELD(fparam) \
+    template<typename T> \
+    using field = typename fparam::template type<T>
 
-        const auto start = function.find(prefix) + prefix.size();
-        const auto end = function.find(suffix);
-        const auto size = end - start;
+#define USING_LIFT(gen_impl, fparam) \
+    template<typename OtherFunctor> \
+    using lift = typename gen_impl<xmd::compose<OtherFunctor, fparam>>
 
-        return function.substr(start, size);
-    }
+#define USING_LIFTFN \
+    template<template<typename> typename TypeFn> \
+    using liftFn = lift<xmd::as_functor<TypeFn>>
 }

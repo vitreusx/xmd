@@ -1,5 +1,5 @@
 #pragma once
-#include "meta/generics.h"
+#include <xmd/meta/generics.h>
 
 namespace xmd {
     template<typename U>
@@ -7,89 +7,90 @@ namespace xmd {
     public:
         U x, y, z;
 
-        inline vec3() = default;
+        vec3() = default;
 
-        inline vec3(U x, U y, U z):
+        vec3(U x, U y, U z):
             x{x}, y{y}, z{z} {};
 
     public:
         using field_types = std::tuple<U, U, U>;
-
         FIELDS(x, y, z);
 
         template<typename Functor>
         using lift = vec3<apply<Functor, U>>;
 
+        USING_LIFTFN;
+
     public:
         template<typename V>
-        inline auto& operator=(vec3<V> const& v);
+        auto& operator=(vec3<V> const& v);
 
         template<typename V>
-        inline auto& operator+=(vec3<V> const& v);
+        auto& operator+=(vec3<V> const& v);
 
         template<typename V>
-        inline auto& operator-=(vec3<V> const& v);
+        auto& operator-=(vec3<V> const& v);
 
         template<typename V>
-        inline auto& operator*=(vec3<V> const& v);
+        auto& operator*=(vec3<V> const& v);
 
         template<typename S>
-        inline auto& operator*=(S const& s);
+        auto& operator*=(S const& s);
 
         template<typename V>
-        inline auto& operator/=(vec3<V> const& v);
+        auto& operator/=(vec3<V> const& v);
 
         template<typename S>
-        inline auto& operator/=(S const& s);
+        auto& operator/=(S const& s);
     };
 
     template<typename U, typename V>
-    inline auto operator+(vec3<U> const& u, vec3<V> const& v);
+    auto operator+(vec3<U> const& u, vec3<V> const& v);
 
     template<typename U, typename V>
-    inline auto operator-(vec3<U> const& u, vec3<V> const& v);
+    auto operator-(vec3<U> const& u, vec3<V> const& v);
 
     template<typename U>
-    inline auto operator-(vec3<U> const& u);
+    auto operator-(vec3<U> const& u);
 
     template<typename U, typename V>
-    inline auto operator*(vec3<U> const& u, vec3<V> const& v);
+    auto operator*(vec3<U> const& u, vec3<V> const& v);
 
     template<typename U, typename S>
-    inline auto operator*(vec3<U> const& u, S const& s);
+    auto operator*(vec3<U> const& u, S const& s);
 
     template<typename S, typename V>
-    inline auto operator*(S const& s, vec3<V> const& v);
+    auto operator*(S const& s, vec3<V> const& v);
 
     template<typename U, typename V>
-    inline auto operator/(vec3<U> const& u, vec3<V> const& v);
+    auto operator/(vec3<U> const& u, vec3<V> const& v);
 
     template<typename U, typename S>
-    inline auto operator/(vec3<U> const& u, S const& s);
+    auto operator/(vec3<U> const& u, S const& s);
 
     template<typename S, typename V>
-    inline auto operator/(S const& s, vec3<V> const& v);
+    auto operator/(S const& s, vec3<V> const& v);
 
     template<typename U>
-    inline auto norm(vec3<U> const& u);
+    auto norm(vec3<U> const& u);
 
     template<typename U>
-    inline auto norm_squared(vec3<U> const& u);
+    auto norm_squared(vec3<U> const& u);
 
     template<typename U>
-    inline auto l1_norm(vec3<U> const& u);
+    auto l1_norm(vec3<U> const& u);
 
     template<typename U>
-    inline auto rnorm(vec3<U> const& u);
+    auto rnorm(vec3<U> const& u);
 
     template<typename U, typename V>
-    inline auto dot(vec3<U> const& u, vec3<V> const& v);
+    auto dot(vec3<U> const& u, vec3<V> const& v);
 
     template<typename U, typename V>
-    inline auto cross(vec3<U> const& u, vec3<V> const& v);
+    auto cross(vec3<U> const& u, vec3<V> const& v);
 
     template<typename U>
-    inline auto unit(vec3<U> const& u);
+    auto unit(vec3<U> const& u);
 
     using vec3f = vec3<float>;
     using vec3d = vec3<double>;

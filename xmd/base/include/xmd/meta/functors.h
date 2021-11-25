@@ -12,12 +12,12 @@ namespace xmd {
         using type = typename Functor1::template type<typename Functor2::template type<T>>;
     };
 
-    template<typename T>
-    struct constant {
-        template<typename U>
-        using type = T;
-    };
-
     template<typename Functor, typename T>
     using apply = typename Functor::template type<T>;
+
+    template<template<typename> typename TypeFn>
+    struct as_functor {
+        template<typename T>
+        using type = TypeFn<T>;
+    };
 }

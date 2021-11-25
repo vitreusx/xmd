@@ -1,11 +1,11 @@
 #pragma once
+#include <xmd/meta/generics.h>
 
 namespace xmd {
     template<typename Functor>
     class gen_chiral_quad: public generic_tag {
     public:
-        template<typename T>
-        using field = typename Functor::template type<T>;
+        USING_FIELD(Functor);
 
         field<int> i1, i2, i3, i4;
         field<float> native_chirality, native_d0_rncube;
@@ -21,11 +21,10 @@ namespace xmd {
     public:
         using field_types = std::tuple<field<int>, field<int>, field<int>,
             field<int>, field<float>, field<float>>;
-
         FIELDS(i1, i2, i3, i4, native_chirality, native_d0_rncube);
 
-        template<typename F2>
-        using lift = gen_chiral_quad<compose<F2, Functor>>;
+        USING_LIFT(gen_chiral_quad, Functor);
+        USING_LIFTFN;
     };
 
     using chiral_quad = gen_chiral_quad<identity>;
