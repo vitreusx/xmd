@@ -1,7 +1,7 @@
 #pragma once
+#include "contact_type.h"
+#include "sync_data.h"
 
 namespace xmd {
-    struct candidate_array {
 
-    };
 }

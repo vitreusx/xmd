@@ -1,5 +1,5 @@
 #pragma once
-#include <xmd/types/vec3_array.h>
+#include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 
 namespace xmd {

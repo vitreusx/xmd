@@ -31,6 +31,8 @@ namespace xmd {
             return val;
         }
 
+        static constexpr int NUM_TYPES = 4 + amino_acid::NUM_AA * amino_acid::NUM_AA;
+
     private:
         inline constexpr contact_type():
             val{decltype(val)(NONE())} {};
