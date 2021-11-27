@@ -6,8 +6,8 @@ namespace xmd {
     class cyclic_buffer {
     public:
         T& push(T const& item) {
-            if (buf.size() == size()) {
-                auto old_size = buf.size();
+            if ((int)buf.size() == size()) {
+                int old_size = buf.size();
                 start %= old_size;
 
                 buf.resize(2*old_size);
@@ -23,7 +23,7 @@ namespace xmd {
             return std::move(buf[(start++) % buf.size()]);
         }
 
-        size_t size() const {
+        int size() const {
             return end - start;
         }
 
@@ -33,6 +33,6 @@ namespace xmd {
 
     private:
         std::vector<T> buf;
-        size_t start, end;
+        int start, end;
     };
 }

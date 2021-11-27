@@ -4,6 +4,9 @@
 namespace xmd {
     class contact_type {
     public:
+        inline constexpr contact_type():
+            val{decltype(val)(NONE())} {};
+
         static inline constexpr contact_type NONE() {
             return contact_type(0);
         }
@@ -34,9 +37,6 @@ namespace xmd {
         static constexpr int NUM_TYPES = 4 + amino_acid::NUM_AA * amino_acid::NUM_AA;
 
     private:
-        inline constexpr contact_type():
-            val{decltype(val)(NONE())} {};
-
         explicit inline constexpr contact_type(int16_t val):
             val{val} {};
 

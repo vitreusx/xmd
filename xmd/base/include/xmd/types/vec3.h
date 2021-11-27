@@ -52,51 +52,63 @@ namespace xmd {
 
             template<typename E>
             auto& operator=(expr<E> const& e) {
-                x_ = e.x();
-                y_ = e.y();
-                z_ = e.z();
+                x() = e.x();
+                y() = e.y();
+                z() = e.z();
                 return *this;
             }
 
-            template<typename E>
-            auto& operator+=(expr<E> const& e) {
-                x_ += e.x();
-                y_ += e.y();
-                z_ += e.z();
+            template<typename E2>
+            auto& operator+=(expr<E2> const& e2) {
+                x() += e2.x();
+                y() += e2.y();
+                z() += e2.z();
                 return *this;
             }
 
-            template<typename E>
-            auto& operator-=(expr<E> const& e) {
-                x_ -= e.x();
-                y_ -= e.y();
-                z_ -= e.z();
+            template<typename E2>
+            auto& operator-=(expr<E2> const& e2) {
+                x() -= e2.x();
+                y() -= e2.y();
+                z() -= e2.z();
                 return *this;
             }
 
             template<typename S>
             auto& operator*=(S const& s) {
-                x_ *= s;
-                y_ *= s;
-                z_ *= s;
+                x() *= s;
+                y() *= s;
+                z() *= s;
                 return *this;
             }
 
             template<typename S>
             auto& operator/=(S const& s) {
-                x_ /= s;
-                y_ /= s;
-                z_ /= s;
+                x() /= s;
+                y() /= s;
+                z() /= s;
                 return *this;
             }
 
         public:
+            U& x() {
+                return x_;
+            }
+
             U const& x() const {
                 return x_;
             }
 
+            U& y() {
+                return y_;
+            }
+
             U const& y() const {
                 return y_;
+            }
+
+            U& z() {
+                return z_;
             }
 
             U const& z() const {
@@ -365,6 +377,38 @@ namespace xmd {
                     *zptr = e.z();
                 })(x_ + idx, y_ + idx, z_ + idx);
 
+                return *this;
+            }
+
+            template<typename E2>
+            auto& operator+=(expr<E2> const& e2) {
+                x() += e2.x();
+                y() += e2.y();
+                z() += e2.z();
+                return *this;
+            }
+
+            template<typename E2>
+            auto& operator-=(expr<E2> const& e2) {
+                x() -= e2.x();
+                y() -= e2.y();
+                z() -= e2.z();
+                return *this;
+            }
+
+            template<typename S>
+            auto& operator*=(S const& s) {
+                x() *= s;
+                y() *= s;
+                z() *= s;
+                return *this;
+            }
+
+            template<typename S>
+            auto& operator/=(S const& s) {
+                x() /= s;
+                y() /= s;
+                z() /= s;
                 return *this;
             }
 
