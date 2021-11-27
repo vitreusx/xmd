@@ -1,30 +1,31 @@
 #pragma once
-#include "types/vec3.h"
-#include "meta/generics.h"
+#include <tuple>
+#include <xmd/math.h>
 
 namespace xmd {
-    template<typename Functor>
-    class gen_lj: public generic_tag {
+    class lj {
     public:
-        template<typename T>
-        using field = typename Functor::template type<T>;
+        float depth, r_min;
 
-        field<float> depth, r_min;
-        gen_lj(field<float> depth, field<float> r_min):
+        lj() = default;
+
+        inline lj(float depth, float r_min):
             depth{depth}, r_min{r_min} {};
 
-        inline std::tuple<float, float> operator()(float r_inv) const;
-
-    public:
-        using field_types = std::tuple<field<float>, field<float>>;
-
-        FIELDS(depth, r_min);
-
-        template<typename F2>
-        using lift = gen_lj<compose<F2, Functor>>;
+        inline std::tuple<float, float> operator()(float r_inv) const {
+            auto s = r_inv * r_min, s6 = ipow<6>(s), s12 = s6 * s6;
+            auto V = depth * (s12 - 2.0f * s6);
+            auto dV_dr = 12.0f * depth * r_inv * (s6 - s12);
+            return std::make_tuple(V, dV_dr);
+        }
     };
 
-    using lj = gen_lj<identity>;
-}
+    struct lj_array {
+        float *depth, *r_min;
+        int size;
 
-#include "detail/lj.inl"
+        inline lj operator[](int idx) {
+            return { depth[idx], r_min[idx] };
+        }
+    };
+}

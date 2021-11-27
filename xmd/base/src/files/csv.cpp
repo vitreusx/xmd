@@ -1,4 +1,4 @@
-#include "files/detail/csv.h"
+#include "files/csv.h"
 
 namespace xmd {
     csv_record::csv_record(std::vector<std::string> fields):

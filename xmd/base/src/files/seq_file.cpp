@@ -1,5 +1,5 @@
 #include "files/seq_file.h"
-#include "detail/map_file.h"
+#include "map_file.h"
 #include <fstream>
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>

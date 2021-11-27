@@ -1,43 +1,43 @@
 #pragma once
+#include <xmd/types/vec3_array.h>
+#include <xmd/model/box.h>
+#include <xmd/math.h>
+#include <xmd/forces/primitives/lj.h>
 
 namespace xmd {
-    template<typename Functor>
-    class gen_go_contact {
-    public:
-        template<typename T>
-        using field = typename Functor::template type<T>;
-
-        field<int> i1, i2;
-        field<float> native_dist;
-
-        gen_go_contact(field<int> i1, field<int> i2, field<float> native_dist):
-            i1{i1}, i2{i2}, native_dist{native_dist} {};
-
-    public:
-        using field_types = std::tuple<field<int>, field<int>, field<float>>;
-
-        FIELDS(i1, i2, native_dist);
-
-        template<typename F2>
-        using lift = gen_go_contact<compose<F2, Functor>>;
+    struct go_contact_array {
+        int *i1, *i2;
+        float *nat_dist;
+        int size;
     };
 
-    using go_contact = gen_go_contact<identity>;
-
-    class compute_go {
+    class eval_go_forces {
     public:
         float depth;
 
-        xmd::list<vec3f> r;
-        boxf *box;
-        xmd::list<go_contact> contacts;
-
-        xmd::list<vec3f> F;
+    public:
+        vec3f_array r, F;
+        box<vec3f> *box;
+        go_contact_array contacts;
         float *V;
 
     public:
-        void operator()();
+        inline void operator()() {
+            for (int idx = 0; idx < contacts.size; ++idx) {
+                auto i1 = contacts.i1[idx], i2 = contacts.i2[idx];
+                auto nat_dist = contacts.nat_dist[idx];
+
+                auto r1 = r[i1], r2 = r[i2];
+                auto r12 = box->ray(r1, r2);
+                auto r12_rn = norm_inv(r12);
+
+                auto r12_u = r12 * r12_rn;
+                auto [V_, dV_dr] = lj(depth, nat_dist)(r12_rn);
+
+                *V += V_;
+                F[i1] -= r12_u * dV_dr;
+                F[i2] += r12_u * dV_dr;
+            }
+        }
     };
 }
-
-#include "detail/go.inl"

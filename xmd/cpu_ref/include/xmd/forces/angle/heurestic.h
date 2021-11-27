@@ -1,62 +1,76 @@
 #pragma once
-#include "types/amino_acid.h"
+#include <xmd/types/vec3_array.h>
+#include <xmd/types/amino_acid.h>
 
 namespace xmd {
-    enum class heurestic_angle_code: char {
-        G_G, G_P, G_X,
-        P_G, P_P, P_X,
-        X_G, X_P, X_X
-    };
-
     class heurestic_angle_type {
     public:
-        inline heurestic_angle_type(amino_acid const& a1, amino_acid const& a2);
+        heurestic_angle_type() = default;
+        inline heurestic_angle_type(amino_acid const& a1, amino_acid const& a2) {
+            auto code1 = (aa_code)a1, code2 = (aa_code)a2;
+            int8_t type1 = (code1 == GLY ? (int8_t)0 : (code1 == PRO ? (int8_t)1 : (int8_t)2));
+            int8_t type2 = (code2 == GLY ? (int8_t)0 : (code2 == PRO ? (int8_t)1 : (int8_t)2));
+            val = (int8_t)3 * type1 + type2;
+        }
 
-        inline operator char() const;
+        explicit inline constexpr operator int8_t() {
+            return val;
+        }
 
     private:
-        heurestic_angle_code code;
+        explicit inline constexpr heurestic_angle_type(int8_t val):
+            val{val} {};
+
+        int8_t val = 0;
     };
 
-    template<typename Functor>
-    class gen_heurestic_angle: public generic_tag {
-    public:
-        template<typename T>
-        using field = typename Functor::template type<T>;
-
-        field<int> i1, i2, i3;
-        field<heurestic_angle_type> type;
-
-        inline gen_heurestic_angle(field<int> i1, field<int> i2,
-            field<int> i3, field<heurestic_angle_type> type):
-            i1{i1}, i2{i2}, i3{i3}, type{type} {};
-
-    public:
-        using field_types = std::tuple<field<int>, field<int>, field<int>,
-            field<heurestic_angle_type>>;
-
-        FIELDS(i1, i2, i3, type);
-
-        template<typename F2>
-        using lift = gen_heurestic_angle<compose<F2, Functor>>;
+    struct heurestic_angle_array {
+        int *i1, *i2, *i3;
+        heurestic_angle_type *type;
+        int size;
     };
 
-    using heurestic_angle = gen_heurestic_angle<identity>;
-
-    class compute_heurestic_angles {
+    class eval_heurestic_angle_forces {
     public:
-        static constexpr int POLY_DEG = 6;
-        xmd::list<float> poly_coeffs[POLY_DEG+1];
+        static constexpr int POLY_DEG = 6, NUM_TYPES = 9;
+        float poly_coeffs[POLY_DEG+1][NUM_TYPES];
 
-        xmd::list<vec3f> r;
-        xmd::list<heurestic_angle> angles;
-
-        xmd::list<vec3f> F;
+    public:
+        vec3f_array r, F;
+        heurestic_angle_array angles;
         float *V;
 
     public:
-        inline void operator()();
+        inline void operator()() const {
+            for (int idx = 0; idx < angles.size; ++idx) {
+                int i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
+                auto type_val = (int8_t)angles.type[idx];
+
+                auto r1 = r[i1], r2 = r[i2], r3 = r[i3];
+                auto r12 = r2 - r1, r23 = r3 - r2;
+
+                auto x12_23 = cross(r12, r23);
+                auto r12_rn = norm_inv(r12), r23_rn = norm_inv(r23);
+
+                auto dtheta_dr1 = unit(cross(r12, x12_23)) * r12_rn;
+                auto dtheta_dr3 = unit(cross(r23, x12_23)) * r23_rn;
+                auto dtheta_dr2 = -dtheta_dr1-dtheta_dr3;
+
+                auto cos_theta = -dot(r12, r23) * r12_rn * r23_rn;
+                auto theta = acos(cos_theta);
+
+                float angle_V = 0.0f, dV_dtheta = 0.0f;
+                for (int d = POLY_DEG; d >= 0; --d) {
+                    auto coeff = poly_coeffs[d][type_val];
+                    if (d > 0) dV_dtheta = (float)d * coeff + theta * dV_dtheta;
+                    angle_V = coeff + theta * angle_V;
+                }
+
+                *V += angle_V;
+                F[i1] -= dV_dtheta * dtheta_dr1;
+                F[i2] -= dV_dtheta * dtheta_dr2;
+                F[i3] -= dV_dtheta * dtheta_dr3;
+            }
+        }
     };
 }
-
-#include "detail/heurestic.inl"

@@ -1,105 +1,131 @@
-#include <xmd/meta/memory.h>
 #include <xmd/types/vec3.h>
-#include <xmd/meta/vector.h>
-
 #include <random>
-#include <iostream>
+#include <functional>
 #include <chrono>
+#include <vector>
+#include <iostream>
 
-template<typename U>
-std::ostream& operator<<(std::ostream& os, xmd::vec3<U> const& v) {
-    return (os << "(" << v.x << ", " << v.y << ", " << v.z << ")");
+template<typename T>
+void gen_saxpy(T x1, T x2, T x3, T y1, T y2, T y3, T z1, T z2, T z3, float a, int size) {
+    for (int idx = 0; idx < size; ++idx) {
+        z1[idx] = a * x1[idx] + y1[idx];
+        z2[idx] = a * x2[idx] + y2[idx];
+        z3[idx] = a * x3[idx] + y3[idx];
+    }
 }
 
-template<typename GenT, size_t... I>
-std::ostream& operator<<(std::ostream& os, xmd::gen_vector<GenT, I...> const& vs) {
-    os << "[";
-    for (size_t idx = 0; idx < vs.size(); ++idx) {
-        os << vs[idx];
-        if (idx+1 < vs.size()) os << ", ";
+void saxpy(float *x1, float *x2, float *x3, float *y1, float *y2, float *y3,
+    float *z1, float *z2, float *z3, float a, int size) {
+
+
+}
+
+void saxpy(xmd::vec3f_array const& x, xmd::vec3f_array const& y,
+    xmd::vec3f_array const& z, float a, int size) {
+
+    for (int idx = 0; idx < size; ++idx) {
+        z[idx] = a * x[idx] + y[idx];
     }
-    os << "]";
+}
+
+struct stats {
+    std::string name;
+    double mean, std, min_t, max_t, q25, q75;
+
+    stats(std::string name, std::function<void()> const& fn, int nsamples) {
+        std::vector<double> times(nsamples);
+
+        using namespace std::chrono;
+        for (int sample_idx = 0; sample_idx < nsamples; ++sample_idx) {
+            auto before = high_resolution_clock::now();
+            fn();
+            auto after = high_resolution_clock::now();
+            auto dur_ns = duration_cast<nanoseconds>(after - before).count();
+            times[sample_idx] = (double)dur_ns / 1.0e9;
+        }
+
+        mean = std::accumulate(times.begin(), times.end(), 0.0) / (double)nsamples;
+        double var = std::accumulate(times.begin(), times.end(), 0.0,
+            [this](auto cur_var, auto t) -> auto {
+                return cur_var + (t - mean) * (t - mean);
+            });
+        std = sqrt(var / (double)(nsamples - 1));
+
+        std::sort(times.begin(), times.end());
+        min_t = times.front();
+        max_t = times.back();
+        q25 = times[(int)(0.25 * (double)nsamples)];
+        q75 = times[(int)(0.75 * (double)nsamples)];
+
+        this->name = std::move(name);
+    }
+};
+
+std::ostream& operator<<(std::ostream& os, stats const& s) {
+    auto saved = os.flags();
+    os << std::scientific;
+    os << s.name << "\n"
+        << "\t" << "mean = " << s.mean << "\n"
+        << "\t" << "std = " << s.std << "\n"
+        << "\t" << "min = " << s.min_t << "\n"
+        << "\t" << "25th quantile = " << s.q25 << "\n"
+        << "\t" << "75th quantile = " << s.q75 << "\n"
+        << "\t" << "max = " << s.max_t;
+    os.flags(saved);
     return os;
 }
 
-//template<typename List>
-//void compute_cross(List& u, List& v, List& uxv) {
-//    for (size_t idx = 0; idx < u.size(); ++idx) {
-//        auto _u = u[idx], _v = v[idx];
-//        xmd::vec3f _uvx;
-//        _uvx.
-//        uxv[idx] = xmd::cross(u[idx], v[idx]);
-//    }
-//}
-
-using X = float*;
-void comp_cross(size_t n, X u_x, X u_y, X u_z, X v_x, X v_y, X v_z,
-    X uxv_x, X uxv_y, X uxv_z) {
-
-    for (size_t idx = 0; idx < n; ++idx) {
-        uxv_x[idx] = u_y[idx] * v_z[idx] - u_z[idx] * v_y[idx];
-        uxv_y[idx] = u_z[idx] * v_x[idx] - u_x[idx] * v_z[idx];
-        uxv_z[idx] = u_x[idx] * v_y[idx] - u_y[idx] * v_x[idx];
-    }
-}
-
-void comp_cross(std::vector<xmd::vec3f>& u, std::vector<xmd::vec3f>& v,
-    std::vector<xmd::vec3f>& uxv) {
-
-    for (size_t idx = 0; idx < u.size(); ++idx) {
-        uxv[idx].x = u[idx].y * v[idx].z - u[idx].z * v[idx].y;
-        uxv[idx].y = u[idx].z * v[idx].x - u[idx].x * v[idx].z;
-        uxv[idx].z = u[idx].x * v[idx].y - u[idx].y * v[idx].x;
-    }
-}
-
-void comp_cross(xmd::vector<xmd::vec3f>& u, xmd::vector<xmd::vec3f>& v,
-    xmd::vector<xmd::vec3f>& uxv) {
-
-    for (size_t idx = 0; idx < u.size(); ++idx) {
-        uxv.x[idx] = u.y[idx] * v.z[idx] - u.z[idx] * v.y[idx];
-        uxv.y[idx] = u.z[idx] * v.x[idx] - u.x[idx] * v.z[idx];
-        uxv.z[idx] = u.x[idx] * v.y[idx] - u.y[idx] * v.x[idx];
-//        uxv[idx].x = u[idx].y * v[idx].z - u[idx].z * v[idx].y;
-//        uxv[idx].y = u[idx].z * v[idx].x - u[idx].x * v[idx].z;
-//        uxv[idx].z = u[idx].x * v[idx].y - u[idx].y * v[idx].x;
-    }
-}
-
-void comp_cross(size_t n, xmd::vec3f* u, xmd::vec3f* v, xmd::vec3f* uxv) {
-    for (size_t idx = 0; idx < n; ++idx) {
-        uxv[idx] = xmd::cross(u[idx], v[idx]);
-    }
-}
-
 int main() {
-    using namespace xmd;
-    using namespace std::chrono;
-
-    using List = std::vector<vec3f>;
-
-    long seed = time(nullptr);
-    std::default_random_engine eng(seed);
+    std::random_device dev;
     std::uniform_real_distribution<float> dist;
 
-    size_t n = size_t(1) << 18;
-    List u(n), v(n), uxv(n);
-    for (size_t idx = 0; idx < n; ++idx) {
-        u[idx] = vec3f(dist(eng), dist(eng), dist(eng));
-        v[idx] = vec3f(dist(eng), dist(eng), dist(eng));
+    int n = int(1) << 16;
+    std::vector<float> x1(n), x2(n), x3(n);
+    std::vector<float> y1(n), y2(n), y3(n);
+    std::vector<float> z1(n), z2(n), z3(n);
+
+    xmd::vec3f_array x(x1.data(), x2.data(), x3.data(), n);
+    xmd::vec3f_array y(y1.data(), y2.data(), y3.data(), n);
+    xmd::vec3f_array z(z1.data(), z2.data(), z3.data(), n);
+
+    float a = dist(dev);
+    for (int idx = 0; idx < n; ++idx) {
+        x[idx] = xmd::vec3f(dist(dev), dist(dev), dist(dev));
+        y[idx] = xmd::vec3f(dist(dev), dist(dev), dist(dev));
     }
 
-    auto before = high_resolution_clock::now();
-    for (size_t repeat = 0; repeat < 1000; ++repeat) {
-//        comp_cross(n, u.x.data(), u.y.data(), u.z.data(),
-//            v.x.data(), v.y.data(), v.z.data(),
-//            uxv.x.data(), uxv.y.data(), uxv.z.data());
-        comp_cross(u, v, uxv);
-    }
-    auto after = high_resolution_clock::now();
-    auto dur = (double)duration_cast<nanoseconds>(after - before).count() / 1e9;
+    int nsamples = (int)1 << 16;
 
-    std::cout << dur << '\n';
+    std::cout << "n = " << n << "\n"
+              << "nsamples = " << nsamples << "\n";
 
+    std::cout << stats("flat, float*", [&]() -> void {
+        saxpy<float*>(x1.data(), x2.data(), x3.data(),
+            y1.data(), y2.data(), y3.data(),
+            z1.data(), z2.data(), z3.data(),
+            a, n);
+    }, nsamples) << "\n";
+
+    std::cout << stats("flat, float * __restrict__", [&]() -> void {
+        saxpy<float * __restrict__>(x1.data(), x2.data(), x3.data(),
+            y1.data(), y2.data(), y3.data(),
+            z1.data(), z2.data(), z3.data(),
+            a, n);
+    }, nsamples) << "\n";
+
+    std::cout << stats("flat, std::vector<float>", [&]() -> void {
+        saxpy<std::vector<float>&>(x1, x2, x3,
+            y1, y2, y3, z1, z2, z3, a, n);
+    }, nsamples) << "\n";
+
+    std::cout << stats("compact, vec3f_array ", [&]() -> void {
+        saxpy(x, y, z, a, n);
+    }, nsamples) << "\n";
+
+//    auto glut_seqfile = xmd::seq_file("data/models/glut.yml");
+//    auto glut_model = glut_seqfile.to_model();
+//    auto rand = xmd::nr_device<Eigen::Vector3d>(442);
+//    glut_model.morph_into_saw(rand, 3.8, 1e-3, true);
+//    std::ofstream("glut.pdb") << xmd::pdb(glut_model);
     return 0;
 }

@@ -1,6 +1,6 @@
 #include "files/pdb.h"
-#include "detail/fields.h"
-#include "detail/records.h"
+#include "fields.h"
+#include "records.h"
 #include <sstream>
 #include <string_view>
 #include <map>

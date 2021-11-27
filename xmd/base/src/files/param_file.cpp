@@ -1,6 +1,6 @@
 #include "files/param_file.h"
 #include <yaml-cpp/yaml.h>
-#include "files/detail/csv.h"
+#include "files/csv.h"
 #include <fstream>
 
 namespace xmd {

@@ -1,7 +1,7 @@
 #include "map_file.h"
 #include <fstream>
 #include <sstream>
-#include "files/detail/csv.h"
+#include "files/csv.h"
 
 namespace xmd {
     void map_file::shift(int shift_val) {
