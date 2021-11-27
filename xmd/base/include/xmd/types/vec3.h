@@ -152,7 +152,7 @@ namespace xmd {
     auto cross(vec3<U> const &u, vec3<V> const &v) {
         auto s_x = u.y * v.z - u.z * v.y;
         auto s_y = u.z * v.x - u.x * v.z;
-        auto s_z = u.x * v.y - u.y * v.z;
+        auto s_z = u.x * v.y - u.y * v.x;
         return vec3(s_x, s_y, s_z);
     }
 
@@ -174,9 +174,9 @@ namespace xmd {
             return { x[idx], y[idx], z[idx] };
         }
 
-        U *__restrict__ x = nullptr;
-        U *__restrict__ y = nullptr;
-        U *__restrict__ z = nullptr;
+        U * x = nullptr;
+        U * y = nullptr;
+        U * z = nullptr;
         int size = 0;
     };
 
