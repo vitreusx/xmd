@@ -1,5 +1,6 @@
 #pragma once
 #include <xmd/types/vec3_array.h>
+#include <xmd/forces/primitives/harmonic.h>
 
 namespace xmd {
     struct tether_pair_array {
@@ -27,16 +28,12 @@ namespace xmd {
                 auto r12 = r2 - r1;
 
                 auto r12_n = norm(r12);
-                auto dx = r12_n - nat_dist;
-
-                auto dx2 = dx * dx;
-                *V += dx2 * (H1 + H2 * dx2);
-                auto dV_dx = dx * (2.0f * H1 + 4.0f * H2 * dx2);
+                auto [V_, dV_dr] = harmonic(H1, H2, nat_dist)(r12_n);
 
                 auto r12_u = r12 / r12_n;
-                auto f = dV_dx * r12_u;
-                F[i1] -= f;
-                F[i2] += f;
+                *V += V_;
+                F[i1] -= dV_dr * r12_u;
+                F[i2] += dV_dr * r12_u;
             }
         }
     };

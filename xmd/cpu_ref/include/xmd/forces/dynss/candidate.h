@@ -1,15 +1,9 @@
 #pragma once
 #include <vector>
 #include <xmd/types/cyclic_buffer.h>
-#include "contact_type.h"
-#include "sync_data.h"
 
-namespace xmd::qa {
-    enum contact_status {
-        FORMING_OR_FORMED, BREAKING
-    };
-
-    class contact_list {
+namespace xmd::dynss {
+    class candidate_list {
     public:
         inline bool has_item(int idx) const {
             return has_item_[idx];
@@ -28,11 +22,6 @@ namespace xmd::qa {
             else {
                 i1.emplace_back();
                 i2.emplace_back();
-                type.emplace_back();
-                status.emplace_back();
-                ref_time.emplace_back();
-                sync_diff1.emplace_back();
-                sync_diff2.emplace_back();
 
                 has_item_.push_back(true);
                 return extent_++;
@@ -47,18 +36,9 @@ namespace xmd::qa {
         void clear() {
             i1.clear();
             i2.clear();
-            type.clear();
-            status.clear();
-            ref_time.clear();
-            sync_diff1.clear();
-            sync_diff2.clear();
         }
 
         std::vector<int> i1, i2;
-        std::vector<contact_type> type;
-        std::vector<contact_status> status;
-        std::vector<float> ref_time;
-        sync_data_vector sync_diff1, sync_diff2;
 
     private:
         int extent_;

@@ -4,7 +4,7 @@
 #include "contact_type.h"
 #include "sync_data.h"
 
-namespace xmd {
+namespace xmd::qa {
     class candidate_list {
     public:
         inline bool has_item(int idx) const {

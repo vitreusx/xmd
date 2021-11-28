@@ -448,6 +448,8 @@ namespace xmd {
         template<typename U>
         class vector_array {
         public:
+            vector_array() = default;
+
             vector_array(U *x, U *y, U *z, int size):
                 x{x}, y{y}, z{z}, size{size} {};
 
@@ -460,7 +462,7 @@ namespace xmd {
             }
 
         private:
-            U *x, *y, *z;
+            U *x = nullptr, *y = nullptr, *z = nullptr;
             int size;
         };
     }

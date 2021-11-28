@@ -2,7 +2,7 @@
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 
-namespace xmd {
+namespace xmd::qa {
     struct nh_bundle_array {
         int *iprev, *icur, *inext;
         int size;

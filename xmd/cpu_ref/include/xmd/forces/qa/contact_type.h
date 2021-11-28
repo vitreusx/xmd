@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/amino_acid.h>
 
-namespace xmd {
+namespace xmd::qa {
     class contact_type {
     public:
         inline constexpr contact_type():

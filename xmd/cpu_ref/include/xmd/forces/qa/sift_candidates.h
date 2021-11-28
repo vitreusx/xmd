@@ -7,7 +7,7 @@
 #include "sync_data.h"
 #include "candidate.h"
 
-namespace xmd {
+namespace xmd::qa {
     class sift_candidates {
     public:
         float min_abs_cos_hr, min_abs_cos_hh, max_cos_nr;

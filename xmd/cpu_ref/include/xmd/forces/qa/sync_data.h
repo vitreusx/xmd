@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace xmd {
+namespace xmd::qa {
     class sync_data_cref {
     public:
         inline sync_data_cref(int8_t const& back, int8_t const& side_all,

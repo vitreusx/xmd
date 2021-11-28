@@ -2,7 +2,7 @@
 #include <vector>
 #include <xmd/types/cyclic_buffer.h>
 
-namespace xmd {
+namespace xmd::qa {
     class free_pair_list {
     public:
         inline bool has_item(int idx) const {
