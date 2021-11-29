@@ -1,0 +1,15 @@
+simulation:
+  trajectories:
+    number: 10
+  configure:
+    Pauli exclusion:
+      cutoff distance: 4.0 A
+  steps:
+    - load pdb file:
+        path: "1ubq.pdb"
+        infer contacts: all atoms
+    - morph into self-avoiding walk
+    - step until:
+        - total time elapsed: 15'000 tau
+        - all native contacts formed:
+            sigma multiplier: 1.5
