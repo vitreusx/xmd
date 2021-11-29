@@ -3,7 +3,7 @@
 #include <xmd/types/cyclic_buffer.h>
 
 namespace xmd::qa {
-    class free_pair_list {
+    class free_pair_set {
     public:
         inline bool has_item(int idx) const {
             return has_item_[idx];

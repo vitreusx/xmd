@@ -13,7 +13,7 @@ namespace xmd::qa {
 
         vec3f_array r, F;
         box<vec3f> *box;
-        contact_list contacts;
+        contact_set contacts;
         float *V, *t;
         sync_data_array sync;
 

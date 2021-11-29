@@ -19,7 +19,7 @@ namespace xmd::dynss {
         box<vec3f> *box;
         qa::sync_data_array sync;
 
-        qa::free_pair_list free_cys_pairs;
+        qa::free_pair_set free_cys_pairs;
         candidate_list candidates;
 
     public:

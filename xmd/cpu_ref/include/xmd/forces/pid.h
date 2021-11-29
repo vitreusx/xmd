@@ -7,10 +7,14 @@
 #include <xmd/model/box.h>
 
 namespace xmd {
+    enum lambda_version {
+        COSINE, ALGEBRAIC, GAUSSIAN
+    };
+
     class lambda_func {
     public:
         float psi_0, alpha;
-        bool cosine_version;
+        lambda_version version;
 
         lambda_func() = default;
 
@@ -22,29 +26,33 @@ namespace xmd {
         }
 
         inline std::tuple<float, float> operator()(float psi) const {
-            auto s = alpha * (psi - psi_0);
-            if (cosine_version) {
+            switch (version) {
+            case COSINE:
+                auto s = alpha * (psi - psi_0);
                 auto val = 0.5f * cos(s) + 0.5f;
                 auto deriv = -0.5f * alpha * sin(s);
                 return std::make_tuple(val, deriv);
-            }
-            else {
+            case ALGEBRAIC:
+                auto s = alpha * (psi - psi_0);
                 auto t = abs(s / M_PI);
                 auto x_inv = 1.0f/(2.0f*t*t-2.0f*t-1);
                 auto val = (t*t-2.0f*t+1.0f)*x_inv;
                 auto deriv = (2.0f*t*(t-1.0f))*x_inv*x_inv / M_PI;
                 deriv *= (s < 0.0f ? -1.0f : 1.0f);
                 return std::make_tuple(val, deriv);
+            default:
+                // TODO: implement the Gaussian version
+                return std::make_tuple(0.0f, 0.0f);
             }
         }
     };
 
     struct lambda_func_array {
         float *psi_0, *alpha;
-        bool cosine_version;
+        lambda_version version;
 
         inline lambda_func operator[](int idx) const {
-            return { psi_0[idx], alpha[idx], cosine_version };
+            return { psi_0[idx], alpha[idx], version };
         }
     };
 

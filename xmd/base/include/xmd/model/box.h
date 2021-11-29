@@ -17,13 +17,18 @@ namespace xmd {
             this->cell_inv = cell_inv;
         }
 
-        template<typename T>
-        auto ray(T const& u, T const& v) {
-            VectorT ray_ = v - u;
-            ray_.x() -= cell.x() * xmd::nearbyint(ray_.x() * cell_inv.x());
-            ray_.y() -= cell.y() * xmd::nearbyint(ray_.y() * cell_inv.y());
-            ray_.z() -= cell.z() * xmd::nearbyint(ray_.z() * cell_inv.z());
-            return ray_;
+        template<typename E>
+        auto in_box(E const& x) {
+            VectorT in_box_ = x;
+            in_box_.x() -= cell.x() * xmd::nearbyint(in_box_.x() * cell_inv.x());
+            in_box_.y() -= cell.y() * xmd::nearbyint(in_box_.y() * cell_inv.y());
+            in_box_.z() -= cell.z() * xmd::nearbyint(in_box_.z() * cell_inv.z());
+            return in_box_;
+        }
+
+        template<typename E>
+        auto ray(E const& u, E const& v) {
+            return in_box(v - u);
         }
     };
 }

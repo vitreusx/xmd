@@ -9,7 +9,7 @@ namespace xmd::qa {
         FORMING_OR_FORMED, BREAKING
     };
 
-    class contact_list {
+    class contact_set {
     public:
         inline bool has_item(int idx) const {
             return has_item_[idx];

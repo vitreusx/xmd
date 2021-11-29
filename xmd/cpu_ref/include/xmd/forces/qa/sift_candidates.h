@@ -20,7 +20,7 @@ namespace xmd::qa {
         amino_acid *atype;
         sync_data_array sync;
 
-        free_pair_list free_pairs;
+        free_pair_set free_pairs;
         candidate_list candidates;
 
     public:

@@ -4,29 +4,29 @@
 
 namespace xmd {
     template<typename T>
-    T sqrt(T const& x) {
-        return (T)std::sqrt(x);
+    auto sqrt(T const& x) {
+        return std::sqrt(x);
     }
 
     template<typename T>
-    T cbrt(T const& x) {
-        return (T)std::cbrt(x);
+    auto cbrt(T const& x) {
+        return std::cbrt(x);
     }
 
     template<size_t N, typename T>
-    T ipow(T const& x) {
+    auto ipow(T const& x) {
         if constexpr (N == 1) return x;
         else return x * ipow<N-1, T>(x);
     }
 
     template<typename T>
-    T nearbyint(T x) {
-        return (T)std::nearbyint(x);
+    auto nearbyint(T x) {
+        return std::nearbyint(x);
     }
 
     template<typename T>
-    T abs(T const& x) {
-        return (T)std::abs(x);
+    auto abs(T const& x) {
+        return std::abs(x);
     }
 
     inline Eigen::Vector3d unit(Eigen::Vector3d const& v) {
@@ -34,17 +34,37 @@ namespace xmd {
     }
 
     template<typename T>
-    T cos(T const& x) {
-        return (T)std::cos(x);
+    auto cos(T const& x) {
+        return std::cos(x);
     }
 
     template<typename T>
-    T sin(T const& x) {
-        return (T)std::sin(x);
+    auto sin(T const& x) {
+        return std::sin(x);
     }
 
     template<typename T>
-    T acos(T const& x) {
-        return (T)std::acos(x);
+    auto acos(T const& x) {
+        return std::acos(x);
+    }
+
+    template<typename T>
+    auto exp(T const& x) {
+        return std::exp(x);
+    }
+
+    template<typename T1, typename T2>
+    auto min(T1 const& x1, T2 const& x2) {
+        return std::min(x1, x2);
+    }
+
+    template<typename T1, typename T2>
+    auto max(T1 const& x1, T2 const& x2) {
+        return std::max(x1, x2);
+    }
+
+    template<typename T>
+    auto ceil(T const& x) {
+        return std::ceil(x);
     }
 }
