@@ -9,13 +9,13 @@ namespace xmd::nl {
 
         int add() {
             cell_idx1.emplace_back();
-            cell_idx1.emplace_back();
+            cell_idx2.emplace_back();
             return size_++;
         }
 
         void clear() {
             cell_idx1.clear();
-            cell_idx1.clear();
+            cell_idx2.clear();
             size_ = 0;
         }
 
