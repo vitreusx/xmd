@@ -3,8 +3,8 @@
 #include <xmd/model/box.h>
 
 namespace xmd::qa {
-    struct nh_bundle_array {
-        int *iprev, *icur, *inext;
+    struct nh_bundle_span {
+        array<int> iprev, icur, inext;
         int size;
     };
 
@@ -12,7 +12,7 @@ namespace xmd::qa {
     public:
         vec3f_array r, n, h;
         box<vec3f> *box;
-        nh_bundle_array bundles;
+        nh_bundle_span bundles;
 
     public:
         inline void operator()() const {

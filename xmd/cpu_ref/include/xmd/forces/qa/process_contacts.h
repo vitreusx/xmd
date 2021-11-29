@@ -11,6 +11,7 @@ namespace xmd::qa {
         lj_array ljs;
         float cycle_time, cycle_time_inv, breaking_factor;
 
+    public:
         vec3f_array r, F;
         box<vec3f> *box;
         contact_set contacts;

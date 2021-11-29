@@ -5,9 +5,9 @@
 #include <xmd/forces/primitives/lj.h>
 
 namespace xmd {
-    struct go_contact_array {
-        int *i1, *i2;
-        float *nat_dist;
+    struct go_contact_span {
+        array<int> i1, i2;
+        array<float> nat_dist;
         int size;
     };
 
@@ -18,7 +18,7 @@ namespace xmd {
     public:
         vec3f_array r, F;
         box<vec3f> *box;
-        go_contact_array contacts;
+        go_contact_span contacts;
         float *V;
 
     public:

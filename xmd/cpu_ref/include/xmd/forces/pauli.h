@@ -1,12 +1,12 @@
 #pragma once
-#include <xmd/types/vec3_array.h>
+#include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include <xmd/math.h>
 #include <xmd/forces/primitives/lj.h>
 
 namespace xmd {
-    struct pauli_pair_array {
-        int *i1, *i2;
+    struct pauli_pair_span {
+        array<int> i1, i2;
         int size;
     };
 
@@ -17,7 +17,7 @@ namespace xmd {
     public:
         vec3f_array r, F;
         box<vec3f> *box;
-        pauli_pair_array pairs;
+        pauli_pair_span pairs;
         float *V;
 
     public:

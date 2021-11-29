@@ -3,9 +3,9 @@
 #include <xmd/math.h>
 
 namespace xmd {
-    struct chiral_quad_array {
-        int *i1, *i2, *i3, *i4;
-        float *nat_chir, *nat_factor;
+    struct chiral_quad_span {
+        array<int> i1, i2, i3, i4;
+        array<float> nat_chir, nat_factor;
         int size;
     };
 
@@ -15,7 +15,7 @@ namespace xmd {
 
     public:
         vec3f_array r, F;
-        chiral_quad_array quads;
+        chiral_quad_span quads;
         float *V;
 
     public:

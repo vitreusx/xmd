@@ -7,12 +7,11 @@ namespace xmd {
     class add_langevin_dynamics {
     public:
         Random rand;
-        float *mass;
         float gamma_factor, temperature;
 
     public:
         vec3f_array F, v;
-        float *mass;
+        array<float> mass;
         int num_particles;
 
     public:

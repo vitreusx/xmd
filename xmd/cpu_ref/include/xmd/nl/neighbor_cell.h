@@ -1,4 +1,5 @@
 #pragma once
+#include <xmd/types/vector.h>
 
 namespace xmd::nl {
     class neighbor_cell_list {
@@ -19,7 +20,7 @@ namespace xmd::nl {
             size_ = 0;
         }
 
-        std::vector<int> cell_idx1, cell_idx2;
+        vector<int> cell_idx1, cell_idx2;
 
     private:
         int size_;

@@ -1,5 +1,6 @@
 #pragma once
-#include <xmd/types/vec3_array.h>
+#include <xmd/types/array.h>
+#include <xmd/types/vec3.h>
 #include <xmd/types/amino_acid.h>
 
 namespace xmd {
@@ -24,9 +25,9 @@ namespace xmd {
         int8_t val = 0;
     };
 
-    struct heurestic_angle_array {
-        int *i1, *i2, *i3;
-        heurestic_angle_type *type;
+    struct heurestic_angle_span {
+        array<int> i1, i2, i3;
+        array<heurestic_angle_type> type;
         int size;
     };
 
@@ -37,13 +38,13 @@ namespace xmd {
 
     public:
         vec3f_array r, F;
-        heurestic_angle_array angles;
+        heurestic_angle_span angles;
         float *V;
 
     public:
         inline void operator()() const {
             for (int idx = 0; idx < angles.size; ++idx) {
-                int i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
+                auto i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
                 auto type_val = (int8_t)angles.type[idx];
 
                 auto r1 = r[i1], r2 = r[i2], r3 = r[i3];

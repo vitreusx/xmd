@@ -11,7 +11,7 @@ namespace xmd {
     public:
         vec3f_array r, F;
         box<vec3f> *box;
-        es_pair_array es_pairs;
+        es_pair_span es_pairs;
         float *V;
 
     public:

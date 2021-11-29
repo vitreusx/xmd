@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <xmd/types/vector.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include "neighbor_cell.h"
@@ -13,8 +13,8 @@ namespace xmd::nl {
         vec3f_array r;
         box<vec3f> *box;
 
-        int *part_cell_idx, *cell_sorted_indices;
-        std::vector<int> cell_begin, cell_num_part;
+        array<int> part_cell_idx, cell_sorted_indices;
+        vector<int> cell_begin, cell_num_part;
         neighbor_cell_list neighbor_cells;
         int num_particles;
 
@@ -91,6 +91,7 @@ namespace xmd::nl {
             auto y_scan_r = (int)ceil(req_r / cell_ay);
             auto z_scan_r = (int)ceil(req_r / cell_az);
 
+            neighbor_cells.clear();
             for (int ix = 0; ix < cell_nx; ++ix) {
                 for (int dx = -x_scan_r; dx <= x_scan_r; ++dx) {
                     auto ix2 = (cell_nx + ix + dx) % cell_nx;

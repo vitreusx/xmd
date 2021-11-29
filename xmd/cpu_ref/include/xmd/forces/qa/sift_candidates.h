@@ -17,7 +17,7 @@ namespace xmd::qa {
     public:
         vec3f_array r, n, h;
         box<vec3f> *box;
-        amino_acid *atype;
+        array<amino_acid> atype;
         sync_data_array sync;
 
         free_pair_set free_pairs;

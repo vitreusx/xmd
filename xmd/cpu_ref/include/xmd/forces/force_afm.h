@@ -1,8 +1,9 @@
 #pragma once
+#include <xmd/types/vec3.h>
 
 namespace xmd {
-    struct force_afm_bundle_array {
-        int *pulled_idx;
+    struct force_afm_bundle_span {
+        array<int> pulled_idx;
         vec3f_array pull_force;
         int size;
     };
@@ -10,7 +11,7 @@ namespace xmd {
     class eval_force_afm_forces {
     public:
         vec3f_array r, F;
-        force_afm_bundle_array bundles;
+        force_afm_bundle_span bundles;
 
     public:
         void operator()() {

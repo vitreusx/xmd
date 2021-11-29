@@ -7,7 +7,8 @@ namespace xmd {
         vec3f_array r, v, F;
         // TODO: store them as doubles here for proper precision
         vec3f_array y0, y1, y2, y3, y4, y5;
-        float *mass_inv, *t, dt;
+        array<float> mass_inv;
+        float *t, dt;
         int num_particles;
 
     public:

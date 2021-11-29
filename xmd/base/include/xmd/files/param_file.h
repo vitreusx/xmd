@@ -8,6 +8,7 @@
 #include <array>
 
 namespace xmd::params {
+
     struct specific_lj {
         double def_sigma, def_depth;
 
@@ -61,14 +62,20 @@ namespace xmd::params {
 }
 
 namespace xmd {
+    class param_entry {
+    public:
+        virtual void load_from(YAML::Node const& node,
+            std::filesystem::path const& pwd) = 0;
+    };
+
     class param_file {
     public:
-        void load_from(YAML::Node const& node, std::filesystem::path const& pwd);
         explicit param_file(std::filesystem::path const& pf_path);
+        void load_entry(param_entry *entry);
 
-        params::lj lj;
-        params::amino_acids amino_acids;
-        params::heurestic_angles heurestic_angles;
-        params::heurestic_dihedrals heurestic_dihedrals;
+    private:
+        YAML::Node node;
+        std::filesystem::path pwd;
+        std::vector<param_file> inherited_pfs;
     };
 }

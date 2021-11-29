@@ -1,11 +1,12 @@
 #pragma once
-#include <xmd/types/vec3_array.h>
+#include <xmd/types/vec3.h>
+#include <xmd/types/array.h>
 #include <xmd/types/amino_acid.h>
 
 namespace xmd {
-    struct native_angle_array {
-        int *i1, *i2, *i3;
-        float *nat_theta;
+    struct native_angle_span {
+        array<int> i1, i2, i3;
+        array<float> nat_theta;
         int size;
     };
 
@@ -16,7 +17,7 @@ namespace xmd {
     public:
         float *V;
         vec3f_array r, F;
-        native_angle_array angles;
+        native_angle_span angles;
 
     public:
         inline void operator()() const {

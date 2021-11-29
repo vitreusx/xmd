@@ -6,7 +6,8 @@ namespace xmd {
     public:
         vec3f_array r, v, F;
         vec3f_array a_prev;
-        float *mass_inv, *t, dt;
+        array<float> mass_inv;
+        float *t, dt;
         int num_particles;
 
     public:

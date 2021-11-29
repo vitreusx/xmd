@@ -3,8 +3,8 @@
 #include <xmd/forces/primitives/harmonic.h>
 
 namespace xmd {
-    struct velocity_afm_bundle_array {
-        int *pulled_idx;
+    struct velocity_afm_bundle_span {
+        array<int> pulled_idx;
         vec3f_array afm_orig, afm_vel;
         int size;
     };
@@ -16,7 +16,7 @@ namespace xmd {
     public:
         vec3f_array r, F;
         float *t;
-        velocity_afm_bundle_array bundles;
+        velocity_afm_bundle_span bundles;
 
     public:
         void operator()() {

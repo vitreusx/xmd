@@ -10,12 +10,11 @@ namespace xmd::dynss {
     public:
         float max_cos_nr;
         float req_min_dist;
-        polarization_type cys_ptype;
         qa::sync_data def_sync_diff;
 
     public:
         vec3f_array r, n;
-        int8_t *has_formed_ssbond;
+        array<bool> has_formed_ssbond;
         box<vec3f> *box;
         qa::sync_data_array sync;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <xmd/math.h>
+#include <xmd/types/vector.h>
 
 namespace xmd {
     namespace v3 {
@@ -36,14 +37,14 @@ namespace xmd {
         };
 
         template<typename U>
-        class vector: public expr<vector<U>> {
+        class vec: public expr<vec<U>> {
         public:
-            vector() = default;
-            vector(U x, U y, U z):
+            vec() = default;
+            vec(U x, U y, U z):
                 x_{x}, y_{y}, z_{z} {};
 
             template<typename E>
-            vector(expr<E> const& e):
+            vec(expr<E> const& e):
                 x_{e.x()}, y_{e.y()}, z_{e.z()} {};
 
             static auto Zero() {
@@ -446,27 +447,104 @@ namespace xmd {
         };
 
         template<typename U>
-        class vector_array {
+        class vec_array {
         public:
-            vector_array() = default;
+            vec_array(): x{nullptr}, y{nullptr}, z{nullptr} {};
 
-            vector_array(U *x, U *y, U *z, int size):
-                x{x}, y{y}, z{z}, size{size} {};
+            vec_array(U *x, U *y, U *z):
+                x{x}, y{y}, z{z} {};
 
-            auto operator[](int const& idx) {
+            auto operator[](int const& idx) const {
                 return at_expr<U>(x, y, z, idx);
             }
 
+        private:
+            U *x, *y, *z;
+        };
+
+        template<typename U>
+        class vec_span {
+        public:
+            vec_span(U *x, U *y, U *z, int size):
+                x{x}, y{y}, z{z}, size_{size} {};
+
             auto operator[](int const& idx) const {
-                return at_const_expr<U>(x, y, z, idx);
+                return at_expr<U>(x, y, z, idx);
             }
 
         private:
-            U *x = nullptr, *y = nullptr, *z = nullptr;
-            int size;
+            U *x, *y, *z;
+            int size_;
+        };
+
+        template<typename U>
+        class vec_vector {
+        public:
+            vec_vector() = default;
+
+            template<typename E>
+            explicit vec_vector(int size, expr<E> const& e = vec<U>()):
+                x{size, e.x()}, y{size, e.y()}, z{size, e.z()} {};
+
+            int size() const {
+                return x.size();
+            }
+
+            void reserve(int new_capacity) {
+                x.reserve(new_capacity);
+                y.reserve(new_capacity);
+                z.reserve(new_capacity);
+            }
+
+            template<typename E>
+            void resize(int new_size, expr<E> const& e = vec<U>()) {
+                x.resize(new_size, e.x());
+                y.resize(new_size, e.y());
+                z.resize(new_size, e.z());
+            }
+
+            template<typename... Args>
+            auto emplace_back(Args&&... args) {
+                return push_back(vec<U>(std::forward<Args>(args)...));
+            }
+
+            template<typename E>
+            auto push_back(expr<E> const& e) {
+                x.push_back(e.x());
+                y.push_back(e.y());
+                z.push_back(e.z());
+                return (*this)[size()-1];
+            }
+
+            void clear() {
+                x.clear();
+                y.clear();
+                z.clear();
+            }
+
+            auto operator[](int const& idx) {
+                return at_expr<U>(x.data(), y.data(), z.data(), idx);
+            }
+
+            auto operator[](int const& idx) const {
+                return at_const_expr<U>(x.data(), y.data(), z.data(), idx);
+            }
+
+            vec_span<U> to_span() {
+                return { x.data(), y.data(), z.data(), size() };
+            }
+
+            vec_span<U const> to_span() const {
+                return { x.data(), y.data(), z.data(), size() };
+            }
+
+        private:
+            vector<U> x, y, z;
         };
     }
 
-    using vec3f = v3::vector<float>;
-    using vec3f_array = v3::vector_array<float>;
+    using vec3f = v3::vec<float>;
+    using vec3f_array = v3::vec_array<float>;
+    using vec3f_span = v3::vec_span<float>;
+    using vec3f_vector = v3::vec_vector<float>;
 }

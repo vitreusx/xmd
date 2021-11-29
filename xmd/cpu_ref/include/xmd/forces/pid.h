@@ -56,10 +56,10 @@ namespace xmd {
         }
     };
 
-    struct pid_bundle_array {
-        int *i1p, *i1, *i1n;
-        int *i2p, *i2, *i2n;
-        int8_t *type;
+    struct pid_bundle_span {
+        array<int> i1p, i1, i1n;
+        array<int> i2p, i2, i2n;
+        array<int8_t> type;
         int size;
     };
 
@@ -74,7 +74,7 @@ namespace xmd {
     public:
         vec3f_array r, F;
         box<vec3f> *box;
-        pid_bundle_array bundles;
+        pid_bundle_span bundles;
         float *V;
 
     public:

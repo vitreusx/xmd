@@ -17,10 +17,10 @@ namespace xmd::dynss {
     public:
         vec3f_array r, F;
         box<vec3f> *box;
-        contact_list contacts;
+        contact_set contacts;
         float *V, *t;
         qa::sync_data_array sync;
-        int *num_neighbours;
+        array<int> num_neighbours;
 
     public:
         inline void operator()() {

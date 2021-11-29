@@ -1,15 +1,15 @@
 #pragma once
-#include <xmd/types/vec3_array.h>
-#include "native_dihedral_array.h"
+#include <xmd/types/vec3.h>
+#include "native_dihedral.h"
 
 namespace xmd {
-    class eval_complex_native_dihedral_forces {
+    class eval_cnd_forces {
     public:
         float CDA, CDB;
 
     public:
         vec3f_array r, F;
-        native_dihedral_array dihedrals;
+        native_dihedral_span dihedrals;
         float *V;
 
     public:

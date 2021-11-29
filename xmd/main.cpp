@@ -1,4 +1,4 @@
-#include <xmd/nl/divide_into_cells.h>
+#include <xmd/forces/angle/heurestic.h>
 
 int main() {
     return 0;

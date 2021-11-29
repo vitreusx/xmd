@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <xmd/types/vector.h>
 #include <xmd/types/cyclic_buffer.h>
 
 namespace xmd::dynss {
@@ -7,7 +7,7 @@ namespace xmd::dynss {
         FORMING_OR_FORMED, BREAKING
     };
 
-    class contact_list {
+    class contact_set {
     public:
         inline bool has_item(int idx) const {
             return has_item_[idx];
@@ -44,15 +44,17 @@ namespace xmd::dynss {
             i2.clear();
             status.clear();
             ref_time.clear();
+            has_item_.clear();
+            vacant_slots.clear();
         }
 
-        std::vector<int> i1, i2;
-        std::vector<contact_status> status;
-        std::vector<float> ref_time;
+        vector<int> i1, i2;
+        vector<contact_status> status;
+        vector<float> ref_time;
 
     private:
         int extent_;
-        std::vector<int8_t> has_item_;
-        xmd::cyclic_buffer<int> vacant_slots;
+        vector<bool> has_item_;
+        cyclic_buffer<int> vacant_slots;
     };
 }

@@ -31,6 +31,11 @@ namespace xmd {
             return start >= end;
         }
 
+        void clear() {
+            buf.clear();
+            start = end = 0;
+        }
+
     private:
         std::vector<T> buf;
         int start, end;

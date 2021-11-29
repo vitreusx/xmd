@@ -190,32 +190,21 @@ namespace xmd {
     }
 
     param_file::param_file(const std::filesystem::path &pf_path) {
-        auto root = YAML::LoadFile(pf_path);
-        auto pwd = pf_path.parent_path();
-        load_from(root, pwd);
-    }
-
-    void param_file::load_from(const YAML::Node &node,
-        const std::filesystem::path &pwd) {
+        node = YAML::LoadFile(pf_path);
+        pwd = pf_path.parent_path();
 
         if (auto inherit_node = node["inherit"]; inherit_node) {
             for (auto iter = inherit_node.begin(); iter != inherit_node.end(); ++iter) {
                 auto path = pwd / iter->as<std::string>();
-                auto file = YAML::LoadFile(path);
-                load_from(file, path.parent_path());
+                inherited_pfs.emplace_back(path);
             }
         }
-        if (auto lj_node = node["lj"]; lj_node) {
-            lj.load_from(lj_node, pwd);
+    }
+
+    void param_file::load_entry(param_entry *entry) {
+        for (auto& pf: inherited_pfs) {
+            pf.load_entry(entry);
         }
-        if (auto amino_acids_node = node["amino-acids"]; amino_acids_node) {
-            amino_acids.load_from(amino_acids_node, pwd);
-        }
-        if (auto heur_angles_node = node["heurestic-angles"]; heur_angles_node) {
-            heurestic_angles.load_from(heur_angles_node, pwd);
-        }
-        if (auto heur_dih_node = node["heurestic-dihedrals"]; heur_dih_node) {
-            heurestic_dihedrals.load_from(heur_dih_node, pwd);
-        }
+        entry->load_from(node, pwd);
     }
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <xmd/types/vector.h>
 #include <xmd/types/cyclic_buffer.h>
 
 namespace xmd::qa {
@@ -38,12 +38,11 @@ namespace xmd::qa {
             i2.clear();
         }
 
-        std::vector<int> i1, i2;
+        vector<int> i1, i2;
 
     private:
         int extent_;
-
-        std::vector<int8_t> has_item_;
-        xmd::cyclic_buffer<int> vacant_slots;
+        vector<bool> has_item_;
+        cyclic_buffer<int> vacant_slots;
     };
 }

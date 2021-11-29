@@ -1,6 +1,5 @@
 #pragma once
-#include <vector>
-#include <xmd/types/cyclic_buffer.h>
+#include <xmd/types/vector.h>
 #include "contact_type.h"
 #include "sync_data.h"
 
@@ -29,8 +28,8 @@ namespace xmd::qa {
             size_ = 0;
         }
 
-        std::vector<int> i1, i2;
-        std::vector<contact_type> type;
+        vector<int> i1, i2;
+        vector<contact_type> type;
         sync_data_vector sync_diff1, sync_diff2;
 
     private:

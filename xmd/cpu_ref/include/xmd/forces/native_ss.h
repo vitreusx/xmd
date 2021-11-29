@@ -3,8 +3,8 @@
 #include <xmd/model/box.h>
 
 namespace xmd {
-    struct native_disulfide_bond_array {
-        int *cys_i1, *cys_i2;
+    struct native_ssbond_span {
+        array<int> cys_i1, cys_i2;
         int size;
     };
 
@@ -15,7 +15,7 @@ namespace xmd {
     public:
         vec3f_array r, F;
         box<vec3f> *box;
-        native_disulfide_bond_array bonds;
+        native_ssbond_span bonds;
         float *V;
 
     public:

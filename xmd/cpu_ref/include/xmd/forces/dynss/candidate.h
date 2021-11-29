@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <xmd/types/vector.h>
 #include <xmd/types/cyclic_buffer.h>
 
 namespace xmd::dynss {
@@ -21,7 +21,7 @@ namespace xmd::dynss {
             size_ = 0;
         }
 
-        std::vector<int> i1, i2;
+        vector<int> i1, i2;
 
     private:
         int size_;

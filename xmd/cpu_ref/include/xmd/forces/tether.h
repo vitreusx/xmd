@@ -1,11 +1,11 @@
 #pragma once
-#include <xmd/types/vec3_array.h>
+#include <xmd/types/vec3.h>
 #include <xmd/forces/primitives/harmonic.h>
 
 namespace xmd {
-    struct tether_pair_array {
-        int *i1, *i2;
-        float *nat_dist;
+    struct tether_pair_span {
+        array<int> i1, i2;
+        array<float> nat_dist;
         int size;
     };
 
@@ -15,7 +15,7 @@ namespace xmd {
 
     public:
         vec3f_array r, F;
-        tether_pair_array tethers;
+        tether_pair_span tethers;
         float *V;
 
     public:

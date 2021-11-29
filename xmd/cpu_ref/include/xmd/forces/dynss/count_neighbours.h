@@ -3,8 +3,8 @@
 #include <xmd/model/box.h>
 
 namespace xmd::dynss {
-    struct neighbor_bundle_array {
-        int *cys_idx, *other_idx;
+    struct neighbor_bundle_span {
+        array<int> cys_idx, other_idx;
         int size;
     };
 
@@ -13,10 +13,10 @@ namespace xmd::dynss {
         float inclusion_radius;
 
     public:
-        vec3f_array *r;
-        neighbor_bundle_array bundles;
+        vec3f_array r;
+        neighbor_bundle_span bundles;
         box<vec3f> *box;
-        int *num_neighbours;
+        array<int> num_neigh;
 
     public:
         inline void operator()() {
