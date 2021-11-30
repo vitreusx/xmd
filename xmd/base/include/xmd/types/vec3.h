@@ -370,8 +370,8 @@ namespace xmd {
 
             template<typename E>
             auto& operator=(expr<E> const& e) const {
-                ([&](float* __restrict__ xptr, float* __restrict__ yptr,
-                    float* __restrict__ zptr) -> void {
+                ([&](U* __restrict__ xptr, U* __restrict__ yptr,
+                    U* __restrict__ zptr) -> void {
 
                     *xptr = e.x();
                     *yptr = e.y();
@@ -382,8 +382,8 @@ namespace xmd {
             }
 
             auto& operator=(at_expr<U> const& e) const {
-                ([&](float* __restrict__ xptr, float* __restrict__ yptr,
-                    float* __restrict__ zptr) -> void {
+                ([&](U* __restrict__ xptr, U* __restrict__ yptr,
+                    U* __restrict__ zptr) -> void {
 
                     *xptr = e.x();
                     *yptr = e.y();
@@ -570,4 +570,9 @@ namespace xmd {
     using vec3f_array = v3::vec_array<float>;
     using vec3f_span = v3::vec_span<float>;
     using vec3f_vector = v3::vec_vector<float>;
+
+    using vec3d = v3::vec<double>;
+    using vec3d_array = v3::vec_array<double>;
+    using vec3d_span = v3::vec_span<double>;
+    using vec3d_vector = v3::vec_vector<double>;
 }

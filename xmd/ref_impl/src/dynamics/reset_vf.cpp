@@ -1,4 +1,4 @@
-#include "integrators/reset_vf.h"
+#include "dynamics/reset_vf.h"
 
 namespace xmd {
     void reset_vf::operator()() const {

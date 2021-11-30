@@ -5,10 +5,14 @@
 namespace xmd {
     class perform_leapfrog_step {
     public:
+        double dt;
+
+    public:
         vec3f_array r, v, F;
-        vec3f_array a_prev;
+        vec3d_array true_r, true_v, a_prev;
         array<float> mass_inv;
-        float *t, dt;
+        double *true_t;
+        float *t;
         int num_particles;
 
     public:

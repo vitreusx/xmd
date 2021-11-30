@@ -7,6 +7,8 @@
 #include <Eigen/Geometry>
 #include <optional>
 #include <memory>
+#include <random>
+#include <xmd/random/sphere_dist.h>
 
 namespace xmd {
     class model {
@@ -18,20 +20,28 @@ namespace xmd {
         friend model operator+(model const& m1, model const& m2);
         model& operator+=(model const& m2);
 
-        template<typename Random>
-        inline void morph_into_saw(Random& rand, std::optional<double> res_bond_length,
+        template<typename Generator>
+        inline void morph_into_saw(Generator& g, std::optional<double> res_bond_length,
             double base_res_dens, bool infer_box) {
 
             auto vol = (double)residues.size() / base_res_dens;
-            auto cell_a = xmd::cbrt(vol);
+            auto cell_a = cbrt(vol);
+
+            auto cell_coord_dist = std::uniform_real_distribution<double>(
+                -cell_a/2.0, cell_a/2.0);
+            auto dir_dist = xmd::sphere_dist<Eigen::Vector3d, double>();
+            auto spread_dist = std::uniform_real_distribution<double>(
+                M_PI/12.0, M_PI/2.0);
+            auto around_dist = std::uniform_real_distribution<double>(
+                -M_PI, M_PI);
 
             for (auto const& xmd_chain: chains) {
                 Eigen::Vector3d pos {
-                    rand.uniform(-cell_a/2.0, cell_a/2.0),
-                    rand.uniform(-cell_a/2.0, cell_a/2.0),
-                    rand.uniform(-cell_a/2.0, cell_a/2.0)
+                    cell_coord_dist(g),
+                    cell_coord_dist(g),
+                    cell_coord_dist(g)
                 };
-                auto dir = rand.sphere();
+                auto dir = dir_dist(g);
 
                 for (size_t res_idx = 0; res_idx < xmd_chain->residues.size(); ++res_idx) {
                     auto next = pos;
@@ -48,11 +58,11 @@ namespace xmd {
 
                         next += dir * bond_length;
 
-                        double spread_angle = rand.uniform(M_PI/12.0, M_PI/2.0);
+                        double spread_angle = spread_dist(g);
                         auto spread = Eigen::AngleAxisd(spread_angle,
                             any_perpendicular(dir));
 
-                        double around_angle = rand.uniform(-M_PI, M_PI);
+                        double around_angle = around_dist(g);
                         auto around = Eigen::AngleAxisd(around_angle, dir);
 
                         dir = (around * spread * dir).normalized();
