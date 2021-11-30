@@ -6,7 +6,7 @@ namespace xmd {
     template<typename Random>
     class add_langevin_dynamics {
     public:
-        Random rand;
+        Random &rand;
         float gamma_factor, temperature;
 
     public:
@@ -15,6 +15,9 @@ namespace xmd {
         int num_particles;
 
     public:
+        explicit add_langevin_dynamics(Random& rand):
+            rand{rand} {};
+
         void operator()() {
             auto noise_factor = sqrt(2.0f * kB * temperature);
 

@@ -6,11 +6,11 @@
 namespace xmd::qa {
     class candidate_list {
     public:
-        int size() const {
+        inline int size() const {
             return size_;
         }
 
-        int add() {
+        inline int add() {
             i1.emplace_back();
             i2.emplace_back();
             type.emplace_back();
@@ -19,7 +19,7 @@ namespace xmd::qa {
             return size_++;
         }
 
-        void clear() {
+        inline void clear() {
             i1.clear();
             i2.clear();
             type.clear();

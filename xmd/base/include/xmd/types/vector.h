@@ -70,7 +70,7 @@ namespace xmd {
             return (data_[size_++] = T(std::forward<Args>(args)...));
         }
 
-        T& push_back(T const& value) {
+        T& push_back(T const& value = T()) {
              return emplace_back(value);
         }
 
@@ -96,11 +96,19 @@ namespace xmd {
 
         span<T> to_span() {
             return {data_, size_};
+        };
+
+        span<const T> to_span() const {
+            return {data_, size_};
         }
 
-        span<T const> to_span() const {
-             return {data_, size_};
-         }
+        array<T> to_array() {
+            return data_;
+        }
+
+        array<const T> to_array() const {
+            return data_;
+        }
 
     private:
         T *data_;

@@ -12,9 +12,9 @@ simulation:
           contacts between i and i+4: false
           sinking version for SS: true
           depth for BB: 0.2 eps
-          velocity AFM:
-            enabled: true
-            HH1: 0.06 eps/A^2
+        velocity AFM:
+          enabled: true
+          HH1: 0.06 eps/A^2
         Lennard-Jones potential:
           r_min for SS pairs:
             from file: "ss-pairs.csv"

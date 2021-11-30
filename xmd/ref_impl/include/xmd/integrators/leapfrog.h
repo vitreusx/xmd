@@ -1,8 +1,9 @@
 #pragma once
 #include <xmd/types/vec3.h>
+#include <xmd/types/array.h>
 
 namespace xmd {
-    class leapfrog_integrator_step {
+    class perform_leapfrog_step {
     public:
         vec3f_array r, v, F;
         vec3f_array a_prev;
@@ -11,14 +12,6 @@ namespace xmd {
         int num_particles;
 
     public:
-        inline void operator()() {
-            for (int idx = 0; idx < num_particles; ++idx) {
-                auto a_cur = F[idx] * mass_inv[idx];
-                v[idx] += 0.5f * (a_prev[idx] + a_cur) * dt;
-                r[idx] += v[idx] * dt + 0.5f * a_cur * dt * dt;
-                a_prev[idx] = a_cur;
-            }
-            *t += dt;
-        }
+        void operator()() const;
     };
 }

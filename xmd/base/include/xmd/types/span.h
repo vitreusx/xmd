@@ -1,4 +1,5 @@
 #pragma once
+#include "array.h"
 
 namespace xmd {
     template<typename T>
@@ -13,6 +14,10 @@ namespace xmd {
 
         T& operator[](int idx) const {
             return data_[idx];
+        }
+
+        array<T> to_array() const {
+            return data_;
         }
 
     private:

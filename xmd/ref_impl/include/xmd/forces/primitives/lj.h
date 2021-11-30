@@ -1,5 +1,6 @@
 #pragma once
 #include <tuple>
+#include <xmd/types/array.h>
 #include <xmd/math.h>
 
 namespace xmd {
@@ -21,10 +22,10 @@ namespace xmd {
     };
 
     struct lj_array {
-        float *depth, *r_min;
+        array<float> depth, r_min;
         int size;
 
-        inline lj operator[](int idx) {
+        inline lj operator[](int idx) const {
             return { depth[idx], r_min[idx] };
         }
     };

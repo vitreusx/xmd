@@ -109,6 +109,38 @@ namespace xmd::qa {
             return *this;
         }
 
+        inline auto& operator+=(sync_data const& other) {
+            back += other.back;
+            side_all += other.side_all;
+            side_polar += other.side_polar;
+            side_hydrophobic += other.side_hydrophobic;
+            return *this;
+        }
+
+        inline auto& operator-=(sync_data const& other) {
+            back -= other.back;
+            side_all -= other.side_all;
+            side_polar -= other.side_polar;
+            side_hydrophobic -= other.side_hydrophobic;
+            return *this;
+        }
+
+        inline auto& operator+=(sync_data_ref const& other) {
+            back += other.back;
+            side_all += other.side_all;
+            side_polar += other.side_polar;
+            side_hydrophobic += other.side_hydrophobic;
+            return *this;
+        }
+
+        inline auto& operator-=(sync_data_ref const& other) {
+            back -= other.back;
+            side_all -= other.side_all;
+            side_polar -= other.side_polar;
+            side_hydrophobic -= other.side_hydrophobic;
+            return *this;
+        }
+
     public:
         int8_t &back, &side_all, &side_polar, &side_hydrophobic;
     };
@@ -118,12 +150,7 @@ namespace xmd::qa {
         array<int8_t> back, side_all, side_polar, side_hydrophobic;
         int size;
 
-        sync_data_ref operator[](int idx) {
-            return { back[idx], side_all[idx], side_polar[idx],
-                     side_hydrophobic[idx] };
-        }
-
-        sync_data_cref operator[](int idx) const {
+        inline sync_data_ref operator[](int idx) const {
             return { back[idx], side_all[idx], side_polar[idx],
                      side_hydrophobic[idx] };
         }
@@ -134,28 +161,28 @@ namespace xmd::qa {
         vector<int8_t> back, side_all, side_polar, side_hydrophobic;
         int size_;
 
-        sync_data_ref operator[](int idx) {
+        inline sync_data_ref operator[](int idx) {
             return { back[idx], side_all[idx], side_polar[idx],
                      side_hydrophobic[idx] };
         }
 
-        sync_data_cref operator[](int idx) const {
+        inline sync_data_cref operator[](int idx) const {
             return { back[idx], side_all[idx], side_polar[idx],
                      side_hydrophobic[idx] };
         }
 
-        sync_data_ref emplace_back() {
+        inline sync_data_ref emplace_back() {
             ++size_;
             return { back.emplace_back(), side_all.emplace_back(),
                      side_polar.emplace_back(), side_hydrophobic.emplace_back()
             };
         }
 
-        int size() const {
+        inline int size() const {
             return size_;
         }
 
-        void clear() {
+        inline void clear() {
             back.clear();
             side_all.clear();
             side_polar.clear();

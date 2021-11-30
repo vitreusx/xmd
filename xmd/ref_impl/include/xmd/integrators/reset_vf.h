@@ -9,11 +9,6 @@ namespace xmd {
         int num_particles;
 
     public:
-        inline void operator()() {
-            *V = 0.0f;
-            for (int idx = 0; idx < num_particles; ++idx) {
-                F[idx] = vec3f::Zero();
-            }
-        }
+        void operator()() const;
     };
 }

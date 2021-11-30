@@ -265,10 +265,12 @@ namespace xmd {
         std::unordered_map<residue const*, xmd::model::residue*> res_map;
 
         for (auto const& [chain_id, pdb_chain]: chains) {
-            auto& xmd_chain = xmd_model.chains.emplace_back();
+            auto& xmd_chain = xmd_model.chains.emplace_back(
+                std::make_unique<xmd::model::chain>());
 
             for (auto const& [res_seq_num, pdb_res]: pdb_chain.residues) {
-                auto& xmd_res = xmd_model.residues.emplace_back();
+                auto& xmd_res = xmd_model.residues.emplace_back(
+                    std::make_unique<xmd::model::residue>());
 
                 xmd_res->type = amino_acid(pdb_res.name);
                 xmd_res->pos = pdb_res.find_by_name("CA")->pos;

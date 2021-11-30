@@ -7,7 +7,7 @@ namespace xmd {
         float H1, H2;
         float nat_r;
 
-        harmonic(float H1, float H2, float nat_r):
+        inline harmonic(float H1, float H2, float nat_r):
             H1{H1}, H2{H2}, nat_r{nat_r} {};
 
     public:

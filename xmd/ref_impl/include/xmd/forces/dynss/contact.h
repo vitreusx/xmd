@@ -13,11 +13,11 @@ namespace xmd::dynss {
             return has_item_[idx];
         }
 
-        int extent() const {
+        inline int extent() const {
             return extent_;
         }
 
-        int add() {
+        inline int add() {
             if (!vacant_slots.empty()) {
                 int slot_idx = vacant_slots.pop();
                 has_item_[slot_idx] = true;
@@ -34,12 +34,12 @@ namespace xmd::dynss {
             }
         }
 
-        void remove(int slot_idx) {
+        inline void remove(int slot_idx) {
             has_item_[slot_idx] = false;
             vacant_slots.push(slot_idx);
         }
 
-        void clear() {
+        inline void clear() {
             i1.clear();
             i2.clear();
             status.clear();

@@ -123,27 +123,27 @@ namespace xmd {
         };
 
         template<typename E>
-        auto norm(expr<E> const& e) {
+        auto norm(v3::expr<E> const& e) {
             return xmd::sqrt(norm_squared(e));
         }
 
         template<typename E>
-        auto norm_squared(expr<E> const& e) {
+        auto norm_squared(v3::expr<E> const& e) {
             return dot(e, e);
         }
 
         template<typename E>
-        auto l1_norm(expr<E> const& e) {
+        auto l1_norm(v3::expr<E> const& e) {
             return xmd::abs(e.x()) + xmd::abs(e.y()) + xmd::abs(e.z());
         }
 
         template<typename E1, typename E2>
-        auto dot(expr<E1> const& e1, expr<E2> const& e2) {
+        auto dot(v3::expr<E1> const& e1, v3::expr<E2> const& e2) {
             return e1.x() * e2.x() + e1.y() * e2.y() + e1.z() * e2.z();
         }
 
         template<typename E>
-        auto norm_inv(expr<E> const& e) {
+        auto norm_inv(v3::expr<E> const& e) {
             return decltype(norm(e))(1.0) / norm(e);
         }
 
@@ -381,6 +381,18 @@ namespace xmd {
                 return *this;
             }
 
+            auto& operator=(at_expr<U> const& e) const {
+                ([&](float* __restrict__ xptr, float* __restrict__ yptr,
+                    float* __restrict__ zptr) -> void {
+
+                    *xptr = e.x();
+                    *yptr = e.y();
+                    *zptr = e.z();
+                })(x_ + idx, y_ + idx, z_ + idx);
+
+                return *this;
+            }
+
             template<typename E2>
             auto& operator+=(expr<E2> const& e2) {
                 x() += e2.x();
@@ -482,8 +494,11 @@ namespace xmd {
         public:
             vec_vector() = default;
 
+            explicit vec_vector(int size):
+                vec_vector(size, vec<U>()) {};
+
             template<typename E>
-            explicit vec_vector(int size, expr<E> const& e = vec<U>()):
+            explicit vec_vector(int size, expr<E> const& e):
                 x{size, e.x()}, y{size, e.y()}, z{size, e.z()} {};
 
             int size() const {
@@ -536,6 +551,14 @@ namespace xmd {
 
             vec_span<U const> to_span() const {
                 return { x.data(), y.data(), z.data(), size() };
+            }
+
+            vec_array<U> to_array() {
+                return { x.data(), y.data(), z.data() };
+            }
+
+            vec_array<U const> to_array() const {
+                return { x.data(), y.data(), z.data() };
             }
 
         private:
