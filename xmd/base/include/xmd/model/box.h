@@ -18,7 +18,7 @@ namespace xmd {
         }
 
         template<typename E>
-        auto in_box(E const& x) {
+        auto warp_to_box(E const& x) {
             VectorT in_box_ = x;
             in_box_.x() -= cell.x() * xmd::nearbyint(in_box_.x() * cell_inv.x());
             in_box_.y() -= cell.y() * xmd::nearbyint(in_box_.y() * cell_inv.y());
@@ -28,7 +28,7 @@ namespace xmd {
 
         template<typename E>
         auto ray(E const& u, E const& v) {
-            return in_box(v - u);
+            return warp_to_box(v - u);
         }
     };
 }

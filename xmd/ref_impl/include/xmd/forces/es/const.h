@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vec3_array.h>
 #include <xmd/model/box.h>
-#include "es_pair_array.h"
+#include "es_pair.h"
 
 namespace xmd {
     class eval_const_es_forces {

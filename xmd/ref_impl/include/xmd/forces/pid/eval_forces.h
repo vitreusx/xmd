@@ -1,68 +1,10 @@
 #pragma once
-#include <tuple>
-#include <xmd/math.h>
+#include "lambda.h"
+#include "bundle.h"
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/forces/primitives/sink_lj.h>
-#include <xmd/types/vec3.h>
-#include <xmd/model/box.h>
 
-namespace xmd {
-    enum lambda_version {
-        COSINE, ALGEBRAIC, GAUSSIAN
-    };
-
-    class lambda_func {
-    public:
-        float psi_0, alpha;
-        lambda_version version;
-
-        lambda_func() = default;
-
-        lambda_func(float psi_0, float alpha, bool cosine_version):
-            psi_0{psi_0}, alpha{alpha}, cosine_version{cosine_version} {};
-
-        inline bool supp(float psi) const {
-            return abs(alpha * (psi - psi_0)) < M_PI;
-        }
-
-        inline std::tuple<float, float> operator()(float psi) const {
-            switch (version) {
-            case COSINE:
-                auto s = alpha * (psi - psi_0);
-                auto val = 0.5f * cos(s) + 0.5f;
-                auto deriv = -0.5f * alpha * sin(s);
-                return std::make_tuple(val, deriv);
-            case ALGEBRAIC:
-                auto s = alpha * (psi - psi_0);
-                auto t = abs(s / M_PI);
-                auto x_inv = 1.0f/(2.0f*t*t-2.0f*t-1);
-                auto val = (t*t-2.0f*t+1.0f)*x_inv;
-                auto deriv = (2.0f*t*(t-1.0f))*x_inv*x_inv / M_PI;
-                deriv *= (s < 0.0f ? -1.0f : 1.0f);
-                return std::make_tuple(val, deriv);
-            default:
-                // TODO: implement the Gaussian version
-                return std::make_tuple(0.0f, 0.0f);
-            }
-        }
-    };
-
-    struct lambda_func_array {
-        float *psi_0, *alpha;
-        lambda_version version;
-
-        inline lambda_func operator[](int idx) const {
-            return { psi_0[idx], alpha[idx], version };
-        }
-    };
-
-    struct pid_bundle_span {
-        array<int> i1p, i1, i1n;
-        array<int> i2p, i2, i2n;
-        array<int8_t> type;
-        int size;
-    };
-
+namespace xmd::pid {
     class eval_pid_forces {
     public:
         lambda_func bb_plus_lam, bb_minus_lam;
@@ -200,11 +142,9 @@ namespace xmd {
                 auto r12_u = r12 * r12_rn;
                 *V += V_;
                 F[i1p] -= A * dpsi1_dr1p;
-                // TODO: check if it should be `+` before C
                 F[i1] -= A * dpsi1_dr1 + B * dpsi2_dr1 + C * r12_u;
                 F[i1n] -= A * dpsi1_dr1n;
                 F[i2p] -= B * dpsi2_dr2p;
-                // TODO: (as before)
                 F[i2] -= A * dpsi1_dr2 + B * dpsi2_dr2 - C * r12_u;
                 F[i2n] -= B * dpsi2_dr2n;
             }

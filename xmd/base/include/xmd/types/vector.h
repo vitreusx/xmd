@@ -86,6 +86,14 @@ namespace xmd {
             return data_[idx];
         }
 
+        T& at(int idx) {
+             return (*this)[idx];
+         }
+
+         T const& at(int idx) const {
+             return (*this)[idx];
+         }
+
         span<T> to_span() {
             return {data_, size_};
         }

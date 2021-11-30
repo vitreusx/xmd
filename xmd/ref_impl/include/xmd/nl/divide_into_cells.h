@@ -2,7 +2,7 @@
 #include <xmd/types/vector.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
-#include "neighbor_cell.h"
+#include "nl_data.h"
 
 namespace xmd::nl {
     class divide_into_cells {
@@ -13,13 +13,11 @@ namespace xmd::nl {
         vec3f_array r;
         box<vec3f> *box;
 
-        array<int> part_cell_idx, cell_sorted_indices;
-        vector<int> cell_begin, cell_num_part;
-        neighbor_cell_list neighbor_cells;
+        nl_data *data;
         int num_particles;
 
     public:
-        void operator()() {
+        inline void operator()() const {
             auto min_val = std::numeric_limits<float>::min();
             auto max_val = std::numeric_limits<float>::max();
 
@@ -27,7 +25,7 @@ namespace xmd::nl {
             auto x_max = min_val, y_max = min_val, z_max = min_val;
 
             for (int idx = 0; idx < num_particles; ++idx) {
-                auto r_ = box->in_box(r[idx]);
+                auto r_ = box->warp_to_box(r[idx]);
                 auto x_ = r_.x(), y_ = r_.y(), z_ = r_.z();
                 x_min = min(x_min, x_);
                 x_max = max(x_max, x_);
@@ -57,8 +55,9 @@ namespace xmd::nl {
             auto cell_az_inv = 1.0f / cell_az;
 
             int num_cells = cell_nx * cell_ny * cell_nz;
-            cell_num_part.resize(num_cells);
-            cell_begin.resize(num_cells);
+            data->num_cells = num_cells;
+            data->cell_num_part.resize(num_cells);
+            data->cell_begin.resize(num_cells);
 
             for (int idx = 0; idx < num_particles; ++idx) {
                 auto r_ = r[idx];
@@ -67,31 +66,31 @@ namespace xmd::nl {
                 auto iz = (int)ceil((r_.z() - z_min) * cell_az_inv);
 
                 auto cell_idx_ = ix + cell_nx * (iy + cell_ny * iz);
-                part_cell_idx[idx] = cell_idx_;
-                ++cell_num_part[cell_idx_];
+                data->part_cell_idx[idx] = cell_idx_;
+                ++(data->cell_num_part[cell_idx_]);
             }
 
             int cur_cell_begin = 0;
             for (int cell_idx = 0; cell_idx < num_cells; ++cell_idx) {
-                auto cell_num_part_ = cell_num_part[cell_idx];
-                cell_begin[cell_idx] = cur_cell_begin;
+                auto cell_num_part_ = data->cell_num_part[cell_idx];
+                data->cell_begin[cell_idx] = cur_cell_begin;
                 cur_cell_begin += cell_num_part_;
             }
 
             for (int idx = 0; idx < num_particles; ++idx) {
-                auto cell_idx_ = part_cell_idx[idx];
-                cell_sorted_indices[cell_begin[cell_idx_]++] = idx;
+                auto cell_idx_ = data->part_cell_idx[idx];
+                data->cell_sorted_indices[data->cell_begin[cell_idx_]++] = idx;
             }
 
             for (int cell_idx = 0; cell_idx < num_cells; ++cell_idx) {
-                cell_begin[cell_idx] -= cell_num_part[cell_idx];
+                data->cell_begin[cell_idx] -= data->cell_num_part[cell_idx];
             }
 
             auto x_scan_r = (int)ceil(req_r / cell_ax);
             auto y_scan_r = (int)ceil(req_r / cell_ay);
             auto z_scan_r = (int)ceil(req_r / cell_az);
 
-            neighbor_cells.clear();
+            data->neighbor_cells.clear();
             for (int ix = 0; ix < cell_nx; ++ix) {
                 for (int dx = -x_scan_r; dx <= x_scan_r; ++dx) {
                     auto ix2 = (cell_nx + ix + dx) % cell_nx;
@@ -105,9 +104,9 @@ namespace xmd::nl {
                                     auto cell_idx2 = ix2 + cell_nx * (iy2 + cell_ny * iz2);
 
                                     if (cell_idx1 <= cell_idx2) {
-                                        auto nc_idx = neighbor_cells.add();
-                                        neighbor_cells.cell_idx1[nc_idx] = cell_idx1;
-                                        neighbor_cells.cell_idx2[nc_idx] = cell_idx2;
+                                        auto nc_idx = data->neighbor_cells.add();
+                                        data->neighbor_cells.cell_idx1[nc_idx] = cell_idx1;
+                                        data->neighbor_cells.cell_idx2[nc_idx] = cell_idx2;
                                     }
                                 }
                             }
@@ -115,6 +114,8 @@ namespace xmd::nl {
                     }
                 }
             }
+
+            data->pad = pad;
         }
     };
 }

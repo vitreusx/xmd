@@ -1,10 +1,10 @@
 add_executable(xmd main.cpp)
 
 add_subdirectory(base)
-add_subdirectory(cpu_ref)
+add_subdirectory(ref_impl)
 
 target_link_libraries(xmd
-    PRIVATE base cpu_ref)
+    PRIVATE base ref_impl)
 
 file(COPY data DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
