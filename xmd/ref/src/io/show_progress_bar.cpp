@@ -21,7 +21,7 @@ namespace xmd {
             else cout << " ";
         }
         cout << "] " << *true_t << " / " << total_time;
-        cout << " V = " << *V;
+        cout << " V = " << *V << " E = "<< *E;
         cout << " t = " << diff/1000 << " ms";
 
         cout.flush();

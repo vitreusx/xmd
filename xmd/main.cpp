@@ -10,6 +10,7 @@
 #include <xmd/forces/tether.h>
 #include <xmd/forces/angle/native.h>
 #include <xmd/forces/dihedral/complex_native.h>
+#include <xmd/stats/total_energy.h>
 
 using namespace xmd;
 
@@ -92,7 +93,7 @@ private:
     vector<amino_acid> atype;
     vector<int8_t> chain_idx;
     vector<int> chain_seq_idx;
-    float V, t;
+    float V, E, t;
     double true_t;
     int num_particles, num_chains;
     std::ofstream output_pdb;
@@ -214,6 +215,7 @@ public:
         show_progress_bar task;
         task.total_time = total_time;
         task.V = &V;
+        task.E = &E;
         task.width = 50;
         task.true_t = &true_t;
         return task;
@@ -251,6 +253,16 @@ public:
         return task;
     }
 
+    auto compute_total_energy_() {
+        compute_total_energy task;
+        task.num_particles = num_particles;
+        task.mass = mass.to_array();
+        task.v = v.to_array();
+        task.V = &V;
+        task.E = &E;
+        return task;
+    }
+
 public:
     void operator()() {
         auto reset_vf_t = reset_vf_();
@@ -261,6 +273,7 @@ public:
         auto eval_tether_forces_t = eval_tether_forces_();
         auto eval_native_angle_forces_t = eval_native_angle_forces_();
         auto eval_cnd_forces_t = eval_cnd_forces_();
+        auto compute_total_energy_t = compute_total_energy_();
 
         using namespace std::chrono;
         show_progress_bar_t.start_wall_time = high_resolution_clock::now();
@@ -273,12 +286,13 @@ public:
 
         while (t < total_time) {
             reset_vf_t();
-            eval_langevin_dynamics_t();
+//            eval_langevin_dynamics_t();
             eval_tether_forces_t();
             eval_native_angle_forces_t();
             eval_cnd_forces_t();
 
             if (t - pbar_last_update_t >= pbar_update_period) {
+                compute_total_energy_t();
                 show_progress_bar_t();
                 pbar_last_update_t = t;
             }

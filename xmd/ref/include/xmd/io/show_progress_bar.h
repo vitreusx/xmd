@@ -8,7 +8,7 @@ namespace xmd {
 
     public:
         double *true_t;
-        float *V;
+        float *V, *E;
         double total_time;
         decltype(std::chrono::high_resolution_clock::now()) start_wall_time;
 
