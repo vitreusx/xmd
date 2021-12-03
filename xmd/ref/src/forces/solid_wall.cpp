@@ -27,8 +27,8 @@ namespace xmd {
 
             auto V_ = eps / (9.0f * ipow<9>(d)), dV_dd = V_ * (-9.0f * d);
             *V += V_;
-            F[part_idx] -= dV_dd * wall.normal;
-            wall_F[wall_idx] += dV_dd * wall.normal;
+            F[part_idx] += dV_dd * wall.normal;
+            wall_F[wall_idx] -= dV_dd * wall.normal;
         }
     }
 }

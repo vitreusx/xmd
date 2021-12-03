@@ -27,8 +27,8 @@ namespace xmd::qa {
             auto [Vij, dVij_dr] = lj_force(r12_rn);
             *V += saturation * Vij;
             auto f = saturation * dVij_dr * r12_u;
-            F[i1] -= f;
-            F[i2] += f;
+            F[i1] += f;
+            F[i2] -= f;
 
             if (status == FORMING_OR_FORMED && saturation == 1.0f) {
                 if (breaking_factor * powf(2.0f, -1.0f/6.0f) * lj_force.r_min * r12_rn < 1.0f) {

@@ -124,6 +124,13 @@ namespace xmd {
         };
         std::vector<contact> contacts, disulfide_bonds;
 
+        struct tether {
+            residue *res1, *res2;
+            double length;
+        };
+        std::vector<tether> tethers(std::optional<double> tether_len =
+            std::nullopt) const;
+
         struct angle {
             residue *res1, *res2, *res3;
             double theta;

@@ -44,8 +44,8 @@ namespace xmd {
             auto [V_, dV_dr] = lj(depth, nat_dist)(r12_rn);
 
             *V += V_;
-            F[i1] -= r12_u * dV_dr;
-            F[i2] += r12_u * dV_dr;
+            F[i1] += r12_u * dV_dr;
+            F[i2] -= r12_u * dV_dr;
         }
     }
 }

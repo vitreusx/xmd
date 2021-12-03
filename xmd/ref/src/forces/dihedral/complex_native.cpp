@@ -20,11 +20,11 @@ namespace xmd {
             if (dot(x12_23, r34) < 0.0f) phi = -phi;
 
             auto diff = phi - nat_phi;
-            auto cos_diff = cos(diff), sin_3diff = sin(3.0f*diff),
-                cos_3diff = cos(3.0f*diff);
+            auto sin_diff = sin(diff), cos_diff = cos(diff);
+            auto sin_3diff = sin(3.0f*diff), cos_3diff = cos(3.0f*diff);
 
             *V += CDA * (1.0f - cos_diff) + CDB * (1.0f - cos_3diff);
-            auto dV_dphi = CDA * sin_3diff + CDB * 3.0f * sin_3diff;
+            auto dV_dphi = CDA * sin_diff + CDB * 3.0f * sin_3diff;
 
             auto r23_n = norm(r23);
             auto dphi_dr1 = -x12_23_u * r23_n * x12_23_rn;

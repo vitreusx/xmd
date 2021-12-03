@@ -14,8 +14,8 @@ namespace xmd {
 
             auto r12_u = r12 / r12_n;
             *V += V_;
-            F[i1] -= dV_dr * r12_u;
-            F[i2] += dV_dr * r12_u;
+            F[i1] += dV_dr * r12_u;
+            F[i2] -= dV_dr * r12_u;
         }
     }
 }

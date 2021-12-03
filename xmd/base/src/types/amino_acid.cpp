@@ -53,7 +53,7 @@ namespace xmd {
     }
 
     void amino_acid_data::load_from_node(const YAML::Node &root,
-        const std::filesystem::path &pwd) {
+        const std::filesystem::path &pwd [[maybe_unused]]) {
 
         std::unordered_map<std::string, double> def_atom_radii;
         auto def_atom_radii_node = root["default atom radii"];

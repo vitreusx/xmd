@@ -166,8 +166,8 @@ namespace xmd {
             }
 
         private:
-            E1 const& e1;
-            E2 const& e2;
+            E1 e1;
+            E2 e2;
         };
 
         template<typename E1, typename E2>
@@ -195,8 +195,8 @@ namespace xmd {
             }
 
         private:
-            E1 const& e1;
-            E2 const& e2;
+            E1 e1;
+            E2 e2;
         };
 
         template<typename E1, typename E2>
@@ -224,7 +224,7 @@ namespace xmd {
             }
 
         private:
-            E const& e;
+            E e;
         };
 
         template<typename E>
@@ -251,8 +251,8 @@ namespace xmd {
             }
 
         private:
-            S const& s;
-            E const& e;
+            S s;
+            E e;
         };
 
         template<typename S, typename E>
@@ -279,8 +279,8 @@ namespace xmd {
             }
 
         private:
-            E const& e;
-            S const& s;
+            E e;
+            S s;
         };
 
         template<typename E, typename S>
@@ -307,8 +307,8 @@ namespace xmd {
             }
 
         private:
-            E const& e;
-            S const& s;
+            E e;
+            S s;
         };
 
         template<typename E, typename S>
@@ -335,8 +335,8 @@ namespace xmd {
             }
 
         private:
-            E1 const& e1;
-            E2 const& e2;
+            E1 e1;
+            E2 e2;
         };
 
         template<typename E1, typename E2>
@@ -356,72 +356,98 @@ namespace xmd {
             at_expr(U* x, U* y, U* z, int idx):
                 x_{x}, y_{y}, z_{z}, idx{idx} {};
 
-            auto& x() const {
+            __attribute__((always_inline)) auto& x() const {
                 return x_[idx];
             }
 
-            auto& y() const {
+            __attribute__((always_inline)) auto& y() const {
                 return y_[idx];
             }
 
-            auto& z() const {
+            __attribute__((always_inline)) auto& z() const {
                 return z_[idx];
             }
 
             template<typename E>
+            __attribute__((always_inline))
+            void _assign_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
+                U* __restrict__ zptr, expr<E> const& e) const {
+
+                *xptr = e.x();
+                *yptr = e.y();
+                *zptr = e.z();
+            }
+
+            template<typename E>
+            __attribute__((always_inline))
             auto& operator=(expr<E> const& e) const {
-                ([&](U* __restrict__ xptr, U* __restrict__ yptr,
-                    U* __restrict__ zptr) -> void {
-
-                    *xptr = e.x();
-                    *yptr = e.y();
-                    *zptr = e.z();
-                })(x_ + idx, y_ + idx, z_ + idx);
-
+                _assign_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
                 return *this;
             }
 
-            auto& operator=(at_expr<U> const& e) const {
-                ([&](U* __restrict__ xptr, U* __restrict__ yptr,
-                    U* __restrict__ zptr) -> void {
+            template<typename E>
+            __attribute__((always_inline))
+            void _add_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
+                U* __restrict__ zptr, expr<E> const& e) const {
 
-                    *xptr = e.x();
-                    *yptr = e.y();
-                    *zptr = e.z();
-                })(x_ + idx, y_ + idx, z_ + idx);
+                *xptr += e.x();
+                *yptr += e.y();
+                *zptr += e.z();
+            }
 
+            template<typename E>
+            __attribute__((always_inline))
+            auto& operator+=(expr<E> const& e) const {
+                _add_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
                 return *this;
             }
 
-            template<typename E2>
-            auto& operator+=(expr<E2> const& e2) {
-                x() += e2.x();
-                y() += e2.y();
-                z() += e2.z();
-                return *this;
+            template<typename E>
+            __attribute__((always_inline))
+            void _sub_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
+                U* __restrict__ zptr, expr<E> const& e) const {
+
+                *xptr -= e.x();
+                *yptr -= e.y();
+                *zptr -= e.z();
             }
 
-            template<typename E2>
-            auto& operator-=(expr<E2> const& e2) {
-                x() -= e2.x();
-                y() -= e2.y();
-                z() -= e2.z();
-                return *this;
-            }
-
-            template<typename S>
-            auto& operator*=(S const& s) {
-                x() *= s;
-                y() *= s;
-                z() *= s;
+            template<typename E>
+            __attribute__((always_inline))
+            auto& operator-=(expr<E> const& e) const {
+                _sub_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
                 return *this;
             }
 
             template<typename S>
-            auto& operator/=(S const& s) {
-                x() /= s;
-                y() /= s;
-                z() /= s;
+            __attribute__((always_inline))
+            void _scalar_mul_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
+                U* __restrict__ zptr, S const& s) const {
+
+                *xptr *= s;
+                *yptr *= s;
+                *zptr *= s;
+            }
+
+            template<typename S>
+            __attribute__((always_inline)) auto& operator*=(S const& s) const {
+                _scalar_mul_op_internal(x_ + idx, y_ + idx, z_ + idx, s);
+                return *this;
+            }
+
+            template<typename S>
+            __attribute__((always_inline))
+            void _scalar_div_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
+                U* __restrict__ zptr, S const& s) const {
+
+                *xptr /= s;
+                *yptr /= s;
+                *zptr /= s;
+            }
+
+            template<typename S>
+            __attribute__((always_inline)) auto& operator/=(S const& s) const {
+                _scalar_div_op_internal(x_ + idx, y_ + idx, z_ + idx, s);
                 return *this;
             }
 
@@ -437,15 +463,15 @@ namespace xmd {
                 U const* z, int idx):
                 x_{x}, y_{y}, z_{z}, idx{idx} {};
 
-            auto const& x() const {
+            __attribute__((always_inline)) auto const& x() const {
                 return x_[idx];
             }
 
-            auto const& y() const {
+            __attribute__((always_inline)) auto const& y() const {
                 return y_[idx];
             }
 
-            auto const& z() const {
+            __attribute__((always_inline)) auto const& z() const {
                 return z_[idx];
             }
 
@@ -557,7 +583,6 @@ namespace xmd {
                 return { x.data(), y.data(), z.data() };
             }
 
-        private:
             vector<U> x, y, z;
         };
     }

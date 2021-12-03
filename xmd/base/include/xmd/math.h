@@ -45,7 +45,8 @@ namespace xmd {
 
     template<typename T>
     auto acos(T const& x) {
-        return std::acos(x);
+        auto x_ = x < T(-1.0) ? T(-1.0) : (x > T(1.0) ? T(1.0) : x);
+        return std::acos(x_);
     }
 
     template<typename T>
@@ -66,5 +67,10 @@ namespace xmd {
     template<typename T>
     auto ceil(T const& x) {
         return std::ceil(x);
+    }
+
+    template<typename T>
+    auto log(T const& x) {
+        return std::log(x);
     }
 }

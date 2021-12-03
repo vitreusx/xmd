@@ -15,7 +15,7 @@ namespace xmd {
             auto r_afm_u = r_afm * r_afm_rn;
 
             auto [_, dV_dr] = afm_force(r_afm_n);
-            F[pulled_idx] -= dV_dr * r_afm_u;
+            F[pulled_idx] += dV_dr * r_afm_u;
         }
     }
 }

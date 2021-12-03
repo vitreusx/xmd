@@ -77,4 +77,30 @@ namespace xmd {
         sum += m2;
         return sum;
     }
+
+    std::vector<model::tether> model::tethers(std::optional<double> tether_len) const {
+        size_t num_tethers = 0;
+        for (auto const& chain_: chains) {
+            auto num_residues = chain_->residues.size();
+            if (num_residues > 0)
+                num_tethers += num_residues - 1;
+        }
+
+        std::vector<tether> tethers_(num_tethers);
+        size_t tether_idx = 0;
+        for (auto const& chain_: chains) {
+            for (size_t res_idx = 0; res_idx+1 < chain_->residues.size(); ++res_idx) {
+                auto& tether_ = tethers_[tether_idx];
+                tether_.res1 = chain_->residues[res_idx];
+                tether_.res2 = chain_->residues[res_idx+1];
+
+                auto nat_length = (tether_.res2->pos - tether_.res1->pos).norm();
+                tether_.length = tether_len.value_or(nat_length);
+
+                ++tether_idx;
+            }
+        }
+
+        return tethers_;
+    }
 }

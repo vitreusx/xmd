@@ -22,8 +22,8 @@ namespace xmd::dynss {
 
             auto [V_, dV_dr] = disulfide_force(r12_n);
             *V += saturation * V_;
-            F[i1] -= saturation * dV_dr * r12_u;
             F[i1] += saturation * dV_dr * r12_u;
+            F[i2] -= saturation * dV_dr * r12_u;
 
             if (status == FORMING_OR_FORMED && saturation == 1.0f) {
                 auto cys1_num_neigh = num_neighbours[i1];

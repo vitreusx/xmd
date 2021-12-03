@@ -19,8 +19,8 @@ namespace xmd {
 
             *V += Vij;
             auto f = r12_u * dVij_dr;
-            F[i1] -= f;
-            F[i2] += f;
+            F[i1] += f;
+            F[i2] -= f;
         }
     }
 }

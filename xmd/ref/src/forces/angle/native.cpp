@@ -18,11 +18,11 @@ namespace xmd {
 
             auto cos_theta = -dot(r12, r23) * r12_rn * r23_rn;
             auto theta = acos(cos_theta);
+
             auto dtheta = theta - nat_theta;
-
             *V += k * dtheta * dtheta;
-
             auto dV_dtheta = 2.0f * k * dtheta;
+
             F[i1] -= dV_dtheta * dtheta_dr1;
             F[i2] -= dV_dtheta * dtheta_dr2;
             F[i3] -= dV_dtheta * dtheta_dr3;
