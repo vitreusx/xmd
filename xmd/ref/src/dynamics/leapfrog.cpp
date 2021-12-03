@@ -8,7 +8,7 @@ namespace xmd {
             true_r[idx] += true_v[idx] * dt + 0.5 * a_cur * dt * dt;
             a_prev[idx] = a_cur;
             r[idx] = true_r[idx];
-            v[idx] = true_r[idx];
+            v[idx] = true_v[idx];
         }
 
         *true_t += dt;

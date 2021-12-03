@@ -1,11 +1,12 @@
 #pragma once
-#include "rational.h"
-#include <unordered_map>
 #include <string>
 #include <cmath>
+#include <tuple>
 
 namespace xmd {
 #define Unit inline constexpr double
+
+    Unit dimensionless = 1.0;
 
     /* Distance */
     Unit f77unit = 1.0;
@@ -36,7 +37,7 @@ namespace xmd {
 
     /* Mass */
     Unit kg = Joule * second * second / (meter * meter);
-    Unit au = kg * 0.99999999965e-3 / mol;
+    Unit amu = kg * 0.99999999965e-3 / mol;
 
     /**
      * In the Fortran version of the model, distance of \p f77unit, time of
@@ -52,11 +53,13 @@ namespace xmd {
     Unit cspeed = 299792458.0 * meter / second;
     Unit Henry = kg * meter * meter / (second * second * Ampere * Ampere);
     Unit mu_0 = 1.25663706212e-6 * Henry / meter;
-    Unit epsilon_0 = 1.0 / (mu_0 * cspeed * cspeed);
+    Unit eps_0 = 1.0 / (mu_0 * cspeed * cspeed);
 
     /* Degrees */
     Unit rad = 1.0;
-    Unit degree = (2.0 * M_PI / 360.0) * rad;
+    Unit deg = (2.0 * M_PI / 360.0) * rad;
 
 #undef Unit
+    double parse_qty(std::string const& quantity,
+        double def_unit = dimensionless);
 };

@@ -10,12 +10,40 @@ namespace xmd {
         vector(): data_{nullptr}, size_{0}, capacity_{0} {};
 
          explicit vector(int size, T const& init = T()) {
-             data_ = (T *)malloc(size * sizeof(T));
-             for (int idx = 0; idx < size; ++idx) {
-                 data_[idx] = init;
-             }
-
              size_ = capacity_ = size;
+
+             data_ = (T *)malloc(size * sizeof(T));
+             std::fill(data_, data_ + size_, init);
+         }
+
+         vector(vector const& other) {
+             size_ = other.size_;
+             capacity_ = other.capacity_;
+             data_ = (T *)malloc(size_ * sizeof(T));
+             std::copy(other.data_, other.data_ + size_, data_);
+         }
+
+         vector& operator=(vector const& other) {
+             this->~vector();
+             size_ = other.size_;
+             capacity_ = other.capacity_;
+             data_ = (T *)malloc(size_ * sizeof(T));
+             std::copy(other.data_, other.data_ + size_, data_);
+             return *this;
+         }
+
+         vector(vector&& other) {
+             *this = std::move(other);
+         }
+
+         vector& operator=(vector&& other) {
+             size_ = other.size_;
+             capacity_ = other.capacity_;
+             data_ = other.data_;
+
+             other.size_ = other.capacity_ = 0;
+             other.data_ = nullptr;
+             return *this;
          }
 
          ~vector() {

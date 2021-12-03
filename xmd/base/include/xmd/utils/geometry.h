@@ -1,5 +1,5 @@
 #pragma once
-#include "vec3.h"
+#include <xmd/types/vec3.h>
 
 namespace xmd {
     namespace v3 {

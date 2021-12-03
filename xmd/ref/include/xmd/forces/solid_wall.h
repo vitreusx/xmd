@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/array.h>
 #include <xmd/types/vector.h>
-#include <xmd/types/geometry.h>
+#include <xmd/utils/geometry.h>
 
 namespace xmd {
     struct solid_wall_pair_span {

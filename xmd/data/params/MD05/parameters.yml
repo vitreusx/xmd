@@ -1,9 +1,0 @@
-inherit:
-  - ../defaults/parameters.yml
-lj:
-  ss:
-    pairwise:
-      sigma:
-        from-file: ss-pairs.csv
-      depth:
-        from-file: mj-matrix.csv

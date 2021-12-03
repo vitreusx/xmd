@@ -353,7 +353,7 @@ namespace xmd {
         template<typename U>
         class at_expr: public expr<at_expr<U>> {
         public:
-            at_expr(U* const& x, U* const& y, U* const& z, int const& idx):
+            at_expr(U* x, U* y, U* z, int idx):
                 x_{x}, y_{y}, z_{z}, idx{idx} {};
 
             auto& x() const {
@@ -426,17 +426,15 @@ namespace xmd {
             }
 
         private:
-            U* const& x_;
-            U* const& y_;
-            U* const& z_;
-            int const& idx;
+            U *x_, *y_, *z_;
+            int idx;
         };
 
         template<typename U>
         class at_const_expr: public expr<at_const_expr<U>> {
         public:
-            at_const_expr(U const* const& x, U const* const& y,
-                U const* const& z, int const& idx):
+            at_const_expr(U const* x, U const* y,
+                U const* z, int idx):
                 x_{x}, y_{y}, z_{z}, idx{idx} {};
 
             auto const& x() const {
@@ -452,10 +450,8 @@ namespace xmd {
             }
 
         private:
-            U const* const& x_;
-            U const* const& y_;
-            U const* const& z_;
-            int const& idx;
+            U const *x_, *y_, *z_;
+            int idx;
         };
 
         template<typename U>

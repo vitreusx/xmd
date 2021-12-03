@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string_view>
 #include <map>
+#include "utils/units.h"
 
 namespace xmd {
     pdb::pdb(std::istream &is) {
@@ -56,7 +57,7 @@ namespace xmd {
 
                     atm->name = atom_r->atom_name;
                     atm->serial = atom_r->serial;
-                    atm->pos = atom_r->pos;
+                    atm->pos = atom_r->pos * angstrom;
                     atm->parent_res = res;
 
                     res->atoms.push_back(atm);
@@ -64,7 +65,7 @@ namespace xmd {
                 else if (auto ssbond_r = record_r.cast<records::ssbond>(); ssbond_r) {
                     disulfide_bond ss;
                     ss.serial = ssbond_r->serial;
-                    ss.length = ssbond_r->length;
+                    ss.length = ssbond_r->length * angstrom;
 
                     auto& chain1 = *find_chain(ssbond_r->res[0].chain_id);
                     auto& res1 = *find_res(chain1, ssbond_r->res[0].res_seq_num);
@@ -78,7 +79,7 @@ namespace xmd {
                 }
                 else if (auto link_r = record_r.cast<records::link>(); link_r) {
                     link _link;
-                    _link.length = link_r->length;
+                    _link.length = link_r->length * angstrom;
 
                     auto& chain1 = *find_chain(link_r->res[0].chain_id);
                     auto& res1 = *find_res(chain1, link_r->res[0].res_seq_num);
@@ -91,7 +92,7 @@ namespace xmd {
                     links.push_back(_link);
                 }
                 else if (auto cryst1_r = record_r.cast<records::cryst1>(); cryst1_r) {
-                    cryst1 = cryst1_r->cell;
+                    cryst1 = cryst1_r->cell * angstrom;
                 }
                 else if (auto ter_r = record_r.cast<records::ter>(); ter_r) {
                     ter_found[ter_r->chain_id] = true;
@@ -195,67 +196,8 @@ namespace xmd {
     }
 
     std::ostream &operator<<(std::ostream &os, const pdb &p) {
-        records::model model_r;
-        model_r.serial = 1;
-        os << model_r.write();
-
-        for (auto const&[chain_id, chain]: p.chains) {
-            for (auto const &res: chain.order) {
-                for (auto const &atm: res->atoms) {
-                    records::atom atom_r;
-                    atom_r.serial = atm->serial;
-                    atom_r.chain_id = chain.chain_id;
-                    atom_r.res_seq_num = res->seq_num;
-                    atom_r.residue_name = res->name;
-                    atom_r.atom_name = atm->name;
-                    atom_r.pos = atm->pos;
-
-                    os << '\n' << atom_r.write();
-                }
-            }
-
-            auto final_res = chain.order.back();
-            records::ter ter_r;
-            ter_r.chain_id = chain.chain_id;
-            ter_r.res_seq_num = final_res->seq_num;
-            ter_r.serial = chain.ter_serial;
-            ter_r.res_name = final_res->name;
-
-            os << '\n' << ter_r.write();
-        }
-
-        os << '\n' << records::endmdl().write();
-
-        for (auto const& [serial, ss]: p.disulfide_bonds) {
-            records::ssbond ssbond_r;
-            ssbond_r.serial = ss.serial;
-            ssbond_r.length = ss.length;
-
-            ssbond_r.res[0].res_seq_num = ss.a1->parent_res->seq_num;
-            ssbond_r.res[0].chain_id = ss.a1->parent_res->parent_chain->chain_id;
-            ssbond_r.res[1].res_seq_num = ss.a2->parent_res->seq_num;
-            ssbond_r.res[1].chain_id = ss.a2->parent_res->parent_chain->chain_id;
-
-            os << '\n' << ssbond_r.write();
-        }
-
-        for (auto const& _link: p.links) {
-            records::link link_r;
-            link_r.length = _link.length;
-
-            link_r.res[0].chain_id = _link.a1->parent_res->parent_chain->chain_id;
-            link_r.res[0].res_seq_num = _link.a1->parent_res->seq_num;
-            link_r.res[0].atom_name = _link.a1->name;
-            link_r.res[0].res_name = _link.a1->parent_res->name;
-
-            link_r.res[1].chain_id = _link.a2->parent_res->parent_chain->chain_id;
-            link_r.res[1].res_seq_num = _link.a2->parent_res->seq_num;
-            link_r.res[1].atom_name = _link.a2->name;
-            link_r.res[1].res_name = _link.a2->parent_res->name;
-
-            os << '\n' << link_r.write();
-        }
-
+        os << p.emit_model(1);
+        os << p.emit_contacts();
         return os;
     }
 
@@ -264,16 +206,21 @@ namespace xmd {
 
         std::unordered_map<residue const*, xmd::model::residue*> res_map;
 
+        int chain_idx = 0;
         for (auto const& [chain_id, pdb_chain]: chains) {
             auto& xmd_chain = xmd_model.chains.emplace_back(
                 std::make_unique<xmd::model::chain>());
+            xmd_chain->chain_idx = chain_idx++;
 
+            int res_seq_idx = 0;
             for (auto const& [res_seq_num, pdb_res]: pdb_chain.residues) {
                 auto& xmd_res = xmd_model.residues.emplace_back(
                     std::make_unique<xmd::model::residue>());
 
                 xmd_res->type = amino_acid(pdb_res.name);
                 xmd_res->pos = pdb_res.find_by_name("CA")->pos;
+                xmd_res->parent = xmd_chain.get();
+                xmd_res->seq_idx = res_seq_idx++;
 
                 xmd_chain->residues.push_back(&*xmd_res);
                 res_map[&pdb_res] = &*xmd_res;
@@ -363,15 +310,12 @@ namespace xmd {
             xmd_model.disulfide_bonds.push_back(xmd_ss);
         }
 
-        xmd_model.model_box.cell = cryst1;
-        xmd_model.model_box.cell_inv = {
-            1.0 / cryst1.x(), 1.0 / cryst1.y(), 1.0 / cryst1.z()
-        };
+        xmd_model.model_box.set_cell(cryst1);
 
         return xmd_model;
     }
 
-    void pdb::add_contacts(params::amino_acids const& amino_acids,
+    void pdb::add_contacts(amino_acid_data const& data,
         bool all_atoms) {
 
         std::map<std::pair<atom*, atom*>, double> contact_map;
@@ -389,8 +333,9 @@ namespace xmd {
 
                 auto res1 = amino_acid(atom1.parent_res->name);
                 auto radius1 = all_atoms
-                    ? amino_acids.atom_radius(res1, atom1.name)
-                    : amino_acids.data.at(res1).radius;
+                    ? data[res1].atoms.at(atom1.name).radius
+                    : data[res1].radius;
+                auto seq1 = (int)atom1.parent_res->seq_num;
 
                 for (auto& [chain2_id, chain2]: chains) {
                     for (auto& [atom2_serial, atom2]: chain2.atoms) {
@@ -401,8 +346,12 @@ namespace xmd {
 
                         auto res2 = amino_acid(atom2.parent_res->name);
                         auto radius2 = all_atoms
-                            ? amino_acids.atom_radius(res2, atom2.name)
-                            : amino_acids.data.at(res2).radius;
+                            ? data[res2].atoms.at(atom2.name).radius
+                            : data[res2].radius;
+                        auto seq2 = (int)atom2.parent_res->seq_num;
+
+                        if (abs(seq1 - seq2) < 3)
+                            continue;
 
                         auto dist = (atom1.pos - atom2.pos).norm();
                         auto max_overlap_dist = radius1 + radius2;
@@ -506,4 +455,89 @@ namespace xmd {
 
         return *this;
     }
+
+    pdb_model_emitter pdb::emit_model(int model_serial) const {
+        return pdb_model_emitter(*this, model_serial);
+    }
+
+    pdb_contacts_emitter pdb::emit_contacts() const {
+        return pdb_contacts_emitter(*this);
+    }
+
+    std::ostream &
+    operator<<(std::ostream &os, const pdb_model_emitter &emitter) {
+        records::model model_r;
+        model_r.serial = emitter.model_serial;
+        os << model_r.write();
+
+        for (auto const&[chain_id, chain]: emitter.owner.chains) {
+            for (auto const &res: chain.order) {
+                for (auto const &atm: res->atoms) {
+                    records::atom atom_r;
+                    atom_r.serial = atm->serial;
+                    atom_r.chain_id = chain.chain_id;
+                    atom_r.res_seq_num = res->seq_num;
+                    atom_r.residue_name = res->name;
+                    atom_r.atom_name = atm->name;
+                    atom_r.pos = atm->pos / angstrom;
+
+                    os << '\n' << atom_r.write();
+                }
+            }
+
+            auto final_res = chain.order.back();
+            records::ter ter_r;
+            ter_r.chain_id = chain.chain_id;
+            ter_r.res_seq_num = final_res->seq_num;
+            ter_r.serial = chain.ter_serial;
+            ter_r.res_name = final_res->name;
+
+            os << '\n' << ter_r.write();
+        }
+
+        os << '\n' << records::endmdl().write();
+
+        return os;
+    }
+
+    pdb_model_emitter::pdb_model_emitter(const pdb &owner, int model_serial):
+        owner{owner}, model_serial{model_serial} {};
+
+    std::ostream &
+    operator<<(std::ostream &os, const pdb_contacts_emitter &emitter) {
+        for (auto const& [serial, ss]: emitter.owner.disulfide_bonds) {
+            records::ssbond ssbond_r;
+            ssbond_r.serial = ss.serial;
+            ssbond_r.length = ss.length / angstrom;
+
+            ssbond_r.res[0].res_seq_num = ss.a1->parent_res->seq_num;
+            ssbond_r.res[0].chain_id = ss.a1->parent_res->parent_chain->chain_id;
+            ssbond_r.res[1].res_seq_num = ss.a2->parent_res->seq_num;
+            ssbond_r.res[1].chain_id = ss.a2->parent_res->parent_chain->chain_id;
+
+            os << '\n' << ssbond_r.write();
+        }
+
+        for (auto const& _link: emitter.owner.links) {
+            records::link link_r;
+            link_r.length = _link.length / angstrom;
+
+            link_r.res[0].chain_id = _link.a1->parent_res->parent_chain->chain_id;
+            link_r.res[0].res_seq_num = _link.a1->parent_res->seq_num;
+            link_r.res[0].atom_name = _link.a1->name;
+            link_r.res[0].res_name = _link.a1->parent_res->name;
+
+            link_r.res[1].chain_id = _link.a2->parent_res->parent_chain->chain_id;
+            link_r.res[1].res_seq_num = _link.a2->parent_res->seq_num;
+            link_r.res[1].atom_name = _link.a2->name;
+            link_r.res[1].res_name = _link.a2->parent_res->name;
+
+            os << '\n' << link_r.write();
+        }
+
+        return os;
+    }
+
+    pdb_contacts_emitter::pdb_contacts_emitter(const pdb &owner):
+        owner{owner} {};
 }

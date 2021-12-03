@@ -1,11 +1,15 @@
 #pragma once
 #include "xmd/model/model.h"
-#include "xmd/files/param_file.h"
+#include "xmd/types/amino_acid.h"
 #include <Eigen/Core>
 #include <vector>
 #include <string>
 
 namespace xmd {
+    class pdb;
+    class pdb_model_emitter;
+    class pdb_contacts_emitter;
+
     class pdb {
     public:
         pdb(pdb const& other);
@@ -15,8 +19,10 @@ namespace xmd {
         explicit pdb(xmd::model const& xmd_model);
 
         friend std::ostream& operator<<(std::ostream& os, pdb const& p);
+        pdb_model_emitter emit_model(int model_serial) const;
+        pdb_contacts_emitter emit_contacts() const;
 
-        void add_contacts(params::amino_acids const& amino_acids,
+        void add_contacts(amino_acid_data const& data,
             bool all_atoms = true);
 
         enum class contact_deriv {
@@ -70,7 +76,35 @@ namespace xmd {
         Eigen::Vector3d cryst1;
 
     private:
+        friend class pdb_model_emitter;
+        friend class pdb_contacts_emitter;
+
         chain *find_chain(char chain_id);
         residue *find_res(chain& c, size_t seq_num);
+    };
+
+    class pdb_model_emitter {
+    public:
+        friend std::ostream& operator<<(std::ostream& os,
+            pdb_model_emitter const& emitter);
+
+    private:
+        friend class pdb;
+
+        pdb const& owner;
+        int model_serial;
+        explicit pdb_model_emitter(pdb const& owner, int model_serial);
+    };
+
+    class pdb_contacts_emitter {
+    public:
+        friend std::ostream& operator<<(std::ostream& os,
+            pdb_contacts_emitter const& emitter);
+
+    private:
+        friend class pdb;
+
+        pdb const& owner;
+        explicit pdb_contacts_emitter(pdb const& owner);
     };
 }

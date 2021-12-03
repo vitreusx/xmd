@@ -5,7 +5,7 @@ file(GLOB_RECURSE PRIVATE_SOURCES CONFIGURE_DEPENDS
 file(GLOB_RECURSE PUBLIC_SOURCES CONFIGURE_DEPENDS
     include/*.hpp include/*.h include/*.inl)
 
-set(TARGET_NAME "ref_impl")
+set(TARGET_NAME "ref")
 set(TARGET_ROOT_DIR "xmd")
 
 add_library(${TARGET_NAME})

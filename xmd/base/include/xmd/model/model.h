@@ -106,13 +106,14 @@ namespace xmd {
 
         struct residue {
             chain* parent;
-            int seq_num;
+            int seq_idx;
             amino_acid type;
             Eigen::Vector3d pos;
         };
         std::vector<std::unique_ptr<residue>> residues;
 
         struct chain {
+            int chain_idx;
             std::vector<residue*> residues;
         };
         std::vector<std::unique_ptr<chain>> chains;
