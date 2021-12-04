@@ -11,6 +11,7 @@
 #include <xmd/forces/angle/native.h>
 #include <xmd/forces/dihedral/complex_native.h>
 #include <xmd/stats/total_energy.h>
+#include <xmd/stats/total_force.h>
 
 using namespace xmd;
 
@@ -95,6 +96,7 @@ private:
     vector<int> chain_seq_idx;
     float V, E, t;
     double true_t;
+    vec3f total_F;
     int num_particles, num_chains;
     std::ofstream output_pdb;
     int pdb_serial;
@@ -263,6 +265,13 @@ public:
         return task;
     }
 
+    auto compute_total_force_() {
+        compute_total_force task;
+        task.F = F.to_span();
+        task.total_F = &total_F;
+        return task;
+    }
+
 public:
     void operator()() {
         auto reset_vf_t = reset_vf_();
@@ -274,6 +283,7 @@ public:
         auto eval_native_angle_forces_t = eval_native_angle_forces_();
         auto eval_cnd_forces_t = eval_cnd_forces_();
         auto compute_total_energy_t = compute_total_energy_();
+        auto compute_total_force_t = compute_total_force_();
 
         using namespace std::chrono;
         show_progress_bar_t.start_wall_time = high_resolution_clock::now();
@@ -293,6 +303,7 @@ public:
 
             if (t - pbar_last_update_t >= pbar_update_period) {
                 compute_total_energy_t();
+                compute_total_force_t();
                 show_progress_bar_t();
                 pbar_last_update_t = t;
             }

@@ -499,11 +499,17 @@ namespace xmd {
         template<typename U>
         class vec_span {
         public:
+            vec_span(): x{nullptr}, y{nullptr}, z{nullptr}, size_{0} {};
+
             vec_span(U *x, U *y, U *z, int size):
                 x{x}, y{y}, z{z}, size_{size} {};
 
             auto operator[](int const& idx) const {
                 return at_expr<U>(x, y, z, idx);
+            }
+
+            int size() const {
+                return size_;
             }
 
         private:
