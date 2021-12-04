@@ -2,9 +2,10 @@
 #include <string>
 #include <cmath>
 #include <tuple>
+#include <xmd/types/scalar.h>
 
 namespace xmd {
-#define Unit inline constexpr double
+#define Unit inline constexpr true_real
 
     Unit dimensionless = 1.0;
 
@@ -60,6 +61,6 @@ namespace xmd {
     Unit deg = (2.0 * M_PI / 360.0) * rad;
 
 #undef Unit
-    double parse_qty(std::string const& quantity,
-        double def_unit = dimensionless);
+    true_real parse_qty(std::string const& quantity,
+        true_real def_unit = dimensionless);
 };

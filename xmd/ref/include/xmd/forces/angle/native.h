@@ -6,17 +6,17 @@
 namespace xmd {
     struct native_angle_span {
         array<int> i1, i2, i3;
-        array<float> nat_theta;
+        array<real> nat_theta;
         int size;
     };
 
     class eval_native_angle_forces {
     public:
-        float k;
+        real k;
 
     public:
-        float *V;
-        vec3f_array r, F;
+        real *V;
+        vec3r_array r, F;
         native_angle_span angles;
 
     public:

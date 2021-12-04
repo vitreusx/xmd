@@ -9,13 +9,13 @@ namespace xmd::qa {
     class process_contacts {
     public:
         lj_array ljs;
-        float cycle_time, cycle_time_inv, breaking_factor;
+        real cycle_time, cycle_time_inv, breaking_factor;
 
     public:
-        vec3f_array r, F;
-        box<vec3f> *box;
+        vec3r_array r, F;
+        box<vec3r> *box;
         contact_set *contacts;
-        float *V, *t;
+        real *V, *t;
         sync_data_array sync;
 
     public:

@@ -96,14 +96,14 @@ namespace xmd::fields {
         inplace_format(line.data() + beg, "%*s", len, ls.c_str());
     }
 
-    real::real(size_t i, size_t j, int n, int m):
+    real_field::real_field(size_t i, size_t j, int n, int m):
         beg{i-1}, len{j-i+1}, n{n}, m{m} {}
 
-    double real::read(const std::string &line) const {
+    true_real real_field::read(const std::string &line) const {
         return std::stod(line.substr(beg, len));
     }
 
-    void real::write(std::string &line, double x) const {
+    void real_field::write(std::string &line, true_real x) const {
         auto x_str = format("%*.*f", n, m, x);
         inplace_format(line.data() + beg, "%*s", len, x_str.c_str());
     }

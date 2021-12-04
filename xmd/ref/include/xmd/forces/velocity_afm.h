@@ -5,7 +5,7 @@
 namespace xmd {
     struct velocity_afm_bundle_span {
         array<int> pulled_idx;
-        vec3f_array afm_orig, afm_vel;
+        vec3r_array afm_orig, afm_vel;
         int size;
     };
 
@@ -14,8 +14,8 @@ namespace xmd {
         harmonic afm_force;
 
     public:
-        vec3f_array r, F;
-        float *t;
+        vec3r_array r, F;
+        real *t;
         velocity_afm_bundle_span bundles;
 
     public:

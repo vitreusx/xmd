@@ -10,13 +10,13 @@
 namespace xmd {
     struct go_contact_span {
         array<int> i1, i2;
-        array<float> nat_dist;
+        array<real> nat_dist;
         int size;
     };
 
     struct go_contact_vector {
         vector<int> i1, i2;
-        vector<float> nat_dist;
+        vector<real> nat_dist;
         int size;
 
         inline int push_back() {
@@ -45,11 +45,11 @@ namespace xmd {
 
     class update_go_contacts {
     public:
-        float cutoff;
+        real cutoff;
 
     public:
-        vec3f_array r;
-        box<vec3f> *box;
+        vec3r_array r;
+        box<vec3r> *box;
         nl::nl_data *nl;
         go_contact_vector *pairs;
 
@@ -59,13 +59,13 @@ namespace xmd {
 
     class eval_go_forces {
     public:
-        float depth;
+        real depth;
 
     public:
-        vec3f_array r, F;
-        box<vec3f> *box;
+        vec3r_array r, F;
+        box<vec3r> *box;
         go_contact_span contacts;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

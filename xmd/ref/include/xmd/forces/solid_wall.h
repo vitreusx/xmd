@@ -37,10 +37,10 @@ namespace xmd {
 
     class update_solid_wall_pairs {
     public:
-        float cutoff;
+        real cutoff;
 
     public:
-        vec3f_array r;
+        vec3r_array r;
         int num_particles;
         span<planef> walls;
         solid_wall_pair_vector *pairs;
@@ -51,13 +51,13 @@ namespace xmd {
 
     class eval_solid_wall_forces {
     public:
-        float eps;
+        real eps;
 
     public:
-        vec3f_array r, F, wall_F;
+        vec3r_array r, F, wall_F;
         solid_wall_pair_span pairs;
         span<planef> walls;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

@@ -6,13 +6,13 @@
 namespace xmd {
     class eval_relative_es_forces {
     public:
-        float A, screen_dist_inv;
+        real A, screen_dist_inv;
 
     public:
-        vec3f_array r, F;
-        box<vec3f> *box;
+        vec3r_array r, F;
+        box<vec3r> *box;
         es_pair_span es_pairs;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

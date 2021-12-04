@@ -39,11 +39,11 @@ namespace xmd {
 
     class update_nat_ssbonds {
     public:
-        float cutoff;
+        real cutoff;
 
     public:
-        vec3f_array r;
-        box<vec3f> *box;
+        vec3r_array r;
+        box<vec3r> *box;
         nl::nl_data *nl;
         nat_ssbond_vector *pairs;
 
@@ -53,13 +53,13 @@ namespace xmd {
 
     class eval_nat_ssbond_forces {
     public:
-        float H1, nat_r;
+        real H1, nat_r;
 
     public:
-        vec3f_array r, F;
-        box<vec3f> *box;
+        vec3r_array r, F;
+        box<vec3r> *box;
         nat_ssbond_span bonds;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

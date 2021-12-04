@@ -4,8 +4,8 @@
 namespace xmd {
     class compute_total_force {
     public:
-        vec3f_span F;
-        vec3f *total_F;
+        vec3r_span F;
+        vec3r *total_F;
 
     public:
         void operator()();

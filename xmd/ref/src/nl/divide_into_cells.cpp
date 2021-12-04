@@ -3,8 +3,8 @@
 namespace xmd::nl {
 
     void divide_into_cells::operator()() const {
-        auto min_val = std::numeric_limits<float>::min();
-        auto max_val = std::numeric_limits<float>::max();
+        auto min_val = std::numeric_limits<real>::min();
+        auto max_val = std::numeric_limits<real>::max();
 
         auto x_min = max_val, y_min = max_val, z_min = max_val;
         auto x_max = min_val, y_max = min_val, z_max = min_val;
@@ -26,17 +26,17 @@ namespace xmd::nl {
 
         auto x_ext = x_max - x_min;
         auto cell_nx = (int)ceil(x_ext * cell_a_inv);
-        auto cell_ax = x_ext * (1.0f / (float)cell_nx + cell_a_eps);
+        auto cell_ax = x_ext * (1.0f / (real)cell_nx + cell_a_eps);
         auto cell_ax_inv = 1.0f / cell_ax;
 
         auto y_ext = y_max - y_min;
         auto cell_ny = (int)ceil(y_ext * cell_a_inv);
-        auto cell_ay = y_ext * (1.0f / (float)cell_ny + cell_a_eps);
+        auto cell_ay = y_ext * (1.0f / (real)cell_ny + cell_a_eps);
         auto cell_ay_inv = 1.0f / cell_ay;
 
         auto z_ext = z_max - z_min;
         auto cell_nz = (int)ceil(z_ext * cell_a_inv);
-        auto cell_az = z_ext * (1.0f / (float)cell_nz + cell_a_eps);
+        auto cell_az = z_ext * (1.0f / (real)cell_nz + cell_a_eps);
         auto cell_az_inv = 1.0f / cell_az;
 
         int num_cells = cell_nx * cell_ny * cell_nz;

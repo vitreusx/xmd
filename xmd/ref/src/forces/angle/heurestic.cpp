@@ -35,10 +35,10 @@ namespace xmd {
             auto cos_theta = -dot(r12, r23) * r12_rn * r23_rn;
             auto theta = acos(cos_theta);
 
-            float angle_V = 0.0f, dV_dtheta = 0.0f;
+            real angle_V = 0.0f, dV_dtheta = 0.0f;
             for (int d = POLY_DEG; d >= 0; --d) {
                 auto coeff = poly_coeffs[d][type_val];
-                if (d > 0) dV_dtheta = (float)d * coeff + theta * dV_dtheta;
+                if (d > 0) dV_dtheta = (real)d * coeff + theta * dV_dtheta;
                 angle_V = coeff + theta * angle_V;
             }
 

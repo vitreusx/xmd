@@ -10,12 +10,12 @@ namespace xmd::dynss {
 
     class count_neighbours {
     public:
-        float inclusion_radius;
+        real inclusion_radius;
 
     public:
-        vec3f_array r;
+        vec3r_array r;
         neighbor_bundle_span bundles;
-        box<vec3f> *box;
+        box<vec3r> *box;
         array<int> num_neigh;
 
     public:

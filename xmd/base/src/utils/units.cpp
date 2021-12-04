@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 namespace xmd {
-    double parse_qty(std::string const& quantity, double def_unit) {
+    true_real parse_qty(std::string const& quantity, true_real def_unit) {
         auto space = std::find(quantity.begin(), quantity.end(), ' ');
         if (space == quantity.end()) {
             return std::stod(quantity) * def_unit;
@@ -13,7 +13,7 @@ namespace xmd {
             auto value = std::stod(std::string(quantity.begin(), space));
             auto unit_str = std::string(space + 1, quantity.end());
 
-            static std::unordered_map<std::string, double> unit_map = {
+            static std::unordered_map<std::string, true_real> unit_map = {
                 { "f77unit", f77unit }, { "A", angstrom }, { "nm", nanometer },
                 { "m", meter }, { "ns", nanosecond }, { "tau", tau },
                 { "micros", microsecond }, { "ms", millisecond }, { "s", second },

@@ -8,7 +8,7 @@ namespace xmd {
         using namespace std;
         using namespace std::chrono;
 
-        double progress = *true_t / total_time;
+        true_real progress = *true_t / total_time;
 
         auto now = high_resolution_clock::now();
         auto diff = duration_cast<microseconds>(now - start_wall_time).count();

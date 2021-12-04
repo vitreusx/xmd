@@ -26,11 +26,11 @@ namespace xmd {
     class eval_heurestic_dihedral_forces {
     public:
         static constexpr int NUM_TERMS = 6, NUM_TYPES = 9;
-        float coeffs[NUM_TERMS][NUM_TYPES];
+        real coeffs[NUM_TERMS][NUM_TYPES];
 
-        vec3f_span r, F;
+        vec3r_span r, F;
         heurestic_dihedral_span dihedrals;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

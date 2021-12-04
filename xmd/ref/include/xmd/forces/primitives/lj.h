@@ -2,18 +2,19 @@
 #include <tuple>
 #include <xmd/types/array.h>
 #include <xmd/math.h>
+#include <xmd/types/scalar.h>
 
 namespace xmd {
     class lj {
     public:
-        float depth, r_min;
+        real depth, r_min;
 
         lj() = default;
 
-        inline lj(float depth, float r_min):
+        inline lj(real depth, real r_min):
             depth{depth}, r_min{r_min} {};
 
-        inline std::tuple<float, float> operator()(float r_inv) const {
+        inline std::tuple<real, real> operator()(real r_inv) const {
             auto s = r_inv * r_min, s6 = ipow<6>(s), s12 = s6 * s6;
             auto V = depth * (s12 - 2.0f * s6);
             auto dV_dr = 12.0f * depth * r_inv * (s6 - s12);
@@ -22,7 +23,7 @@ namespace xmd {
     };
 
     struct lj_array {
-        array<float> depth, r_min;
+        array<real> depth, r_min;
         int size;
 
         inline lj operator[](int idx) const {

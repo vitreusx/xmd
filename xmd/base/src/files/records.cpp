@@ -33,9 +33,9 @@ namespace xmd::records {
         a.residue_name = fields::residue_name(18, 20).read(line);
         a.chain_id = fields::achar(22).read(line);
         a.res_seq_num = fields::integer(23, 26).read(line);
-        a.pos.x() = fields::real(31, 38, 8, 3).read(line);
-        a.pos.y() = fields::real(39, 46, 8, 3).read(line);
-        a.pos.z() = fields::real(47, 54, 8, 3).read(line);
+        a.pos.x() = fields::real_field(31, 38, 8, 3).read(line);
+        a.pos.y() = fields::real_field(39, 46, 8, 3).read(line);
+        a.pos.z() = fields::real_field(47, 54, 8, 3).read(line);
 
         return a;
     }
@@ -49,9 +49,9 @@ namespace xmd::records {
         fields::residue_name(18, 20).write(line, residue_name);
         fields::achar(22).write(line, chain_id);
         fields::integer(23, 26).write(line, res_seq_num);
-        fields::real(31, 38, 8, 3).write(line, pos.x());
-        fields::real(39, 46, 8, 3).write(line, pos.y());
-        fields::real(47, 54, 8, 3).write(line, pos.z());
+        fields::real_field(31, 38, 8, 3).write(line, pos.x());
+        fields::real_field(39, 46, 8, 3).write(line, pos.y());
+        fields::real_field(47, 54, 8, 3).write(line, pos.z());
 
         return line;
     }
@@ -68,7 +68,7 @@ namespace xmd::records {
         s.res[0].res_seq_num = fields::integer(18, 21).read(line);
         s.res[1].chain_id = fields::achar(30).read(line);
         s.res[1].res_seq_num = fields::integer(32, 35).read(line);
-        s.length = fields::real(74, 78, 5, 2).read(line);
+        s.length = fields::real_field(74, 78, 5, 2).read(line);
 
         return s;
     }
@@ -83,7 +83,7 @@ namespace xmd::records {
         fields::integer(18, 21).write(line, res[0].res_seq_num);
         fields::achar(30).write(line, res[1].chain_id);
         fields::integer(32, 35).write(line, res[1].res_seq_num);
-        fields::real(74, 78, 5, 2).write(line, length);
+        fields::real_field(74, 78, 5, 2).write(line, length);
 
         return line;
     }
@@ -101,7 +101,7 @@ namespace xmd::records {
         l.res[1].res_name = fields::residue_name(48, 50).read(line);
         l.res[1].chain_id = fields::achar(52).read(line);
         l.res[1].res_seq_num = fields::integer(53, 56).read(line);
-        l.length = fields::real(74, 78, 5, 2).read(line);
+        l.length = fields::real_field(74, 78, 5, 2).read(line);
 
         return l;
     }
@@ -118,7 +118,7 @@ namespace xmd::records {
         fields::residue_name(48, 50).write(line, res[1].res_name);
         fields::achar(52).write(line, res[1].chain_id);
         fields::integer(53, 56).write(line, res[1].res_seq_num);
-        fields::real(74, 78, 5, 2).write(line, length);
+        fields::real_field(74, 78, 5, 2).write(line, length);
 
         return line;
     }
@@ -128,9 +128,9 @@ namespace xmd::records {
 
         if (!fields::record_name("CRYST1").read(line))
             return std::nullopt;
-        c1.cell.x() = fields::real(7, 15, 9, 3).read(line);
-        c1.cell.y() = fields::real(16, 24, 9, 3).read(line);
-        c1.cell.z() = fields::real(25, 33, 9, 3).read(line);
+        c1.cell.x() = fields::real_field(7, 15, 9, 3).read(line);
+        c1.cell.y() = fields::real_field(16, 24, 9, 3).read(line);
+        c1.cell.z() = fields::real_field(25, 33, 9, 3).read(line);
 
         return c1;
     }
@@ -139,9 +139,9 @@ namespace xmd::records {
         std::string line(80, ' ');
 
         fields::record_name("CRYST1").write(line);
-        fields::real(7, 15, 9, 3).write(line, cell.x());
-        fields::real(16, 24, 9, 3).write(line, cell.y());
-        fields::real(25, 33, 9, 3).write(line, cell.z());
+        fields::real_field(7, 15, 9, 3).write(line, cell.x());
+        fields::real_field(16, 24, 9, 3).write(line, cell.y());
+        fields::real_field(25, 33, 9, 3).write(line, cell.z());
 
         return line;
     }

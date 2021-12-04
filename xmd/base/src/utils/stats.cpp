@@ -7,7 +7,7 @@ namespace xmd {
     stats::stats(std::string name, const std::function<void()> &fn,
         int nsamples)  {
 
-        std::vector<double> times(nsamples);
+        std::vector<true_real> times(nsamples);
 
         using namespace std::chrono;
         for (int sample_idx = 0; sample_idx < nsamples; ++sample_idx) {
@@ -15,21 +15,21 @@ namespace xmd {
             fn();
             auto after = high_resolution_clock::now();
             auto dur_ns = duration_cast<nanoseconds>(after - before).count();
-            times[sample_idx] = (double)dur_ns / 1.0e9;
+            times[sample_idx] = (true_real)dur_ns / 1.0e9;
         }
 
-        mean = std::accumulate(times.begin(), times.end(), 0.0) / (double)nsamples;
-        double var = std::accumulate(times.begin(), times.end(), 0.0,
+        mean = std::accumulate(times.begin(), times.end(), 0.0) / (true_real)nsamples;
+        true_real var = std::accumulate(times.begin(), times.end(), 0.0,
             [this](auto cur_var, auto t) -> auto {
                 return cur_var + (t - mean) * (t - mean);
             });
-        std = nsamples > 1 ? sqrt(var / (double)(nsamples - 1)) : 0.0;
+        std = nsamples > 1 ? sqrt(var / (true_real)(nsamples - 1)) : 0.0;
 
         std::sort(times.begin(), times.end());
         min_t = times.front();
         max_t = times.back();
-        q25 = times[(int)(0.25 * (double)nsamples)];
-        q75 = times[(int)(0.75 * (double)nsamples)];
+        q25 = times[(int)(0.25 * (true_real)nsamples)];
+        q75 = times[(int)(0.75 * (true_real)nsamples)];
 
         this->name = std::move(name);
     }

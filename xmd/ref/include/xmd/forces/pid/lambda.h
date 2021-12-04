@@ -1,5 +1,6 @@
 #pragma once
 #include <xmd/types/array.h>
+#include <xmd/types/scalar.h>
 #include <tuple>
 #include <cmath>
 #include <xmd/math.h>
@@ -11,19 +12,19 @@ namespace xmd::pid {
 
     class lambda_func {
     public:
-        float psi_0, alpha;
+        real psi_0, alpha;
         lambda_version version;
 
         lambda_func() = default;
 
-        lambda_func(float psi_0, float alpha, lambda_version version):
+        lambda_func(real psi_0, real alpha, lambda_version version):
             psi_0{psi_0}, alpha{alpha}, version{version} {};
 
-        inline bool supp(float psi) const {
+        inline bool supp(real psi) const {
             return abs(alpha * (psi - psi_0)) < M_PI;
         }
 
-        inline std::tuple<float, float> operator()(float psi) const {
+        inline std::tuple<real, real> operator()(real psi) const {
             switch (version) {
             case COSINE: {
                 auto s = alpha * (psi - psi_0);
@@ -49,7 +50,7 @@ namespace xmd::pid {
     };
 
     struct lambda_func_array {
-        array<float> psi_0, alpha;
+        array<real> psi_0, alpha;
         lambda_version version;
 
         inline lambda_func operator[](int idx) const {

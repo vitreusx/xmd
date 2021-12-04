@@ -9,13 +9,13 @@ namespace xmd {
     template<typename Generator>
     class set_initial_vel {
     public:
-        float temperature;
-        sphere_dist<vec3f, float> vel_dist;
+        real temperature;
+        sphere_dist<vec3r, real> vel_dist;
 
     public:
         Generator& g;
-        vec3f_array v;
-        array<float> mass_inv;
+        vec3r_array v;
+        array<real> mass_inv;
         int num_particles;
 
     public:
@@ -25,7 +25,7 @@ namespace xmd {
         void operator()() const {
             auto factor = sqrt(kB * temperature);
             for (int idx = 0; idx < num_particles; ++idx) {
-                v[idx] = vec3f::Zero();
+                v[idx] = vec3r::Zero();
             }
         }
     };

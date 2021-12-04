@@ -10,8 +10,8 @@ namespace xmd::qa {
 
     class precompute_nh {
     public:
-        vec3f_array r, n, h;
-        box<vec3f> *box;
+        vec3r_array r, n, h;
+        box<vec3r> *box;
         nh_bundle_span bundles;
 
     public:

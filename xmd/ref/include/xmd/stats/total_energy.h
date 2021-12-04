@@ -4,10 +4,10 @@
 namespace xmd {
     class compute_total_energy {
     public:
-        vec3f_array v;
-        array<float> mass;
+        vec3r_array v;
+        array<real> mass;
         int num_particles;
-        float *V, *E;
+        real *V, *E;
 
     public:
         void operator()() const;

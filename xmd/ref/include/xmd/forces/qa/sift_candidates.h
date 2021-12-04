@@ -10,13 +10,13 @@
 namespace xmd::qa {
     class sift_candidates {
     public:
-        float min_abs_cos_hr, min_abs_cos_hh, max_cos_nr;
-        float req_min_dist[contact_type::NUM_TYPES];
+        real min_abs_cos_hr, min_abs_cos_hh, max_cos_nr;
+        real req_min_dist[contact_type::NUM_TYPES];
         polarization_type ptype[amino_acid::NUM_AA];
 
     public:
-        vec3f_array r, n, h;
-        box<vec3f> *box;
+        vec3r_array r, n, h;
+        box<vec3r> *box;
         array<amino_acid> atype;
         sync_data_array sync;
 

@@ -38,11 +38,11 @@ namespace xmd {
 
     class update_pauli_pairs {
     public:
-        float r_excl;
+        real r_excl;
 
     public:
-        vec3f_array r;
-        box<vec3f> *box;
+        vec3r_array r;
+        box<vec3r> *box;
         nl::nl_data *nl;
         pauli_pair_vector *pairs;
 
@@ -52,13 +52,13 @@ namespace xmd {
 
     class eval_pauli_exclusion_forces {
     public:
-        float depth, r_excl;
+        real depth, r_excl;
 
     public:
-        vec3f_array r, F;
-        box<vec3f> *box;
+        vec3r_array r, F;
+        box<vec3r> *box;
         pauli_pair_span pairs;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

@@ -1,6 +1,7 @@
 #pragma once
 #include <xmd/math.h>
 #include <xmd/types/vector.h>
+#include <xmd/types/scalar.h>
 
 namespace xmd {
     namespace v3 {
@@ -356,6 +357,9 @@ namespace xmd {
             at_expr(U* x, U* y, U* z, int idx):
                 x_{x}, y_{y}, z_{z}, idx{idx} {};
 
+            at_expr(at_expr<U> const& other):
+                x_{other.x_}, y_{other.y_}, z_{other.z_}, idx{other.idx} {};
+
             __attribute__((always_inline)) auto& x() const {
                 return x_[idx];
             }
@@ -381,6 +385,12 @@ namespace xmd {
             template<typename E>
             __attribute__((always_inline))
             auto& operator=(expr<E> const& e) const {
+                _assign_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
+                return *this;
+            }
+
+            __attribute__((always_inline))
+            auto& operator=(at_expr<U> const& e) const {
                 _assign_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
                 return *this;
             }
@@ -593,13 +603,13 @@ namespace xmd {
         };
     }
 
-    using vec3f = v3::vec<float>;
-    using vec3f_array = v3::vec_array<float>;
-    using vec3f_span = v3::vec_span<float>;
-    using vec3f_vector = v3::vec_vector<float>;
+    using vec3r = v3::vec<real>;
+    using vec3r_array = v3::vec_array<real>;
+    using vec3r_span = v3::vec_span<real>;
+    using vec3r_vector = v3::vec_vector<real>;
 
-    using vec3d = v3::vec<double>;
-    using vec3d_array = v3::vec_array<double>;
-    using vec3d_span = v3::vec_span<double>;
-    using vec3d_vector = v3::vec_vector<double>;
+    using vec3tr = v3::vec<true_real>;
+    using vec3tr_array = v3::vec_array<true_real>;
+    using vec3tr_span = v3::vec_span<true_real>;
+    using vec3tr_vector = v3::vec_vector<true_real>;
 }

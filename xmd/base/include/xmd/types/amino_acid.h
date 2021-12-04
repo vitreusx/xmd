@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <xmd/utils/param_entry.h>
+#include "scalar.h"
 
 namespace xmd {
     enum aa_code : char {
@@ -52,7 +53,7 @@ namespace std {
 namespace xmd {
     struct atom_data {
         std::string name;
-        double radius;
+        true_real radius;
         bool backbone;
     };
 
@@ -61,10 +62,10 @@ namespace xmd {
     };
 
     struct aa_data {
-        double mass, radius;
+        true_real mass, radius;
         std::unordered_map<std::string, atom_data> atoms;
         polarization_type polarization;
-        double charge;
+        true_real charge;
         contact_limits limits;
     };
 

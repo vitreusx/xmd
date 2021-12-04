@@ -4,9 +4,9 @@ namespace xmd::pid {
 
     void eval_pid_forces::operator()() {
         for (int idx = 0; idx < bundles.size; ++idx) {
-            float psi1, psi2;
-            vec3f dpsi1_dr1p, dpsi1_dr1, dpsi1_dr1n, dpsi1_dr2;
-            vec3f dpsi2_dr2p, dpsi2_dr2, dpsi2_dr2n, dpsi2_dr1;
+            real psi1, psi2;
+            vec3r dpsi1_dr1p, dpsi1_dr1, dpsi1_dr1n, dpsi1_dr2;
+            vec3r dpsi2_dr2p, dpsi2_dr2, dpsi2_dr2n, dpsi2_dr1;
 
             auto i1p = bundles.i1p[idx], i1 = bundles.i1[idx], i1n = bundles.i1n[idx];
             auto i2p = bundles.i2p[idx], i2 = bundles.i2[idx], i2n = bundles.i2n[idx];
@@ -84,7 +84,7 @@ namespace xmd::pid {
             auto r12 = box->ray(r1, r2);
             auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
 
-            float A = 0.0f, B = 0.0f, C = 0.0f, V_ = 0.0f;
+            real A = 0.0f, B = 0.0f, C = 0.0f, V_ = 0.0f;
 
             if (bb_plus_lam.supp(psi1) && bb_plus_lam.supp(psi2)) {
                 auto [lam1, deriv1] = bb_plus_lam(psi1);

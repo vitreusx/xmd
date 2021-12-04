@@ -3,7 +3,7 @@
 namespace xmd {
 
     void eval_relative_es_forces::operator()() const {
-        auto V_factor = 1.0f / (4.0f * (float)M_PI * A);
+        auto V_factor = 1.0f / (4.0f * (real)M_PI * A);
 
         for (int idx = 0; idx < es_pairs.size; ++idx) {
             auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];

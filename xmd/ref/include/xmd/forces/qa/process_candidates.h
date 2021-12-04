@@ -8,7 +8,7 @@ namespace xmd::qa {
     public:
         candidate_list *candidates;
         sync_data_array sync;
-        float *t;
+        real *t;
         contact_set *contacts;
 
     public:

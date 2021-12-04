@@ -78,7 +78,7 @@ namespace xmd {
         return sum;
     }
 
-    std::vector<model::tether> model::tethers(std::optional<double> tether_len) const {
+    std::vector<model::tether> model::tethers(std::optional<true_real> tether_len) const {
         size_t num_tethers = 0;
         for (auto const& chain_: chains) {
             auto num_residues = chain_->residues.size();

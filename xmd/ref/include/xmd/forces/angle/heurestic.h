@@ -26,12 +26,12 @@ namespace xmd {
     class eval_heurestic_angle_forces {
     public:
         static constexpr int POLY_DEG = 6, NUM_TYPES = 9;
-        float poly_coeffs[POLY_DEG+1][NUM_TYPES];
+        real poly_coeffs[POLY_DEG+1][NUM_TYPES];
 
     public:
-        vec3f_array r, F;
+        vec3r_array r, F;
         heurestic_angle_span angles;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

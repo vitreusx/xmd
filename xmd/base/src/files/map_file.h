@@ -3,25 +3,26 @@
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
+#include <types/scalar.h>
 
 namespace xmd {
     class map_file {
     public:
         struct contact {
             int i1, i2;
-            double length;
+            true_real length;
         };
         std::vector<contact> contacts;
 
         struct angle {
             int i1, i2, i3;
-            double theta;
+            true_real theta;
         };
         std::vector<angle> angles;
 
         struct dihedral {
             int i1, i2, i3, i4;
-            double phi;
+            true_real phi;
         };
         std::vector<dihedral> dihedrals;
 

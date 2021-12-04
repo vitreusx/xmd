@@ -7,11 +7,11 @@
 namespace xmd::nl {
     class divide_into_cells {
     public:
-        float cutoff, pad;
+        real cutoff, pad;
 
     public:
-        vec3f_array r;
-        box<vec3f> *box;
+        vec3r_array r;
+        box<vec3r> *box;
 
         nl_data *data;
         int num_particles;

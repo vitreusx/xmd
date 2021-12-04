@@ -5,11 +5,11 @@
 namespace xmd::nl {
     class verify {
     public:
-        float pad;
+        real pad;
 
     public:
-        vec3f_array r, orig_r;
-        box<vec3f> *box, *orig_box;
+        vec3r_array r, orig_r;
+        box<vec3r> *box, *orig_box;
         bool *invalid;
         int num_particles;
 

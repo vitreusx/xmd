@@ -4,13 +4,13 @@
 namespace xmd {
     struct force_afm_bundle_span {
         array<int> pulled_idx;
-        vec3f_array pull_force;
+        vec3r_array pull_force;
         int size;
     };
 
     class eval_force_afm_forces {
     public:
-        vec3f_array F;
+        vec3r_array F;
         force_afm_bundle_span bundles;
 
     public:

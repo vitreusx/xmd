@@ -58,13 +58,13 @@ namespace xmd::pid {
 
     class update_pid_bundles {
     public:
-        float cutoff;
+        real cutoff;
 
     public:
-        vec3f_array r;
+        vec3r_array r;
         array<int> prev, next;
         array<amino_acid> atype;
-        box<vec3f> *box;
+        box<vec3r> *box;
         nl::nl_data *nl;
         pid_bundle_vector *bundles;
 

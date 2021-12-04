@@ -5,12 +5,12 @@
 namespace xmd {
     class eval_snd_forces {
     public:
-        float CDH;
+        real CDH;
 
     public:
-        vec3f_array r, F;
+        vec3r_array r, F;
         native_dihedral_span dihedrals;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

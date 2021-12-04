@@ -6,7 +6,7 @@
 namespace xmd {
     class export_pdb {
     public:
-        vec3d_array true_r;
+        vec3tr_array true_r;
         array<amino_acid> atype;
         array<int8_t> chain_idx;
         array<int> chain_seq_idx;

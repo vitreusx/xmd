@@ -1,6 +1,7 @@
 #pragma once
 #include "xmd/model/model.h"
 #include "xmd/types/amino_acid.h"
+#include <xmd/types/scalar.h>
 #include <Eigen/Core>
 #include <vector>
 #include <string>
@@ -63,13 +64,13 @@ namespace xmd {
         struct disulfide_bond {
             size_t serial;
             atom *a1, *a2;
-            double length;
+            true_real length;
         };
         std::unordered_map<size_t, disulfide_bond> disulfide_bonds;
 
         struct link {
             atom *a1, *a2;
-            double length;
+            true_real length;
         };
         std::vector<link> links;
 

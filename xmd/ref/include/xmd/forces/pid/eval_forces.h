@@ -14,10 +14,10 @@ namespace xmd::pid {
         sink_lj_array ss_sink_ljs;
 
     public:
-        vec3f_array r, F;
-        box<vec3f> *box;
+        vec3r_array r, F;
+        box<vec3r> *box;
         pid_bundle_span bundles;
-        float *V;
+        real *V;
 
     public:
         void operator()();

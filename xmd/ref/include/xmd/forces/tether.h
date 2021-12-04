@@ -5,18 +5,18 @@
 namespace xmd {
     struct tether_pair_span {
         array<int> i1, i2;
-        array<float> nat_dist;
+        array<real> nat_dist;
         int size;
     };
 
     class eval_tether_forces {
     public:
-        float H1, H2;
+        real H1, H2;
 
     public:
-        vec3f_array r, F;
+        vec3r_array r, F;
         tether_pair_span tethers;
-        float *V;
+        real *V;
 
     public:
         void operator()() const;

@@ -8,14 +8,14 @@
 namespace xmd::dynss {
     class sift_candidates {
     public:
-        float max_cos_nr;
-        float req_min_dist;
+        real max_cos_nr;
+        real req_min_dist;
         qa::sync_data def_sync_diff;
 
     public:
-        vec3f_array r, n;
+        vec3r_array r, n;
         array<bool> has_formed_ssbond;
-        box<vec3f> *box;
+        box<vec3r> *box;
         qa::sync_data_array sync;
 
         qa::free_pair_set *free_cys_pairs;

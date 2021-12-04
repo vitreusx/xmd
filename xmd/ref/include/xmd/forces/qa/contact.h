@@ -57,7 +57,7 @@ namespace xmd::qa {
         vector<int> i1, i2;
         vector<contact_type> type;
         vector<contact_status> status;
-        vector<float> ref_time;
+        vector<real> ref_time;
         sync_data_vector sync_diff1, sync_diff2;
 
     private:

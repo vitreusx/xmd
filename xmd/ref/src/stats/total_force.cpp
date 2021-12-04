@@ -2,7 +2,7 @@
 
 namespace xmd {
     void compute_total_force::operator()() {
-        vec3f res = vec3f::Zero();
+        vec3r res = vec3r::Zero();
         for (int idx = 0; idx < F.size(); ++idx) {
             res += F[idx];
         }

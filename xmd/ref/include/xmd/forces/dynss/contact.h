@@ -50,7 +50,7 @@ namespace xmd::dynss {
 
         vector<int> i1, i2;
         vector<contact_status> status;
-        vector<float> ref_time;
+        vector<real> ref_time;
 
     private:
         int extent_;

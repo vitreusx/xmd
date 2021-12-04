@@ -272,7 +272,7 @@ namespace xmd {
             }
         }
 
-        std::map<std::pair<residue const*, residue const*>, double> contacts_map;
+        std::map<std::pair<residue const*, residue const*>, true_real> contacts_map;
         for (auto const& pdb_link: links) {
             auto *res1 = pdb_link.a1->parent_res;
             auto *res2 = pdb_link.a2->parent_res;
@@ -291,7 +291,7 @@ namespace xmd {
             xmd_model.contacts.push_back(xmd_cont);
         }
 
-        std::map<std::pair<residue const*, residue const*>, double> ss_map;
+        std::map<std::pair<residue const*, residue const*>, true_real> ss_map;
         for (auto const& [ss_serial, pdb_ss]: disulfide_bonds) {
             auto *res1 = pdb_ss.a1->parent_res;
             auto *res2 = pdb_ss.a2->parent_res;
@@ -318,7 +318,7 @@ namespace xmd {
     void pdb::add_contacts(amino_acid_data const& data,
         bool all_atoms) {
 
-        std::map<std::pair<atom*, atom*>, double> contact_map;
+        std::map<std::pair<atom*, atom*>, true_real> contact_map;
         for (auto const& pdb_link: links) {
             contact_map[{pdb_link.a1, pdb_link.a2}] = pdb_link.length;
         }
@@ -363,7 +363,7 @@ namespace xmd {
             }
         }
 
-        std::map<std::pair<atom*, atom*>, double> ss_bonds;
+        std::map<std::pair<atom*, atom*>, true_real> ss_bonds;
 
         links = {};
         disulfide_bonds = {};

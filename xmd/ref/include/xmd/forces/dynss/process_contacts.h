@@ -9,16 +9,16 @@ namespace xmd::dynss {
     class process_contacts {
     public:
         harmonic disulfide_force;
-        float cycle_time, cycle_time_inv;
-        float optimal_dist, max_dist_deviation;
+        real cycle_time, cycle_time_inv;
+        real optimal_dist, max_dist_deviation;
         int min_req_num_of_neighbours;
         qa::sync_data ssbond_sync_diff;
 
     public:
-        vec3f_array r, F;
-        box<vec3f> *box;
+        vec3r_array r, F;
+        box<vec3r> *box;
         contact_set *contacts;
-        float *V, *t;
+        real *V, *t;
         qa::sync_data_array sync;
         array<int> num_neighbours;
 

@@ -20,13 +20,25 @@ namespace xmd {
             return (state = res);
         }
 
-        inline std::pair<float, float> normalx2() {
+        template<typename RealT>
+        inline RealT normal() {
             uint64_t val1 = (*this)();
-            float r1 = (float)((uint32_t)val1) / (float)(1ull << 32) + 1.0e-8f;
-            float r = sqrt(-2.0f * log(r1));
-            float r2 = (float)((uint32_t)(val1 >> 32)) / (float)(1ull << 32);
-            float t = 2.0f * (float)M_PI * r2;
+            RealT r1 = (RealT)((uint32_t)val1) / (RealT)(1ull << 32);
+            RealT r = sqrt((RealT)(-2.0) * log(r1));
+            if (isnan(r)) r = (RealT)0.0;
+            RealT r2 = (RealT)((uint32_t)(val1 >> 32)) / (RealT)(1ull << 32);
+            RealT t = (RealT)(2.0 * M_PI) * r2;
+            return r * cos(t);
+        }
 
+        template<typename RealT>
+        inline std::pair<RealT, RealT> normalx2() {
+            uint64_t val1 = (*this)();
+            RealT r1 = (RealT)((uint32_t)val1) / (RealT)(1ull << 32);
+            RealT r = sqrt((RealT)(-2.0) * log(r1));
+            if (isnan(r)) r = (RealT)0.0;
+            RealT r2 = (RealT)((uint32_t)(val1 >> 32)) / (RealT)(1ull << 32);
+            RealT t = (RealT)(2.0 * M_PI) * r2;
             return { r * cos(t), r * sin(t) };
         }
     };

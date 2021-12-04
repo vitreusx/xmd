@@ -3,6 +3,7 @@
 #include <optional>
 #include <variant>
 #include <Eigen/Core>
+#include <types/scalar.h>
 
 namespace xmd::records {
     class remark {
@@ -36,7 +37,7 @@ namespace xmd::records {
             char chain_id;
             int res_seq_num;
         } res[2];
-        double length;
+        true_real length;
 
     public:
         static std::optional<ssbond> try_parse(std::string const& line);
@@ -51,7 +52,7 @@ namespace xmd::records {
             char chain_id;
             int res_seq_num;
         } res[2];
-        double length;
+        true_real length;
 
     public:
         static std::optional<link> try_parse(std::string const& line);

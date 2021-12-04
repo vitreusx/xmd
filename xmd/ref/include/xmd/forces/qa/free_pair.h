@@ -51,11 +51,11 @@ namespace xmd::qa {
 
     class update_free_pairs {
     public:
-        float max_formation_min_dist;
+        real max_formation_min_dist;
 
     public:
-        vec3f_array r;
-        box<vec3f> *box;
+        vec3r_array r;
+        box<vec3r> *box;
         nl::nl_data *nl;
         free_pair_set *pairs;
 

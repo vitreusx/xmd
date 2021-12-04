@@ -8,13 +8,13 @@
 namespace xmd {
     struct es_pair_span {
         array<int> i1, i2;
-        array<float> q1_q2;
+        array<real> q1_q2;
         int size;
     };
 
     struct es_pair_vector {
         vector<int> i1, i2;
-        vector<float> q1_q2;
+        vector<real> q1_q2;
         int size;
 
         inline int push_back() {
@@ -43,11 +43,11 @@ namespace xmd {
 
     class update_es_pairs {
     public:
-        float cutoff;
+        real cutoff;
 
     public:
-        vec3f_array r;
-        box<vec3f> *box;
+        vec3r_array r;
+        box<vec3r> *box;
         nl::nl_data *nl;
         es_pair_vector *pairs;
 

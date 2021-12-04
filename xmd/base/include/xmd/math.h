@@ -73,4 +73,9 @@ namespace xmd {
     auto log(T const& x) {
         return std::log(x);
     }
+
+    template<typename T>
+    auto isnan(T const& x) {
+        return std::isnan(x);
+    }
 }

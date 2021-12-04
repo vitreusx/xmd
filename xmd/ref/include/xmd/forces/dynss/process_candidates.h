@@ -1,6 +1,7 @@
 #pragma once
 #include "candidate.h"
 #include <xmd/forces/qa/sync_data.h>
+#include <xmd/types/scalar.h>
 #include "contact.h"
 
 namespace xmd::dynss {
@@ -11,7 +12,7 @@ namespace xmd::dynss {
     public:
         candidate_list *candidates;
         qa::sync_data_array sync;
-        float *t;
+        real *t;
         contact_set *contacts;
 
     public:

@@ -6,7 +6,7 @@ namespace xmd {
     export_pdb::export_pdb(std::ostream &out_file):
         out_file {out_file} {}
 
-    static Eigen::Vector3d cast_vector(vec3d const& v) {
+    static Eigen::Vector3d cast_vector(vec3tr const& v) {
         return { v.x(), v.y(), v.z() };
     }
 

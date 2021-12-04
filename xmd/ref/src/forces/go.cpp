@@ -4,7 +4,7 @@ namespace xmd {
     void update_go_contacts::operator()() const {
         pairs->clear();
 
-        float min_rnorm = 1.0f / (cutoff + nl->pad);
+        real min_rnorm = 1.0f / (cutoff + nl->pad);
         for (int idx = 0; idx < nl->neighbor_cells.size(); ++idx) {
             auto cell_idx1 = nl->neighbor_cells.cell_idx1[idx];
             auto cell_beg1 = nl->cell_begin[cell_idx1];

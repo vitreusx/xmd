@@ -55,7 +55,7 @@ namespace xmd {
     void amino_acid_data::load_from_node(const YAML::Node &root,
         const std::filesystem::path &pwd [[maybe_unused]]) {
 
-        std::unordered_map<std::string, double> def_atom_radii;
+        std::unordered_map<std::string, true_real> def_atom_radii;
         auto def_atom_radii_node = root["default atom radii"];
         for (auto const& entry: root["default atom radii"]) {
             auto name = entry.first.as<std::string>();
@@ -142,7 +142,7 @@ namespace xmd {
             [](auto const& sum, auto const& entry) -> auto {
                 auto const& [name, res_data] = entry;
                 return sum + res_data.mass;
-            }) / (double)data.size();
+            }) / (true_real)data.size();
 
         for (auto& [name, res_data]: data) {
             res_data.mass = (res_data.mass / avg_res_mass) * f77mass;

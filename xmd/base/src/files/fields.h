@@ -3,6 +3,7 @@
 #include <string_view>
 #include <optional>
 #include <vector>
+#include <types/scalar.h>
 
 namespace xmd::fields {
     class achar {
@@ -70,11 +71,11 @@ namespace xmd::fields {
         size_t beg, len;
     };
 
-    class real {
+    class real_field {
     public:
-        real(size_t i, size_t j, int n, int m);
-        double read(std::string const& line) const;
-        void write(std::string& line, double x) const;
+        real_field(size_t i, size_t j, int n, int m);
+        true_real read(std::string const& line) const;
+        void write(std::string& line, true_real x) const;
 
     private:
         size_t beg, len;

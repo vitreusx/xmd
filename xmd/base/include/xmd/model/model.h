@@ -9,6 +9,7 @@
 #include <memory>
 #include <random>
 #include <xmd/random/sphere_dist.h>
+#include <xmd/types/scalar.h>
 
 namespace xmd {
     class model {
@@ -21,18 +22,18 @@ namespace xmd {
         model& operator+=(model const& m2);
 
         template<typename Generator>
-        inline void morph_into_saw(Generator& g, std::optional<double> res_bond_length,
-            double base_res_dens, bool infer_box) {
+        inline void morph_into_saw(Generator& g, std::optional<true_real> res_bond_length,
+            true_real base_res_dens, bool infer_box) {
 
-            auto vol = (double)residues.size() / base_res_dens;
+            auto vol = (true_real)residues.size() / base_res_dens;
             auto cell_a = cbrt(vol);
 
-            auto cell_coord_dist = std::uniform_real_distribution<double>(
+            auto cell_coord_dist = std::uniform_real_distribution<true_real>(
                 -cell_a/2.0, cell_a/2.0);
-            auto dir_dist = xmd::sphere_dist<Eigen::Vector3d, double>();
-            auto spread_dist = std::uniform_real_distribution<double>(
+            auto dir_dist = xmd::sphere_dist<Eigen::Vector3d, true_real>();
+            auto spread_dist = std::uniform_real_distribution<true_real>(
                 M_PI/12.0, M_PI/2.0);
-            auto around_dist = std::uniform_real_distribution<double>(
+            auto around_dist = std::uniform_real_distribution<true_real>(
                 -M_PI, M_PI);
 
             for (auto const& xmd_chain: chains) {
@@ -46,7 +47,7 @@ namespace xmd {
                 for (size_t res_idx = 0; res_idx < xmd_chain->residues.size(); ++res_idx) {
                     auto next = pos;
                     if (res_idx+1 < xmd_chain->residues.size()) {
-                        double bond_length;
+                        true_real bond_length;
                         if (res_bond_length) {
                             bond_length = res_bond_length.value();
                         }
@@ -58,11 +59,11 @@ namespace xmd {
 
                         next += dir * bond_length;
 
-                        double spread_angle = spread_dist(g);
+                        true_real spread_angle = spread_dist(g);
                         auto spread = Eigen::AngleAxisd(spread_angle,
                             any_perpendicular(dir));
 
-                        double around_angle = around_dist(g);
+                        true_real around_angle = around_dist(g);
                         auto around = Eigen::AngleAxisd(around_angle, dir);
 
                         dir = (around * spread * dir).normalized();
@@ -74,9 +75,9 @@ namespace xmd {
             }
 
             if (infer_box) {
-                auto min_val = std::numeric_limits<double>::min();
+                auto min_val = std::numeric_limits<true_real>::min();
                 auto x_max = min_val, y_max = min_val, z_max = min_val;
-                auto max_val = std::numeric_limits<double>::max();
+                auto max_val = std::numeric_limits<true_real>::max();
                 auto x_min = max_val, y_min = max_val, z_min = max_val;
 
                 for (auto const& res: residues) {
@@ -120,26 +121,26 @@ namespace xmd {
 
         struct contact {
             residue *res1, *res2;
-            double length;
+            true_real length;
         };
         std::vector<contact> contacts, disulfide_bonds;
 
         struct tether {
             residue *res1, *res2;
-            double length;
+            true_real length;
         };
-        std::vector<tether> tethers(std::optional<double> tether_len =
+        std::vector<tether> tethers(std::optional<true_real> tether_len =
             std::nullopt) const;
 
         struct angle {
             residue *res1, *res2, *res3;
-            double theta;
+            true_real theta;
         };
         std::vector<angle> angles;
 
         struct dihedral {
             residue *res1, *res2, *res3, *res4;
-            double phi;
+            true_real phi;
         };
         std::vector<dihedral> dihedrals;
 
