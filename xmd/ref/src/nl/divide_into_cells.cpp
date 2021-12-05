@@ -51,7 +51,7 @@ namespace xmd::nl {
             auto iz = (int)ceil((r_.z() - z_min) * cell_az_inv);
 
             auto cell_idx_ = ix + cell_nx * (iy + cell_ny * iz);
-            data->part_cell_idx[idx] = cell_idx_;
+            data->cell_idx_for_particle[idx] = cell_idx_;
             ++(data->cell_num_part[cell_idx_]);
         }
 
@@ -63,8 +63,8 @@ namespace xmd::nl {
         }
 
         for (int idx = 0; idx < num_particles; ++idx) {
-            auto cell_idx_ = data->part_cell_idx[idx];
-            data->cell_sorted_indices[data->cell_begin[cell_idx_]++] = idx;
+            auto cell_idx_ = data->cell_idx_for_particle[idx];
+            data->particle_index_groups[data->cell_begin[cell_idx_]++] = idx;
         }
 
         for (int cell_idx = 0; cell_idx < num_cells; ++cell_idx) {

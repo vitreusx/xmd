@@ -11,6 +11,11 @@
 #include <xmd/stats/total_energy.h>
 #include <xmd/stats/total_force.h>
 #include <xmd/dynamics/lang_pc.h>
+#include <xmd/nl/verify.h>
+#include <xmd/nl/divide_into_cells.h>
+#include <xmd/forces/go.h>
+#include <xmd/forces/pauli.h>
+#include <xmd/forces/qa/precompute_nh.h>
 //#define _GNU_SOURCE
 //#include <fenv.h>
 
@@ -89,13 +94,13 @@ public:
 
 private:
     std::default_random_engine eng;
-    vec3r_vector r, v, F;
+    vec3r_vector r, v, F, orig_r;
     vec3tr_vector true_r, y1, y2, y3, y4, y5;
     vector<real> mass, mass_inv;
     vector<amino_acid> atype;
     vector<int8_t> chain_idx;
     vector<int> chain_seq_idx;
-    real V, E, t;
+    real V, E, t, pad, cutoff;
     true_real true_t;
     vec3r total_F;
     int num_particles, num_chains;
@@ -105,6 +110,9 @@ private:
     native_angle_vector angles;
     native_dihedral_vector dihedrals;
     xorshift64 lang_xorshift;
+    box<vec3r> box, orig_box;
+    bool first_time, invalid;
+    nl::nl_data nl_data;
 
 public:
     simulation(xmd::model const& xmd_model, amino_acid_data const& data,
@@ -118,11 +126,14 @@ public:
         mass = mass_inv = vector<real>(num_particles);
         atype = vector<amino_acid>(num_particles);
         chain_idx = vector<int8_t>(num_particles);
-        chain_seq_idx = vector<int>(num_particles);
+        chain_seq_idx = nl_data.particle_index_groups =
+            nl_data.cell_idx_for_particle = vector<int>(num_particles);
         true_t = 0.0;
         V = t = 0.0f;
         output_pdb = std::ofstream("output.pdb");
         pdb_serial = 0;
+        first_time = invalid = true;
+        pad = cutoff = 0;
 
         std::unordered_map<xmd::model::residue const*, int> res_ptr_to_idx;
         for (int idx = 0; idx < num_particles; ++idx) {
@@ -270,17 +281,41 @@ public:
         return task;
     }
 
+    auto nl_verify_() {
+        nl::verify task;
+        task.num_particles = num_particles;
+        task.box = &box;
+        task.first_time = &first_time;
+        task.invalid = &invalid;
+        task.orig_box = &orig_box;
+        task.pad = pad;
+        task.orig_r = orig_r.to_array();
+        return task;
+    }
+
+    auto nl_divide_into_cells_() {
+        nl::divide_into_cells task;
+        task.pad = pad;
+        task.box = &box;
+        task.cutoff = cutoff;
+        task.num_particles = num_particles;
+        task.data = &nl_data;
+        task.r = r.to_array();
+        return task;
+    }
+
 public:
     void operator()() {
         auto reset_vf_t = reset_vf_();
         auto show_progress_bar_t = show_progress_bar_();
         auto export_pdb_t = export_pdb_();
-        auto eval_tether_forces_t = eval_tether_forces_();
-        auto eval_native_angle_forces_t = eval_native_angle_forces_();
-        auto eval_cnd_forces_t = eval_cnd_forces_();
         auto compute_total_energy_t = compute_total_energy_();
         auto compute_total_force_t = compute_total_force_();
         auto lang_pc_integrator_step_t = lang_pc_integrator_step_();
+
+        auto eval_tether_forces_t = eval_tether_forces_();
+        auto eval_native_angle_forces_t = eval_native_angle_forces_();
+        auto eval_cnd_forces_t = eval_cnd_forces_();
 
         using namespace std::chrono;
         show_progress_bar_t.start_wall_time = high_resolution_clock::now();
@@ -294,8 +329,8 @@ public:
         while (t < total_time) {
             reset_vf_t();
             eval_tether_forces_t();
-//            eval_native_angle_forces_t();
-//            eval_cnd_forces_t();
+            eval_native_angle_forces_t();
+            eval_cnd_forces_t();
 
             if (t - pbar_last_update_t >= pbar_update_period) {
                 compute_total_energy_t();
@@ -315,8 +350,6 @@ public:
 };
 
 int main() {
-//    feenableexcept(FE_ALL_EXCEPT & ~FE_INEXACT);
-
     std::ifstream stream("data/models/1ubq.pdb");
     pdb pdb_model(stream);
 
@@ -328,17 +361,16 @@ int main() {
 
     int seed = 442;
     std::default_random_engine eng(seed);
-    xmd_model.morph_into_saw(eng, 3.8*angstrom, 1e-3*atom/pow(angstrom, 3.0),
+    xmd_model.morph_into_saw(eng, std::nullopt, 1e-3*atom/pow(angstrom, 3.0),
         false);
 
     simulation simulation_(xmd_model, data, seed);
     simulation_.dt = 5e-3 * tau;
-    simulation_.total_time = 15e3 * tau;
-    simulation_.temperature = 3.5*eps/kB;
-    simulation_.gamma_factor = 0.2/tau;
+    simulation_.total_time = 5e3 * tau;
+    simulation_.temperature = 0.35*eps/kB;
+    simulation_.gamma_factor = 2/tau;
 
     simulation_();
 
-    std::ofstream("morphed.pdb") << pdb(xmd_model);
     return 0;
 }

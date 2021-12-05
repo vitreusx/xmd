@@ -233,7 +233,7 @@ namespace xmd {
 
                 auto r1 = res1->pos, r2 = res2->pos, r3 = res3->pos;
                 auto r12_u = (r2 - r1).normalized(), r23_u = (r3 - r2).normalized();
-                auto theta = acos(r12_u.dot(r23_u));
+                auto theta = acos(-r12_u.dot(r23_u));
 
                 xmd::model::angle xmd_angle;
                 xmd_angle.res1 = res1;

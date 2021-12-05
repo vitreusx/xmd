@@ -5,13 +5,13 @@
 namespace xmd::nl {
     class verify {
     public:
-        real pad;
 
     public:
         vec3r_array r, orig_r;
         box<vec3r> *box, *orig_box;
-        bool *invalid;
+        bool *invalid, *first_time;
         int num_particles;
+        real pad;
 
     public:
         void operator()() const;
