@@ -1,6 +1,6 @@
 #pragma once
 
 namespace xmd {
-    using real = double;
+    using real = float;
     using true_real = double;
 }

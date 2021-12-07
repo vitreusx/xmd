@@ -27,25 +27,31 @@ namespace xmd {
             }
         }
 
+        tethers = other.tethers;
+        for (auto& tether_: tethers) {
+            tether_.res1 = res_map[tether_.res1];
+            tether_.res2 = res_map[tether_.res2];
+        }
+
         contacts = other.contacts;
         for (auto& cont: contacts) {
-            cont.res1 = res_map[&*cont.res1];
-            cont.res2 = res_map[&*cont.res2];
+            cont.res1 = res_map[cont.res1];
+            cont.res2 = res_map[cont.res2];
         }
 
         angles = other.angles;
         for (auto& _angle: angles) {
-            _angle.res1 = res_map[&*_angle.res1];
-            _angle.res2 = res_map[&*_angle.res2];
-            _angle.res3 = res_map[&*_angle.res3];
+            _angle.res1 = res_map[_angle.res1];
+            _angle.res2 = res_map[_angle.res2];
+            _angle.res3 = res_map[_angle.res3];
         }
 
         dihedrals = other.dihedrals;
         for (auto& _dihedral: dihedrals) {
-            _dihedral.res1 = res_map[&*_dihedral.res1];
-            _dihedral.res2 = res_map[&*_dihedral.res2];
-            _dihedral.res3 = res_map[&*_dihedral.res3];
-            _dihedral.res4 = res_map[&*_dihedral.res4];
+            _dihedral.res1 = res_map[_dihedral.res1];
+            _dihedral.res2 = res_map[_dihedral.res2];
+            _dihedral.res3 = res_map[_dihedral.res3];
+            _dihedral.res4 = res_map[_dihedral.res4];
         }
 
         model_box = other.model_box;
@@ -61,6 +67,8 @@ namespace xmd {
         for (auto& chain: m2_copy.chains)
             chains.emplace_back(std::move(chain));
 
+        tethers.insert(tethers.end(),
+            m2_copy.tethers.begin(), m2_copy.tethers.end());
         contacts.insert(contacts.end(),
             m2_copy.contacts.begin(), m2_copy.contacts.end());
         angles.insert(angles.end(),
@@ -76,31 +84,5 @@ namespace xmd {
         sum += m1;
         sum += m2;
         return sum;
-    }
-
-    std::vector<model::tether> model::tethers(std::optional<true_real> tether_len) const {
-        size_t num_tethers = 0;
-        for (auto const& chain_: chains) {
-            auto num_residues = chain_->residues.size();
-            if (num_residues > 0)
-                num_tethers += num_residues - 1;
-        }
-
-        std::vector<tether> tethers_(num_tethers);
-        size_t tether_idx = 0;
-        for (auto const& chain_: chains) {
-            for (size_t res_idx = 0; res_idx+1 < chain_->residues.size(); ++res_idx) {
-                auto& tether_ = tethers_[tether_idx];
-                tether_.res1 = chain_->residues[res_idx];
-                tether_.res2 = chain_->residues[res_idx+1];
-
-                auto nat_length = (tether_.res2->pos - tether_.res1->pos).norm();
-                tether_.length = tether_len.value_or(nat_length);
-
-                ++tether_idx;
-            }
-        }
-
-        return tethers_;
     }
 }

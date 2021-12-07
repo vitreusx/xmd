@@ -20,6 +20,13 @@ namespace xmd {
         iter();
     }
 
+    void update_pauli_pairs::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        nl = &vm_inst.find<nl::nl_data>("nl");
+        pairs = &vm_inst.find<pauli_pair_vector>("pauli_pairs");
+    }
+
     void eval_pauli_exclusion_forces::operator()() const {
         for (int idx = 0; idx < pairs.size; ++idx) {
             auto i1 = pairs.i1[idx], i2 = pairs.i2[idx];
@@ -37,5 +44,37 @@ namespace xmd {
                 F[i2] -= r12_u * dV_dr;
             }
         }
+    }
+
+    void eval_pauli_exclusion_forces::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        V = &vm_inst.find<real>("V");
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        pairs = vm_inst.find_or_emplace<pauli_pair_vector>(
+            "pauli_pairs").to_span();
+    }
+
+    int pauli_pair_vector::push_back()  {
+        i1.push_back();
+        i2.push_back();
+        return size++;
+    }
+
+    pauli_pair_vector::pauli_pair_vector(int n):
+        i1{n}, i2{n}, size{n} {};
+
+    void pauli_pair_vector::clear() {
+        i1.clear();
+        i2.clear();
+        size = 0;
+    }
+
+    pauli_pair_span pauli_pair_vector::to_span() {
+        pauli_pair_span s;
+        s.i1 = i1.data();
+        s.i2 = i2.data();
+        s.size = size;
+        return s;
     }
 }

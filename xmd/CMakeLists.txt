@@ -8,7 +8,7 @@ file(GLOB_RECURSE PUBLIC_SOURCES CONFIGURE_DEPENDS
 set(TARGET_NAME "xmd")
 set(TARGET_ROOT_DIR "xmd")
 
-add_library(${TARGET_NAME})
+add_executable(${TARGET_NAME})
 
 target_sources(${TARGET_NAME}
     PRIVATE ${PRIVATE_SOURCES}

@@ -5,6 +5,7 @@
 #include <xmd/types/vector.h>
 #include <xmd/nl/nl_data.h>
 #include <xmd/types/vec3.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct nat_ssbond_span {
@@ -16,28 +17,14 @@ namespace xmd {
         vector<int> i1, i2;
         int size;
 
-        inline int push_back() {
-            i1.push_back();
-            i2.push_back();
-            return size++;
-        }
+        explicit nat_ssbond_vector(int n = 0);
 
-        inline void clear() {
-            i1.clear();
-            i2.clear();
-            size = 0;
-        }
-
-        inline auto to_span() const {
-            nat_ssbond_span s;
-            s.i1 = i1.data();
-            s.i2 = i2.data();
-            s.size = size;
-            return s;
-        }
+        int push_back();
+        void clear();
+        nat_ssbond_span to_span();
     };
 
-    class update_nat_ssbonds {
+    class update_nat_ssbonds: public vm_aware {
     public:
         real cutoff;
 
@@ -45,21 +32,25 @@ namespace xmd {
         vec3r_array r;
         box<vec3r> *box;
         nl::nl_data *nl;
-        nat_ssbond_vector *pairs;
+        nat_ssbond_vector *all_ssobnds, *ssbonds;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
     };
 
-    class eval_nat_ssbond_forces {
+    class eval_nat_ssbond_forces: public vm_aware {
     public:
         real H1, nat_r;
 
     public:
         vec3r_array r, F;
         box<vec3r> *box;
-        nat_ssbond_span bonds;
+        nat_ssbond_span ssbonds;
         real *V;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

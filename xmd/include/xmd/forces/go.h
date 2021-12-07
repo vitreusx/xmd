@@ -6,6 +6,7 @@
 #include <xmd/utils/math.h>
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/nl/nl_data.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct go_contact_span {
@@ -18,6 +19,8 @@ namespace xmd {
         vector<int> i1, i2;
         vector<real> nat_dist;
         int size;
+
+        explicit go_contact_vector(int n = 0);
 
         inline int push_back() {
             i1.push_back();
@@ -43,21 +46,20 @@ namespace xmd {
         }
     };
 
-    class update_go_contacts {
-    public:
-        real cutoff;
-
+    class update_go_contacts: public vm_aware {
     public:
         vec3r_array r;
         box<vec3r> *box;
         nl::nl_data *nl;
-        go_contact_vector *pairs;
+        go_contact_vector *all_contacts, *contacts;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
     };
 
-    class eval_go_forces {
+    class eval_go_forces: public vm_aware {
     public:
         real depth;
 
@@ -66,6 +68,8 @@ namespace xmd {
         box<vec3r> *box;
         go_contact_span contacts;
         real *V;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

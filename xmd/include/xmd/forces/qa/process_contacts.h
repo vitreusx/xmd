@@ -4,6 +4,7 @@
 #include <xmd/model/box.h>
 #include "contact.h"
 #include "sync_data.h"
+#include <xmd/vm/vm.h>
 
 namespace xmd::qa {
     class process_contacts {

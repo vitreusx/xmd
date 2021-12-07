@@ -5,6 +5,7 @@
 #include <string_view>
 #include <map>
 #include "utils/units.h"
+#include <set>
 
 namespace xmd {
     pdb::pdb(std::istream &is) {
@@ -141,31 +142,25 @@ namespace xmd {
             ++chain_id;
         }
 
+        size_t ss_serial = 1;
         for (auto const& xmd_cont: xmd_model.contacts) {
             auto *pdb_res1 = res_map[&*xmd_cont.res1];
             auto *pdb_res2 = res_map[&*xmd_cont.res2];
 
-            link pdb_cont;
-            pdb_cont.a1 = pdb_res1->atoms[0];
-            pdb_cont.a2 = pdb_res2->atoms[0];
-            pdb_cont.length = xmd_cont.length;
-
-            links.push_back(pdb_cont);
-        }
-
-        size_t ss_serial = 1;
-        for (auto const& xmd_ss: xmd_model.disulfide_bonds) {
-            auto *pdb_res1 = res_map[&*xmd_ss.res1];
-            auto *pdb_res2 = res_map[&*xmd_ss.res2];
-
-            disulfide_bond pdb_ss;
-            pdb_ss.a1 = pdb_res1->atoms[0];
-            pdb_ss.a2 = pdb_res2->atoms[0];
-            pdb_ss.serial = ss_serial;
-            pdb_ss.length = xmd_ss.length;
-
-            disulfide_bonds[ss_serial] = pdb_ss;
-            ++ss_serial;
+            if (xmd_cont.type == xmd::model::NAT_SS) {
+                auto& pdb_ss = disulfide_bonds[ss_serial];
+                pdb_ss.a1 = pdb_res1->atoms[0];
+                pdb_ss.a2 = pdb_res2->atoms[0];
+                pdb_ss.serial = ss_serial;
+                pdb_ss.length = xmd_cont.length;
+                ++ss_serial;
+            }
+            else {
+                auto& pdb_link = links.emplace_back();
+                pdb_link.a1 = pdb_res1->atoms[0];
+                pdb_link.a2 = pdb_res2->atoms[0];
+                pdb_link.length = xmd_cont.length;
+            }
         }
 
         cryst1 = xmd_model.model_box.cell;
@@ -208,13 +203,13 @@ namespace xmd {
 
         int chain_idx = 0;
         for (auto const& [chain_id, pdb_chain]: chains) {
-            auto& xmd_chain = xmd_model.chains.emplace_back(
+            auto &xmd_chain = xmd_model.chains.emplace_back(
                 std::make_unique<xmd::model::chain>());
             xmd_chain->chain_idx = chain_idx++;
 
             int res_seq_idx = 0;
-            for (auto const& [res_seq_num, pdb_res]: pdb_chain.residues) {
-                auto& xmd_res = xmd_model.residues.emplace_back(
+            for (auto const&[res_seq_num, pdb_res]: pdb_chain.residues) {
+                auto &xmd_res = xmd_model.residues.emplace_back(
                     std::make_unique<xmd::model::residue>());
 
                 xmd_res->type = amino_acid(pdb_res.name);
@@ -226,88 +221,96 @@ namespace xmd {
                 res_map[&pdb_res] = &*xmd_res;
             }
 
-            for (size_t res_idx = 0; res_idx + 2 < xmd_chain->residues.size(); ++res_idx) {
-                auto res1 = xmd_chain->residues[res_idx];
-                auto res2 = xmd_chain->residues[res_idx+1];
-                auto res3 = xmd_chain->residues[res_idx+2];
+            for (size_t idx = 0; idx + 1 < xmd_chain->residues.size(); ++idx) {
+                auto *res1 = xmd_chain->residues[idx];
+                auto *res2 = xmd_chain->residues[idx + 1];
 
-                auto r1 = res1->pos, r2 = res2->pos, r3 = res3->pos;
-                auto r12_u = (r2 - r1).normalized(), r23_u = (r3 - r2).normalized();
-                auto theta = acos(-r12_u.dot(r23_u));
+                auto r1 = res1->pos, r2 = res2->pos;
 
-                xmd::model::angle xmd_angle;
-                xmd_angle.res1 = res1;
-                xmd_angle.res2 = res2;
-                xmd_angle.res3 = res3;
-                xmd_angle.theta = theta;
+                auto &xmd_tether = xmd_model.tethers.emplace_back();
+                xmd_tether.res1 = res1;
+                xmd_tether.res2 = res2;
+                xmd_tether.length = (r2 - r1).norm();
 
-                xmd_model.angles.push_back(xmd_angle);
+                if (idx + 2 < xmd_chain->residues.size()) {
+                    auto *res3 = xmd_chain->residues[idx + 2];
+                    auto r3 = res3->pos;
+                    auto r12_u = (r2 - r1).normalized(), r23_u = (r3 -
+                                                                  r2).normalized();
+                    auto theta = acos(-r12_u.dot(r23_u));
+
+                    auto &xmd_angle = xmd_model.angles.emplace_back();
+                    xmd_angle.res1 = res1;
+                    xmd_angle.res2 = res2;
+                    xmd_angle.res3 = res3;
+                    xmd_angle.theta = theta;
+
+                    if (idx + 3 < xmd_chain->residues.size()) {
+                        auto *res4 = xmd_chain->residues[idx + 3];
+                        auto r4 = res4->pos;
+
+                        auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
+                        auto x12_23 = r12.cross(r23), x23_34 = r23.cross(r34);
+                        auto x12_23_u = x12_23.normalized(), x23_34_u = x23_34.normalized();
+                        auto cos_phi = x12_23_u.dot(x23_34_u);
+                        auto phi = acos(cos_phi);
+                        if (x12_23.dot(r34) < 0.0f) phi = -phi;
+
+                        auto &xmd_dihedral = xmd_model.dihedrals.emplace_back();
+                        xmd_dihedral.res1 = res1;
+                        xmd_dihedral.res2 = res2;
+                        xmd_dihedral.res3 = res3;
+                        xmd_dihedral.res4 = res4;
+                        xmd_dihedral.phi = phi;
+                    }
+                }
             }
-
-            for (size_t res_idx = 0; res_idx + 3 < xmd_chain->residues.size(); ++res_idx) {
-                auto res1 = xmd_chain->residues[res_idx];
-                auto res2 = xmd_chain->residues[res_idx+1];
-                auto res3 = xmd_chain->residues[res_idx+2];
-                auto res4 = xmd_chain->residues[res_idx+3];
-
-                auto r1 = res1->pos, r2 = res2->pos, r3 = res3->pos,
-                     r4 = res4->pos;
-                auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
-                auto x12_23 = r12.cross(r23), x23_34 = r23.cross(r34);
-
-                auto x12_23_u = x12_23.normalized(), x23_34_u = x23_34.normalized();
-
-                auto cos_phi = x12_23_u.dot(x23_34_u);
-                auto phi = acos(cos_phi);
-                if (x12_23.dot(r34) < 0.0f) phi = -phi;
-
-                xmd::model::dihedral xmd_dihedral;
-                xmd_dihedral.res1 = res1;
-                xmd_dihedral.res2 = res2;
-                xmd_dihedral.res3 = res3;
-                xmd_dihedral.res4 = res4;
-                xmd_dihedral.phi = phi;
-
-                xmd_model.dihedrals.push_back(xmd_dihedral);
-            }
         }
 
-        std::map<std::pair<residue const*, residue const*>, true_real> contacts_map;
-        for (auto const& pdb_link: links) {
-            auto *res1 = pdb_link.a1->parent_res;
-            auto *res2 = pdb_link.a2->parent_res;
-            if (res1 >= res2) std::swap(res1, res2);
+        std::set<std::pair<residue*, residue*>> cont_res_pairs;
 
-            contacts_map[{res1, res2}] = pdb_link.length;
-        }
-        for (auto const& [res1_res2, length]: contacts_map) {
-            xmd::model::contact xmd_cont;
-
-            auto const& [res1, res2] = res1_res2;
-            xmd_cont.res1 = res_map[res1];
-            xmd_cont.res2 = res_map[res2];
-            xmd_cont.length = length;
-
-            xmd_model.contacts.push_back(xmd_cont);
-        }
-
-        std::map<std::pair<residue const*, residue const*>, true_real> ss_map;
         for (auto const& [ss_serial, pdb_ss]: disulfide_bonds) {
             auto *res1 = pdb_ss.a1->parent_res;
             auto *res2 = pdb_ss.a2->parent_res;
-            if (res1 >= res2) std::swap(res1, res2);
+            if (res1 >= res2)
+                std::swap(res1, res2);
+            if (cont_res_pairs.count(std::make_pair(res1, res2)) > 0)
+                continue;
 
-            ss_map[{res1, res2}] = pdb_ss.length;
-        }
-        for (auto const& [res1_res2, length]: ss_map) {
-            xmd::model::contact xmd_ss;
-
-            auto const& [res1, res2] = res1_res2;
+            auto& xmd_ss = xmd_model.contacts.emplace_back();
             xmd_ss.res1 = res_map[res1];
             xmd_ss.res2 = res_map[res2];
-            xmd_ss.length = length;
+            xmd_ss.length = pdb_ss.length;
+            xmd_ss.type = xmd::model::NAT_SS;
 
-            xmd_model.disulfide_bonds.push_back(xmd_ss);
+            cont_res_pairs.insert(std::make_pair(res1, res2));
+        }
+
+        for (auto const& pdb_link: links) {
+            auto *res1 = pdb_link.a1->parent_res;
+            auto *res2 = pdb_link.a2->parent_res;
+            if (res1 >= res2)
+                std::swap(res1, res2);
+            if (cont_res_pairs.count(std::make_pair(res1, res2)) > 0)
+                continue;
+
+            auto& xmd_cont = xmd_model.contacts.emplace_back();
+            xmd_cont.res1 = res_map[res1];
+            xmd_cont.res2 = res_map[res2];
+            xmd_cont.length = pdb_link.length;
+
+            auto back1 = pdb_link.a1->in_backbone();
+            auto back2 = pdb_link.a2->in_backbone();
+
+            xmd::model::contact_type type;
+            if (back1 && back2) type = xmd::model::BACK_BACK;
+            else if (back1 && !back2) type = xmd::model::BACK_SIDE;
+            else if (!back1 && back2) type = xmd::model::SIDE_BACK;
+            else type = xmd::model::SIDE_SIDE;
+
+            xmd_cont.type = type;
+
+            cont_res_pairs.insert(std::make_pair(res1, res2));
         }
 
         xmd_model.model_box.set_cell(cryst1);
@@ -470,7 +473,7 @@ namespace xmd {
         model_r.serial = emitter.model_serial;
         os << model_r.write();
 
-        for (auto const&[chain_id, chain]: emitter.owner.chains) {
+        for (auto const& [chain_id, chain]: emitter.owner.chains) {
             for (auto const &res: chain.order) {
                 for (auto const &atm: res->atoms) {
                     records::atom atom_r;
@@ -540,4 +543,12 @@ namespace xmd {
 
     pdb_contacts_emitter::pdb_contacts_emitter(const pdb &owner):
         owner{owner} {};
+
+    bool pdb::atom::in_backbone() const {
+        for (auto const& back_atom: { "N", "CA", "C", "O", "OXT" }) {
+            if (name == back_atom)
+                return true;
+        }
+        return false;
+    }
 }

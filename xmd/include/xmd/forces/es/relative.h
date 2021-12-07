@@ -2,9 +2,10 @@
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include "es_pair.h"
+#include <xmd/vm/vm.h>
 
 namespace xmd {
-    class eval_relative_es_forces {
+    class eval_relative_es_forces: public vm_aware  {
     public:
         real A, screen_dist_inv;
 
@@ -13,6 +14,8 @@ namespace xmd {
         box<vec3r> *box;
         es_pair_span es_pairs;
         real *V;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

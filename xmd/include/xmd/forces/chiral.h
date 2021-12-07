@@ -1,6 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/utils/math.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct chiral_quad_span {
@@ -9,7 +10,18 @@ namespace xmd {
         int size;
     };
 
-    class eval_chiral_forces {
+    class chiral_quad_vector {
+    public:
+        vector<int> i1, i2, i3, i4;
+        vector<real> nat_chir, nat_factor;
+        int size;
+
+        explicit chiral_quad_vector(int n = 0);
+
+        chiral_quad_span to_span();
+    };
+
+    class eval_chiral_forces: public vm_aware {
     public:
         real e_chi;
 
@@ -18,8 +30,7 @@ namespace xmd {
         chiral_quad_span quads;
         real *V;
 
-    public:
-        void fill_nat_values() const;
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

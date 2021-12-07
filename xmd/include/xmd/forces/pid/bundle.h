@@ -5,6 +5,7 @@
 #include <xmd/model/box.h>
 #include <xmd/types/vec3.h>
 #include <xmd/nl/nl_data.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd::pid {
     struct pid_bundle_span {
@@ -21,42 +22,12 @@ namespace xmd::pid {
         vector<int16_t> type;
         int size;
 
-        inline int push_back() {
-            i1p.push_back();
-            i1.push_back();
-            i1n.push_back();
-            i2p.push_back();
-            i2.push_back();
-            i2n.push_back();
-            type.push_back();
-            return size++;
-        }
-
-        inline void clear() {
-            i1p.clear();
-            i1.clear();
-            i1n.clear();
-            i2p.clear();
-            i2.clear();
-            i2n.clear();
-            type.clear();
-            size = 0;
-        }
-
-        inline auto to_span() const {
-            pid_bundle_span s;
-            s.i1p = i1p.data();
-            s.i1 = i1.data();
-            s.i1n = i1n.data();
-            s.i2p = i2p.data();
-            s.i2 = i2.data();
-            s.i2n = i2n.data();
-            s.size = size;
-            return s;
-        }
+        int push_back();
+        void clear();
+        pid_bundle_span to_span();
     };
 
-    class update_pid_bundles {
+    class update_pid_bundles: public vm_aware {
     public:
         real cutoff;
 
@@ -67,6 +38,8 @@ namespace xmd::pid {
         box<vec3r> *box;
         nl::nl_data *nl;
         pid_bundle_vector *bundles;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

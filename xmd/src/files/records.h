@@ -112,14 +112,16 @@ namespace xmd::records {
         std::string write() const;
 
         template<typename Record>
-        Record *cast();
+        Record *cast() {
+            return std::get_if<Record>(&rec);
+        }
 
         template<typename Record>
-        Record const *cast() const;
+        Record const *cast() const {
+            return std::get_if<Record>(&rec);
+        }
 
     private:
         explicit record(record_variant_t rec);
     };
 }
-
-#include "records.inl"

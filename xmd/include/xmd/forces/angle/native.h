@@ -2,6 +2,7 @@
 #include <xmd/types/vec3.h>
 #include <xmd/types/array.h>
 #include <xmd/types/amino_acid.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct native_angle_span {
@@ -10,7 +11,17 @@ namespace xmd {
         int size;
     };
 
-    class eval_native_angle_forces {
+    class native_angle_vector {
+    public:
+        explicit native_angle_vector(int n = 0);
+        native_angle_span to_span();
+
+        vector<int> i1, i2, i3;
+        vector<real> nat_theta;
+        int size;
+    };
+
+    class eval_native_angle_forces: public vm_aware {
     public:
         real k;
 
@@ -18,6 +29,8 @@ namespace xmd {
         real *V;
         vec3r_array r, F;
         native_angle_span angles;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

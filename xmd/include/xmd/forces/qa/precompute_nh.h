@@ -1,6 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd::qa {
     struct nh_bundle_span {
@@ -8,11 +9,22 @@ namespace xmd::qa {
         int size;
     };
 
-    class precompute_nh {
+    struct nh_bundle_vector {
+        vector<int> iprev, icur, inext;
+        int size;
+
+        explicit nh_bundle_vector(int n = 0);
+
+        nh_bundle_span to_span();
+    };
+
+    class precompute_nh: public vm_aware {
     public:
         vec3r_array r, n, h;
         box<vec3r> *box;
         nh_bundle_span bundles;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

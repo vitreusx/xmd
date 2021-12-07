@@ -4,6 +4,7 @@
 #include <xmd/utils/math.h>
 #include <xmd/nl/nl_data.h>
 #include <xmd/forces/primitives/lj.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct pauli_pair_span {
@@ -15,28 +16,14 @@ namespace xmd {
         vector<int> i1, i2;
         int size;
 
-        inline int push_back() {
-            i1.push_back();
-            i2.push_back();
-            return size++;
-        }
+        explicit pauli_pair_vector(int n = 0);
 
-        inline void clear() {
-            i1.clear();
-            i2.clear();
-            size = 0;
-        }
-
-        inline auto to_span() const {
-            pauli_pair_span s;
-            s.i1 = i1.data();
-            s.i2 = i2.data();
-            s.size = size;
-            return s;
-        }
+        int push_back();
+        void clear();
+        pauli_pair_span to_span();
     };
 
-    class update_pauli_pairs {
+    class update_pauli_pairs: public vm_aware {
     public:
         real r_excl;
 
@@ -46,11 +33,13 @@ namespace xmd {
         nl::nl_data *nl;
         pauli_pair_vector *pairs;
 
+        void bind_to_vm(vm& vm_inst) override;
+
     public:
         void operator()() const;
     };
 
-    class eval_pauli_exclusion_forces {
+    class eval_pauli_exclusion_forces: public vm_aware {
     public:
         real depth, r_excl;
 
@@ -59,6 +48,8 @@ namespace xmd {
         box<vec3r> *box;
         pauli_pair_span pairs;
         real *V;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

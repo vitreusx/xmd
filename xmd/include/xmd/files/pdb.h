@@ -41,6 +41,8 @@ namespace xmd {
             size_t serial;
             Eigen::Vector3d pos;
             residue *parent_res;
+
+            bool in_backbone() const;
         };
 
         struct residue {

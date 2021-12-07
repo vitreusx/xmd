@@ -39,4 +39,37 @@ namespace xmd {
         *t = (*true_t += dt);
         *gen = local_gen;
     }
+
+    void lang_pc_step::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        t = &vm_inst.find<real>("t");
+        num_particles = vm_inst.find<int>("num_particles");
+        mass = vm_inst.find<vector<real>>("mass").to_array();
+        gen = &vm_inst.find<xorshift64>("gen");
+
+        mass_inv = vm_inst.find_or<vector<real>>("mass_inv", [&]() -> auto& {
+            auto& mass_inv_ = vm_inst.emplace<vector<real>>("mass_inv", num_particles);
+            for (int idx = 0; idx < num_particles; ++idx)
+                mass_inv_[idx] = (real)1.0 / mass[idx];
+            return mass_inv_;
+        }).to_array();
+        y0 = vm_inst.find_or<vec3tr_vector>("y0", [&]() -> auto& {
+            auto& y0_ = vm_inst.emplace<vec3tr_vector>("y0", num_particles);
+            for (int idx = 0; idx < num_particles; ++idx)
+                y0_[idx] = y0[idx];
+            return y0_;
+        }).to_array();
+        y1 = vm_inst.find_or_emplace<vec3tr_vector>("y1",
+            num_particles).to_array();
+        y2 = vm_inst.find_or_emplace<vec3tr_vector>("y2",
+            num_particles).to_array();
+        y3 = vm_inst.find_or_emplace<vec3tr_vector>("y3",
+            num_particles).to_array();
+        y4 = vm_inst.find_or_emplace<vec3tr_vector>("y4",
+            num_particles).to_array();
+        y5 = vm_inst.find_or_emplace<vec3tr_vector>("y5",
+            num_particles).to_array();
+        true_t = &vm_inst.find_or_emplace<true_real>("true_t", *t);
+    }
 }

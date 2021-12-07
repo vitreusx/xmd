@@ -9,6 +9,6 @@ namespace xmd {
         model const& to_model() const;
 
     private:
-        model m;
+        model xmd_model;
     };
 }

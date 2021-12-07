@@ -4,6 +4,7 @@
 #include <xmd/nl/nl_data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct es_pair_span {
@@ -31,17 +32,10 @@ namespace xmd {
             size = 0;
         }
 
-        inline auto to_span() const {
-            es_pair_span s;
-            s.i1 = i1.data();
-            s.i2 = i2.data();
-            s.q1_q2 = q1_q2.data();
-            s.size = size;
-            return s;
-        }
+        es_pair_span to_span();
     };
 
-    class update_es_pairs {
+    class update_es_pairs: public vm_aware {
     public:
         real cutoff;
 
@@ -50,6 +44,8 @@ namespace xmd {
         box<vec3r> *box;
         nl::nl_data *nl;
         es_pair_vector *pairs;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

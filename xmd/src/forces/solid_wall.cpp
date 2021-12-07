@@ -16,6 +16,14 @@ namespace xmd {
         }
     }
 
+    void update_solid_wall_pairs::bind_to_vm(vm &vm_inst) {
+        auto& rv = vm_inst.find<vec3r_vector>("r");
+        r = rv.to_array();
+        num_particles = rv.size();
+        walls = vm_inst.find<vector<planef>>("walls").to_span();
+        pairs = &vm_inst.find<solid_wall_pair_vector>("wall_pairs");
+    }
+
     void eval_solid_wall_forces::operator()() const {
         for (int idx = 0; idx < pairs.size; ++idx) {
             auto part_idx = pairs.part_idx[idx],
@@ -30,5 +38,39 @@ namespace xmd {
             F[part_idx] += dV_dd * wall.normal;
             wall_F[wall_idx] -= dV_dd * wall.normal;
         }
+    }
+
+    void eval_solid_wall_forces::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        walls = vm_inst.find<vector<planef>>("walls").to_span();
+        wall_F = vm_inst.find_or_emplace<vec3r_vector>("wall_F",
+            walls.size()).to_array();
+        pairs = vm_inst.find_or_emplace<solid_wall_pair_vector>(
+            "wall_pairs").to_span();
+        V = &vm_inst.find<real>("V");
+    }
+
+    int solid_wall_pair_vector::push_back()  {
+        wall_idx.push_back();
+        part_idx.push_back();
+        return size++;
+    }
+
+    solid_wall_pair_vector::solid_wall_pair_vector(int n):
+        wall_idx(n), part_idx(n), size(n) {}
+
+    void solid_wall_pair_vector::clear() {
+        wall_idx.clear();
+        part_idx.clear();
+        size = 0;
+    }
+
+    solid_wall_pair_span solid_wall_pair_vector::to_span() {
+        solid_wall_pair_span s;
+        s.wall_idx = wall_idx.data();
+        s.part_idx = part_idx.data();
+        s.size = size;
+        return s;
     }
 }

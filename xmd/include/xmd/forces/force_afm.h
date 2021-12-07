@@ -1,5 +1,6 @@
 #pragma once
 #include <xmd/types/vec3.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct force_afm_bundle_span {
@@ -8,10 +9,23 @@ namespace xmd {
         int size;
     };
 
-    class eval_force_afm_forces {
+    class force_afm_bundle_vector {
+    public:
+        vector<int> pulled_idx;
+        vec3r_vector pull_force;
+        int size;
+
+        explicit force_afm_bundle_vector(int n);
+
+        force_afm_bundle_span to_span();
+    };
+
+    class eval_force_afm_forces: public vm_aware {
     public:
         vec3r_array F;
         force_afm_bundle_span bundles;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

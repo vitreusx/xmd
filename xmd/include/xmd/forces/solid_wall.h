@@ -2,6 +2,7 @@
 #include <xmd/types/array.h>
 #include <xmd/types/vector.h>
 #include <xmd/utils/geometry.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     struct solid_wall_pair_span {
@@ -14,28 +15,14 @@ namespace xmd {
         vector<int> wall_idx, part_idx;
         int size;
 
-        inline int push_back() {
-            wall_idx.push_back();
-            part_idx.push_back();
-            return size++;
-        }
+        explicit solid_wall_pair_vector(int n = 0);
 
-        inline void clear() {
-            wall_idx.clear();
-            part_idx.clear();
-            size = 0;
-        }
-
-        inline auto to_span() const {
-            solid_wall_pair_span s;
-            s.wall_idx = wall_idx.data();
-            s.part_idx = part_idx.data();
-            s.size = size;
-            return s;
-        }
+        int push_back();
+        void clear();
+        solid_wall_pair_span to_span();
     };
 
-    class update_solid_wall_pairs {
+    class update_solid_wall_pairs: public vm_aware {
     public:
         real cutoff;
 
@@ -45,11 +32,13 @@ namespace xmd {
         span<planef> walls;
         solid_wall_pair_vector *pairs;
 
+        void bind_to_vm(vm& vm_inst) override;
+
     public:
         void operator()() const;
     };
 
-    class eval_solid_wall_forces {
+    class eval_solid_wall_forces: public vm_aware {
     public:
         real eps;
 
@@ -58,6 +47,8 @@ namespace xmd {
         solid_wall_pair_span pairs;
         span<planef> walls;
         real *V;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

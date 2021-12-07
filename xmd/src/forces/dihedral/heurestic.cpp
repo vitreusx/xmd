@@ -1,4 +1,5 @@
 #include "forces/dihedral/heurestic.h"
+#include <xmd/model/model.h>
 
 namespace xmd {
 
@@ -59,4 +60,59 @@ namespace xmd {
             F[i4] -= dV_dphi * dphi_dr4;
         }
     }
+
+    void eval_heurestic_dihedral_forces::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        V = &vm_inst.find<real>("V");
+
+        dihedrals = vm_inst.find_or<heurestic_dihedral_vector>("heurestic_dihedrals",
+            [&]() -> auto& {
+                auto& xmd_model = vm_inst.find<model>("model");
+                int num_heur_dih = 0;
+                for (auto const& dihedral: xmd_model.dihedrals) {
+                    if (!dihedral.phi.has_value())
+                        num_heur_dih += 1;
+                }
+
+                auto& dihedrals_vec = vm_inst.emplace<heurestic_dihedral_vector>(
+                    "heurestic_dihedrals", num_heur_dih);
+
+                int dih_idx = 0;
+                using res_map_t = std::unordered_map<xmd::model::residue*, int>;
+                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                auto atypes = vm_inst.find<vector<amino_acid>>("atype").to_array();
+                for (auto const& dihedral: xmd_model.dihedrals) {
+                    if (!dihedral.phi.has_value()) {
+                        auto i1 = res_map[dihedral.res1], i2 = res_map[dihedral.res2],
+                            i3 = res_map[dihedral.res3], i4 = res_map[dihedral.res4];
+
+                        dihedrals_vec.i1[dih_idx] = i1;
+                        dihedrals_vec.i2[dih_idx] = i2;
+                        dihedrals_vec.i3[dih_idx] = i3;
+                        dihedrals_vec.i4[dih_idx] = i4;
+                        auto type = heurestic_dihedral_type(atypes[i2], atypes[i3]);
+                        dihedrals_vec.type[dih_idx] = type;
+
+                        ++dih_idx;
+                    }
+                }
+
+                return dihedrals_vec;
+            }).to_span();
+    }
+
+    heurestic_dihedral_span heurestic_dihedral_vector::to_span() {
+        heurestic_dihedral_span span;
+        span.i1 = i1.to_array();
+        span.i2 = i2.to_array();
+        span.i3 = i3.to_array();
+        span.i4 = i4.to_array();
+        span.type = type.to_array();
+        span.size = size;
+        return span;
+    }
+
+    heurestic_dihedral_vector::heurestic_dihedral_vector(int n):
+        i1{n}, i2{n}, i3{n}, i4{n}, type{n}, size{n} {};
 }

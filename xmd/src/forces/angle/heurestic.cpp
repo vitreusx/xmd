@@ -1,4 +1,5 @@
 #include "forces/angle/heurestic.h"
+#include <xmd/model/model.h>
 
 namespace xmd {
 
@@ -48,4 +49,57 @@ namespace xmd {
             F[i3] -= dV_dtheta * dtheta_dr3;
         }
     }
+
+    void eval_heurestic_angle_forces::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        V = &vm_inst.find<real>("V");
+
+        angles = vm_inst.find_or<heurestic_angle_vector>("heurestic_angles",
+            [&]() -> auto& {
+                auto& xmd_model = vm_inst.find<model>("model");
+                int num_heur_ang = 0;
+                for (auto const& angle: xmd_model.angles) {
+                    if (!angle.theta.has_value())
+                        num_heur_ang += 1;
+                }
+
+                auto& angles_vec = vm_inst.emplace<heurestic_angle_vector>(
+                    "heurestic_angles", num_heur_ang);
+
+                int ang_idx = 0;
+                using res_map_t = std::unordered_map<xmd::model::residue*, int>;
+                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                auto atypes = vm_inst.find<vector<amino_acid>>("atype").to_array();
+                for (auto const& angle: xmd_model.angles) {
+                    if (!angle.theta.has_value()) {
+                        auto i1 = res_map[angle.res1], i2 = res_map[angle.res2],
+                            i3 = res_map[angle.res3];
+
+                        angles_vec.i1[ang_idx] = i1;
+                        angles_vec.i2[ang_idx] = i2;
+                        angles_vec.i3[ang_idx] = i3;
+                        auto type = heurestic_angle_type(atypes[i1], atypes[i2]);
+                        angles_vec.type[ang_idx] = type;
+
+                        ++ang_idx;
+                    }
+                }
+
+                return angles_vec;
+            }).to_span();
+    }
+
+    heurestic_angle_span heurestic_angle_vector::to_span()  {
+        heurestic_angle_span span;
+        span.i1 = i1.to_array();
+        span.i2 = i2.to_array();
+        span.i3 = i3.to_array();
+        span.type = type.to_array();
+        span.size = i1.size();
+        return span;
+    }
+
+    heurestic_angle_vector::heurestic_angle_vector(int n):
+        i1{n}, i2{n}, i3{n}, type{n}, size{n} {};
 }

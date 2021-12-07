@@ -19,4 +19,20 @@ namespace xmd {
 
         iter();
     }
+
+    void update_es_pairs::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        nl = &vm_inst.find<nl::nl_data>("nl");
+        pairs = &vm_inst.find<es_pair_vector>("es_pairs");
+    }
+
+    es_pair_span es_pair_vector::to_span() {
+        es_pair_span s;
+        s.i1 = i1.data();
+        s.i2 = i2.data();
+        s.q1_q2 = q1_q2.data();
+        s.size = size;
+        return s;
+    }
 }

@@ -9,61 +9,61 @@ namespace xmd {
     public:
         vector(): data_{nullptr}, size_{0}, capacity_{0} {};
 
-         explicit vector(int size, T const& init = T()) {
-             size_ = capacity_ = size;
+        explicit vector(int size, T const& init = T()) {
+            size_ = capacity_ = size;
 
-             data_ = (T *)malloc(size * sizeof(T));
-             std::fill(data_, data_ + size_, init);
-         }
+            data_ = (T *)malloc(size * sizeof(T));
+            std::fill(data_, data_ + size_, init);
+        }
 
-         vector(vector const& other) {
-             size_ = other.size_;
-             capacity_ = other.capacity_;
-             data_ = (T *)malloc(size_ * sizeof(T));
-             std::copy(other.data_, other.data_ + size_, data_);
-         }
+        vector(vector const& other) {
+            size_ = other.size_;
+            capacity_ = other.capacity_;
+            data_ = (T *)malloc(size_ * sizeof(T));
+            std::copy(other.data_, other.data_ + size_, data_);
+        }
 
-         vector& operator=(vector const& other) {
-             this->~vector();
-             size_ = other.size_;
-             capacity_ = other.capacity_;
-             data_ = (T *)malloc(size_ * sizeof(T));
-             std::copy(other.data_, other.data_ + size_, data_);
-             return *this;
-         }
+        vector& operator=(vector const& other) {
+            this->~vector();
+            size_ = other.size_;
+            capacity_ = other.capacity_;
+            data_ = (T *)malloc(size_ * sizeof(T));
+            std::copy(other.data_, other.data_ + size_, data_);
+            return *this;
+        }
 
-         vector(vector&& other) {
-             *this = std::move(other);
-         }
+        vector(vector&& other) {
+            *this = std::move(other);
+        }
 
-         vector& operator=(vector&& other) {
-             size_ = other.size_;
-             capacity_ = other.capacity_;
-             data_ = other.data_;
+        vector& operator=(vector&& other) {
+            size_ = other.size_;
+            capacity_ = other.capacity_;
+            data_ = other.data_;
 
-             other.size_ = other.capacity_ = 0;
-             other.data_ = nullptr;
-             return *this;
-         }
+            other.size_ = other.capacity_ = 0;
+            other.data_ = nullptr;
+            return *this;
+        }
 
-         ~vector() {
-             if (data_) {
-                 for (int idx = 0; idx < size_; ++idx) {
-                     data_[idx].~T();
-                 }
-                 free(data_);
-             }
-             data_ = nullptr;
-             size_ = capacity_ = 0;
-         }
+        ~vector() {
+            if (data_) {
+                for (int idx = 0; idx < size_; ++idx) {
+                    data_[idx].~T();
+                }
+                free(data_);
+            }
+            data_ = nullptr;
+            size_ = capacity_ = 0;
+        }
 
         int size() const {
             return size_;
         }
 
         T *data() const {
-             return data_;
-         }
+            return data_;
+        }
 
         void reserve(int new_capacity) {
             T *new_data = (T *)malloc(new_capacity * sizeof(T));
@@ -115,19 +115,19 @@ namespace xmd {
         }
 
         T& at(int idx) {
-             return (*this)[idx];
-         }
+            return (*this)[idx];
+        }
 
-         T const& at(int idx) const {
-             return (*this)[idx];
-         }
+        T const& at(int idx) const {
+            return (*this)[idx];
+        }
 
         span<T> to_span() {
-            return {data_, size_};
-        };
+            return span<T>(data_, size_);
+        }
 
         span<const T> to_span() const {
-            return {data_, size_};
+            return span<T>(data_, size_);
         }
 
         array<T> to_array() {

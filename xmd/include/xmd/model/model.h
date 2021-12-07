@@ -119,28 +119,32 @@ namespace xmd {
         };
         std::vector<std::unique_ptr<chain>> chains;
 
+        enum contact_type {
+            UNKNOWN, BACK_BACK, BACK_SIDE, SIDE_BACK, SIDE_SIDE, NAT_SS
+        };
+
         struct contact {
             residue *res1, *res2;
             true_real length;
+            contact_type type;
         };
-        std::vector<contact> contacts, disulfide_bonds;
+        std::vector<contact> contacts;
 
         struct tether {
             residue *res1, *res2;
-            true_real length;
+            std::optional<true_real> length;
         };
-        std::vector<tether> tethers(std::optional<true_real> tether_len =
-            std::nullopt) const;
+        std::vector<tether> tethers;
 
         struct angle {
             residue *res1, *res2, *res3;
-            true_real theta;
+            std::optional<true_real> theta;
         };
         std::vector<angle> angles;
 
         struct dihedral {
             residue *res1, *res2, *res3, *res4;
-            true_real phi;
+            std::optional<true_real> phi;
         };
         std::vector<dihedral> dihedrals;
 

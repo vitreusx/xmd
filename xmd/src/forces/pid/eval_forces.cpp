@@ -131,4 +131,13 @@ namespace xmd::pid {
             F[i2n] -= B * dpsi2_dr2n;
         }
     }
+
+    void eval_pid_forces::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        bundles = vm_inst.find_or_emplace<pid_bundle_vector>(
+            "pid_bundles").to_span();
+        V = &vm_inst.find<real>("V");
+    }
 }

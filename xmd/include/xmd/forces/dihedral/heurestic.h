@@ -2,6 +2,7 @@
 #include <xmd/types/amino_acid.h>
 #include <xmd/types/vec3.h>
 #include <xmd/types/array.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
     class heurestic_dihedral_type {
@@ -23,14 +24,27 @@ namespace xmd {
         int size;
     };
 
-    class eval_heurestic_dihedral_forces {
+    class heurestic_dihedral_vector {
+    public:
+        explicit heurestic_dihedral_vector(int n = 0);
+
+        heurestic_dihedral_span to_span();
+
+        vector<int> i1, i2, i3, i4;
+        vector<heurestic_dihedral_type> type;
+        int size;
+    };
+
+    class eval_heurestic_dihedral_forces: public vm_aware {
     public:
         static constexpr int NUM_TERMS = 6, NUM_TYPES = 9;
         real coeffs[NUM_TERMS][NUM_TYPES];
 
-        vec3r_span r, F;
+        vec3r_array r, F;
         heurestic_dihedral_span dihedrals;
         real *V;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

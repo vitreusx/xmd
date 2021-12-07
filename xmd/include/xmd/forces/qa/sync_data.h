@@ -148,7 +148,6 @@ namespace xmd::qa {
     class sync_data_array {
     public:
         array<int8_t> back, side_all, side_polar, side_hydrophobic;
-        int size;
 
         inline sync_data_ref operator[](int idx) const {
             return { back[idx], side_all[idx], side_polar[idx],
@@ -187,6 +186,15 @@ namespace xmd::qa {
             side_all.clear();
             side_polar.clear();
             side_hydrophobic.clear();
+        }
+
+        inline auto to_array() {
+            sync_data_array a;
+            a.back = back.to_array();
+            a.side_all = side_all.to_array();
+            a.side_polar = side_polar.to_array();
+            a.side_hydrophobic = side_hydrophobic.to_array();
+            return a;
         }
     };
 }

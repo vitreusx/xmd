@@ -23,4 +23,12 @@ namespace xmd {
             F[i2] -= f;
         }
     }
+
+    void eval_relative_es_forces::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        V = &vm_inst.find<real>("V");
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        es_pairs = vm_inst.find_or_emplace<es_pair_vector>("es_pairs").to_span();
+    }
 }

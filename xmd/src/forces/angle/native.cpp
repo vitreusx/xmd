@@ -1,4 +1,5 @@
 #include "forces/angle/native.h"
+#include <xmd/model/model.h>
 
 namespace xmd {
     void eval_native_angle_forces::operator()() const {
@@ -28,4 +29,53 @@ namespace xmd {
             F[i3] -= dV_dtheta * dtheta_dr3;
         }
     }
+
+    void eval_native_angle_forces::bind_to_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        V = &vm_inst.find<real>("V");
+
+        angles = vm_inst.find_or<native_angle_vector>("native_angles",
+            [&]() -> auto& {
+                auto& xmd_model = vm_inst.find<model>("model");
+                int num_nat_ang = 0;
+                for (auto const& angle: xmd_model.angles) {
+                    if (angle.theta.has_value())
+                        num_nat_ang += 1;
+                }
+
+                auto& angles_vec = vm_inst.emplace<native_angle_vector>(
+                    "native_angles", num_nat_ang);
+
+                int ang_idx = 0;
+                using res_map_t = std::unordered_map<xmd::model::residue*, int>;
+                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                for (auto const& angle: xmd_model.angles) {
+                    if (angle.theta.has_value()) {
+                        angles_vec.i1[ang_idx] = res_map[angle.res1];
+                        angles_vec.i2[ang_idx] = res_map[angle.res2];
+                        angles_vec.i3[ang_idx] = res_map[angle.res3];
+                        angles_vec.nat_theta[ang_idx] = (real)angle.theta.value();
+
+                        ++ang_idx;
+                    }
+                }
+
+                return angles_vec;
+            }).to_span();
+    }
+
+    native_angle_span native_angle_vector::to_span() {
+        native_angle_span span;
+        span.i1 = i1.to_array();
+        span.i2 = i2.to_array();
+        span.i3 = i3.to_array();
+        span.nat_theta = nat_theta.to_array();
+        span.size = size;
+        return span;
+    }
+
+    native_angle_vector::native_angle_vector(int n):
+        i1{n}, i2{n}, i3{n}, nat_theta{n}, size{n} {};
+
 }

@@ -1,9 +1,10 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/random/xorshift64.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd {
-    class lang_pc_step {
+    class lang_pc_step: public vm_aware {
     public:
         real gamma_factor, temperature;
         true_real dt;
@@ -16,6 +17,8 @@ namespace xmd {
         true_real *true_t;
         int num_particles;
         xorshift64 *gen;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

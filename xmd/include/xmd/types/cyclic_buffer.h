@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include "vector.h"
 
 namespace xmd {
     template<typename T>
@@ -11,8 +11,8 @@ namespace xmd {
                 start %= old_size;
 
                 buf.resize(2*old_size);
-                std::move(buf.begin(), buf.begin() + start,
-                    buf.begin() + old_size);
+                std::move(buf.data(), buf.data() + start,
+                    buf.data() + old_size);
                 end = start + old_size;
             }
 
@@ -37,7 +37,7 @@ namespace xmd {
         }
 
     private:
-        std::vector<T> buf;
+        vector<T> buf;
         int start, end;
     };
 }

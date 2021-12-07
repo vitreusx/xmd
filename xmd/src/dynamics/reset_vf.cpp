@@ -7,4 +7,10 @@ namespace xmd {
             F[idx] = vec3r::Zero();
         }
     }
+
+    void reset_vf::bind_to_vm(vm &vm_inst) {
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        V = &vm_inst.find<real>("V");
+        num_particles = vm_inst.find<int>("num_particles");
+    }
 }

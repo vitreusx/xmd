@@ -4,6 +4,7 @@
 #include <xmd/nl/nl_data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
+#include <xmd/vm/vm.h>
 
 namespace xmd::qa {
     class free_pair_set {
@@ -49,7 +50,7 @@ namespace xmd::qa {
         cyclic_buffer<int> vacant_slots;
     };
 
-    class update_free_pairs {
+    class update_free_pairs: public vm_aware {
     public:
         real max_formation_min_dist;
 
@@ -58,6 +59,8 @@ namespace xmd::qa {
         box<vec3r> *box;
         nl::nl_data *nl;
         free_pair_set *pairs;
+
+        void bind_to_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
