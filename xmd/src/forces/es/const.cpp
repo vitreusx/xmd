@@ -24,7 +24,7 @@ namespace xmd {
         }
     }
 
-    void eval_const_es_forces::bind_to_vm(vm &vm_inst) {
+    void eval_const_es_forces::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

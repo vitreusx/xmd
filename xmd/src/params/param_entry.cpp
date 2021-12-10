@@ -1,4 +1,4 @@
-#include "utils/param_entry.h"
+#include "params/param_entry.h"
 
 namespace xmd {
     void param_entry::load_from_file(const std::filesystem::path &file) {

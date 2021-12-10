@@ -25,7 +25,7 @@ namespace xmd {
         vec3r_array F;
         force_afm_bundle_span bundles;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

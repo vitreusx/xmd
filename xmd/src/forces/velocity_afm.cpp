@@ -19,7 +19,7 @@ namespace xmd {
         }
     }
 
-    void eval_velocity_afm_forces::bind_to_vm(vm &vm_inst) {
+    void eval_velocity_afm_forces::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         t = &vm_inst.find<real>("t");

@@ -8,7 +8,7 @@ file(GLOB_RECURSE PUBLIC_SOURCES CONFIGURE_DEPENDS
 set(TARGET_NAME "xmd")
 set(TARGET_ROOT_DIR "xmd")
 
-add_executable(${TARGET_NAME})
+add_library(${TARGET_NAME})
 
 target_sources(${TARGET_NAME}
     PRIVATE ${PRIVATE_SOURCES}
@@ -28,7 +28,7 @@ target_include_directories(${TARGET_NAME}
 
 target_compile_options(${TARGET_NAME}
     PRIVATE
-    $<$<CONFIG:Debug>:-g;$<$<COMPILE_LANGUAGE:CXX>:-Og>>
+    $<$<CONFIG:Debug>:-g;-pg>
     $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-Ofast;-march=native>>
     $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 
@@ -37,8 +37,6 @@ find_package(yaml-cpp REQUIRED)
 
 target_link_libraries(${TARGET_NAME}
     PUBLIC Eigen3::Eigen yaml-cpp)
-
-file(COPY data DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_custom_command(
     TARGET ${TARGET_NAME}

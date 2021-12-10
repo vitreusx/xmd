@@ -1,20 +1,22 @@
 #pragma once
-#include <ostream>
 #include <xmd/types/vec3.h>
 #include <xmd/types/amino_acid.h>
+#include <xmd/vm/vm.h>
+#include <xmd/model/model.h>
+#include <xmd/model/loader.h>
 
 namespace xmd {
-    class export_pdb {
+    class export_pdb: public vm_aware {
+    public:
+        std::filesystem::path out_file_path;
+
     public:
         vec3tr_array true_r;
-        array<amino_acid> atype;
-        array<int8_t> chain_idx;
-        array<int> chain_seq_idx;
-        int num_particles, num_chains, *serial;
+        xmd::model *ref_model;
+        res_map_t *res_map;
+        int *serial;
 
-        std::ostream& out_file;
-
-        explicit export_pdb(std::ostream& out_file);
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

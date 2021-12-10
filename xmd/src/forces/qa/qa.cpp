@@ -1,8 +1,8 @@
 #include "forces/qa/qa.h"
 
 namespace xmd::qa {
-    void eval_qa_forces::bind_to_vm(vm &vm_inst) {
-        precompute_nh_t.bind_to_vm(vm_inst);
+    void eval_qa_forces::init_from_vm(vm &vm_inst) {
+        precompute_nh_t.init_from_vm(vm_inst);
 
         auto& free_pairs = vm_inst.find_or_emplace<free_pair_set>("qa_free_pairs");
         auto& candidates = vm_inst.find_or_emplace<candidate_list>("qa_candidates");

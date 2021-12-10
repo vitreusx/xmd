@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 #include <unordered_map>
-#include <any>
 #include "path.h"
 
 namespace xmd {
@@ -9,25 +8,37 @@ namespace xmd {
 
     class vm_aware {
     public:
-        virtual void bind_to_vm(vm& vm_inst) = 0;
+        virtual ~vm_aware() = default;
+        virtual void init_from_vm(vm& vm_inst) = 0;
+    };
+
+    class resource_not_found: public std::logic_error {
+    public:
+        explicit resource_not_found(vm_path const& path);
     };
 
     class vm {
     public:
-        template<typename T>
-        T& find(vm_path const& path) {
-            return std::any_cast<T&>(resources.at(path));
-        }
-
         template<typename T, typename Function>
         T& find_or(vm_path const& path, Function&& if_not_found) {
             auto iter = resources.find(path);
             if (iter != resources.end()) {
-                return std::any_cast<T&>(iter->second);
+                return *std::static_pointer_cast<T>(iter->second).get();
             }
             else {
                 auto& ret = if_not_found();
                 return ret;
+            }
+        }
+
+        template<typename T>
+        T& find(vm_path const& path) {
+            auto iter = resources.find(path);
+            if (iter != resources.end()) {
+                return *std::static_pointer_cast<T>(resources[path]).get();
+            }
+            else {
+                throw resource_not_found(path);
             }
         }
 
@@ -45,11 +56,13 @@ namespace xmd {
 
         template<typename T, typename... Args>
         T& emplace(vm_path const& path, Args&&... args) {
-            auto value = std::make_any<T>(std::forward<Args>(args)...);
-            auto& resource = (resources[path] = std::move(value));
+            auto value = std::make_shared<T>(std::forward<Args>(args)...);
+            auto as_void_ptr = std::static_pointer_cast<void>(value);
+            resources[path] = std::move(value);
+            auto& resource = find<T>(path);
             if constexpr (std::is_base_of_v<vm_aware, T>)
-                ((vm_aware&)resource).bind_to_vm(*this);
-            return std::any_cast<T&>(resource);
+                ((vm_aware &) resource).init_from_vm(*this);
+            return find<T>(path);
         };
 
         template<typename T, typename... Args>
@@ -60,6 +73,6 @@ namespace xmd {
         }
 
     private:
-        std::unordered_map<vm_path, std::any> resources;
+        std::unordered_map<vm_path, std::shared_ptr<void>> resources;
     };
 }

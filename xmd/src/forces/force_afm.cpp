@@ -8,7 +8,7 @@ namespace xmd {
         }
     }
 
-    void eval_force_afm_forces::bind_to_vm(vm &vm_inst) {
+    void eval_force_afm_forces::init_from_vm(vm &vm_inst) {
         F = vm_inst.find<vec3r_vector>("F").to_array();
         bundles = vm_inst.find<force_afm_bundle_vector>("force_afm_bundles").to_span();
     }

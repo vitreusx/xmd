@@ -20,7 +20,7 @@ namespace xmd::pid {
         pid_bundle_span bundles;
         real *V;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()();

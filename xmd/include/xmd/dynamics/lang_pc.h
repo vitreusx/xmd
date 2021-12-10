@@ -11,14 +11,14 @@ namespace xmd {
 
     public:
         vec3r_array r, v, F;
-        array<real> mass, mass_inv;
+        array<real> mass, mass_inv, mass_rsqrt;
         real *t;
         vec3tr_array y0, y1, y2, y3, y4, y5;
         true_real *true_t;
         int num_particles;
         xorshift64 *gen;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

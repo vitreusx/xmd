@@ -27,8 +27,7 @@ namespace xmd {
         bool operator==(vm_path const& other) const;
         bool operator!=(vm_path const& other) const;
 
-    private:
-        std::string path;
+        std::string repr;
         friend std::hash<vm_path>;
     };
 }
@@ -37,7 +36,7 @@ namespace std {
     template<>
     struct hash<xmd::vm_path> {
         size_t operator()(xmd::vm_path const& p) const {
-            return hash<string>()(p.path);
+            return hash<string>()(p.repr);
         }
     };
 }

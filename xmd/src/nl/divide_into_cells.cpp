@@ -3,7 +3,7 @@
 namespace xmd::nl {
 
     void divide_into_cells::operator()() const {
-        auto min_val = std::numeric_limits<real>::min();
+        auto min_val = std::numeric_limits<real>::lowest();
         auto max_val = std::numeric_limits<real>::max();
 
         auto x_min = max_val, y_min = max_val, z_min = max_val;
@@ -20,7 +20,7 @@ namespace xmd::nl {
             z_max = max(z_max, z_);
         }
 
-        auto req_r = cutoff + pad;
+        auto req_r = *cutoff + *pad;
         auto cell_a = req_r, cell_a_inv = 1.0f / cell_a;
         auto cell_a_eps = 1e-6;
 
@@ -43,6 +43,9 @@ namespace xmd::nl {
         data->num_cells = num_cells;
         data->cell_num_part.resize(num_cells);
         data->cell_begin.resize(num_cells);
+
+        for (int idx = 0; idx < num_cells; ++idx)
+            data->cell_num_part[idx] = 0;
 
         for (int idx = 0; idx < num_particles; ++idx) {
             auto r_ = r[idx];
@@ -100,6 +103,29 @@ namespace xmd::nl {
             }
         }
 
-        data->pad = pad;
+        data->pad = *pad;
+        for (int idx = 0; idx < num_particles; ++idx)
+            orig_r[idx] = r[idx];
+        *orig_box = *box;
+        *invalid = false;
+    }
+
+    void divide_into_cells::init_from_vm(vm &vm_inst) {
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        num_particles = vm_inst.find<int>("num_particles");
+        data = &vm_inst.find_or<nl_data>("nl_data", [&]() -> auto& {
+            auto& data_ = vm_inst.emplace<nl_data>("nl_data");
+            data_.cell_idx_for_particle.resize(num_particles);
+            data_.particle_index_groups.resize(num_particles);
+            return data_;
+        });
+        cutoff = &vm_inst.find_or_emplace<real>("cutoff");
+        pad = &vm_inst.find_or_emplace<real>("pad");
+        invalid = &vm_inst.find_or_emplace<bool>("invalid", true);
+
+        orig_r = vm_inst.find_or_emplace<vec3r_vector>("orig_r",
+            num_particles).to_array();
+        orig_box = &vm_inst.find_or_emplace<xmd::box<vec3r>>("orig_box");
     }
 }

@@ -32,7 +32,7 @@ namespace xmd {
         span<planef> walls;
         solid_wall_pair_vector *pairs;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
@@ -48,7 +48,7 @@ namespace xmd {
         span<planef> walls;
         real *V;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

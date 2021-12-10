@@ -132,7 +132,7 @@ namespace xmd::pid {
         }
     }
 
-    void eval_pid_forces::bind_to_vm(vm &vm_inst) {
+    void eval_pid_forces::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");

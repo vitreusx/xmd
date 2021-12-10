@@ -4,7 +4,7 @@
 #include <xmd/types/amino_acid.h>
 #include <xmd/model/box.h>
 #include <xmd/types/vec3.h>
-#include <xmd/nl/nl_data.h>
+#include <xmd/nl/data.h>
 #include <xmd/vm/vm.h>
 
 namespace xmd::pid {
@@ -39,7 +39,7 @@ namespace xmd::pid {
         nl::nl_data *nl;
         pid_bundle_vector *bundles;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

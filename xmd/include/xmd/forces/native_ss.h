@@ -3,7 +3,7 @@
 #include <xmd/model/box.h>
 #include <xmd/types/array.h>
 #include <xmd/types/vector.h>
-#include <xmd/nl/nl_data.h>
+#include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/vm/vm.h>
 
@@ -34,7 +34,7 @@ namespace xmd {
         nl::nl_data *nl;
         nat_ssbond_vector *all_ssobnds, *ssbonds;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
@@ -50,7 +50,7 @@ namespace xmd {
         nat_ssbond_span ssbonds;
         real *V;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

@@ -17,7 +17,7 @@ namespace xmd {
         }
     }
 
-    void update_nat_ssbonds::bind_to_vm(vm &vm_inst) {
+    void update_nat_ssbonds::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         nl = &vm_inst.find<nl::nl_data>("nl");
@@ -68,7 +68,7 @@ namespace xmd {
         }
     }
 
-    void eval_nat_ssbond_forces::bind_to_vm(vm &vm_inst) {
+    void eval_nat_ssbond_forces::init_from_vm(vm &vm_inst) {
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         ssbonds = vm_inst.find<nat_ssbond_vector>("ssbonds").to_span();
         r = vm_inst.find<vec3r_vector>("r").to_array();

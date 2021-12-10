@@ -5,7 +5,7 @@
 #include <xmd/model/box.h>
 #include <xmd/utils/math.h>
 #include <xmd/forces/primitives/lj.h>
-#include <xmd/nl/nl_data.h>
+#include <xmd/nl/data.h>
 #include <xmd/vm/vm.h>
 
 namespace xmd {
@@ -53,7 +53,7 @@ namespace xmd {
         nl::nl_data *nl;
         go_contact_vector *all_contacts, *contacts;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
@@ -69,7 +69,7 @@ namespace xmd {
         go_contact_span contacts;
         real *V;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

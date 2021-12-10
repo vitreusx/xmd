@@ -30,7 +30,7 @@ namespace xmd {
         vec3r_array r, F;
         native_angle_span angles;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

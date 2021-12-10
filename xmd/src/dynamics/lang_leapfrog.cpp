@@ -1,5 +1,6 @@
 #include "dynamics/lang_leapfrog.h"
 #include <xmd/utils/units.h>
+#include <xmd/
 
 namespace xmd {
     void lang_leapfrog_step::operator()() const {
@@ -21,7 +22,7 @@ namespace xmd {
             vec3tr cur_a = vel_invariant_term - mass_inv[idx] * cur_v;
             vec3tr next_r = r[idx] + (cur_v + 0.5 * cur_a * dt) * dt;
 
-            r[idx] = true_r[idx] = next_r;
+            r[idx] = (true_r[idx] = next_r);
             true_prev_v[idx] = cur_v;
             prev_a[idx] = cur_a;
         }
@@ -30,14 +31,15 @@ namespace xmd {
         *gen = local_gen;
     }
 
-    void lang_leapfrog_step::bind_to_vm(vm &vm_inst) {
+    void lang_leapfrog_step::init_from_vm(vm &vm_inst) {
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
-        t = &vm_inst.find<real>("t");
         num_particles = vm_inst.find<int>("num_particles");
         mass = vm_inst.find<vector<real>>("mass").to_array();
         gen = &vm_inst.find<xorshift64>("gen");
 
+        F = vm_inst.find_or_emplace<vec3r_vector>("F", num_particles).to_array();
+        t = &vm_inst.find_or_emplace<real>("t", (real)0.0);
         true_r = vm_inst.find_or<vec3tr_vector>("true_r", [&]() -> auto& {
             auto& true_r_ = vm_inst.emplace<vec3tr_vector>("true_r", num_particles);
             for (int idx = 0; idx < num_particles; ++idx)

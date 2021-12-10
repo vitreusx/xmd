@@ -24,7 +24,7 @@ namespace xmd::qa {
         box<vec3r> *box;
         nh_bundle_span bundles;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

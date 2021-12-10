@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <xmd/utils/param_entry.h>
+#include <xmd/params/param_entry.h>
 #include "scalar.h"
 
 namespace xmd {

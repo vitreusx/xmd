@@ -16,7 +16,7 @@ namespace xmd {
         pdb(pdb const& other);
         pdb& operator=(pdb const& other);
 
-        explicit pdb(std::istream& is);
+        explicit pdb(std::istream&& is);
         explicit pdb(xmd::model const& xmd_model);
 
         friend std::ostream& operator<<(std::ostream& os, pdb const& p);

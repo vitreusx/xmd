@@ -26,4 +26,10 @@ namespace xmd {
 
         cout.flush();
     }
+
+    void show_progress_bar::init_from_vm(vm &vm_inst) {
+        true_t = &vm_inst.find<true_real>("true_t");
+        V = &vm_inst.find<real>("V");
+        E = &vm_inst.find<real>("E");
+    }
 }

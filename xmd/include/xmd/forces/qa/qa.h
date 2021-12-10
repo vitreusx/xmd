@@ -13,7 +13,7 @@ namespace xmd::qa {
         process_candidates process_candidates_t;
         process_contacts process_contacts_t;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

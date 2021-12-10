@@ -8,7 +8,7 @@
 #include <set>
 
 namespace xmd {
-    pdb::pdb(std::istream &is) {
+    pdb::pdb(std::istream &&is) {
         std::unordered_map<char, bool> ter_found;
 
         auto find_or_add_chain = [&](char chain_id) -> auto {

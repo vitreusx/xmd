@@ -68,13 +68,14 @@ namespace xmd {
         void reserve(int new_capacity) {
             T *new_data = (T *)malloc(new_capacity * sizeof(T));
             std::move(data_, data_ + size_, new_data);
+            if (data_) free(data_);
             data_ = new_data;
             capacity_ = new_capacity;
         }
 
         void resize(int new_size, T const& init = T()) {
             if (new_size > capacity_) {
-                int new_capacity = (int)ceil(1.5f * (float)new_size);
+                int new_capacity = (int)ceil(1.5f * (float)new_size) + 32;
                 reserve(new_capacity);
             }
 
@@ -91,7 +92,7 @@ namespace xmd {
         template<typename... Args>
         T& emplace_back(Args&&... args) {
             if (size_ == capacity_) {
-                int new_capacity = (int)ceil(1.5f * (float)capacity_);
+                int new_capacity = (int)ceil(1.5f * (float)capacity_) + 32;
                 reserve(new_capacity);
             }
 

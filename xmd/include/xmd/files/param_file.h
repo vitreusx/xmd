@@ -1,5 +1,5 @@
 #pragma once
-#include <xmd/utils/param_entry.h>
+#include <xmd/params/param_entry.h>
 #include "xmd/types/amino_acid.h"
 #include <yaml-cpp/yaml.h>
 #include <filesystem>

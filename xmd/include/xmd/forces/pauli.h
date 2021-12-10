@@ -2,7 +2,7 @@
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include <xmd/utils/math.h>
-#include <xmd/nl/nl_data.h>
+#include <xmd/nl/data.h>
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/vm/vm.h>
 
@@ -33,7 +33,7 @@ namespace xmd {
         nl::nl_data *nl;
         pauli_pair_vector *pairs;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
@@ -49,7 +49,7 @@ namespace xmd {
         pauli_pair_span pairs;
         real *V;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

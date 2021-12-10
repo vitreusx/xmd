@@ -16,7 +16,7 @@ namespace xmd {
         }
     }
 
-    void update_solid_wall_pairs::bind_to_vm(vm &vm_inst) {
+    void update_solid_wall_pairs::init_from_vm(vm &vm_inst) {
         auto& rv = vm_inst.find<vec3r_vector>("r");
         r = rv.to_array();
         num_particles = rv.size();
@@ -40,7 +40,7 @@ namespace xmd {
         }
     }
 
-    void eval_solid_wall_forces::bind_to_vm(vm &vm_inst) {
+    void eval_solid_wall_forces::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         walls = vm_inst.find<vector<planef>>("walls").to_span();

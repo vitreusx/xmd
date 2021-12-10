@@ -31,7 +31,7 @@ namespace xmd::pid {
         iter();
     }
 
-    void update_pid_bundles::bind_to_vm(vm &vm_inst) {
+    void update_pid_bundles::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         prev = vm_inst.find<vector<int>>("prev").to_array();
         next = vm_inst.find<vector<int>>("next").to_array();

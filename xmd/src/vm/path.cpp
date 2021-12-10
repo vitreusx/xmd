@@ -4,24 +4,24 @@
 
 namespace xmd {
     vm_path::vm_path():
-        path {""} {};
+        repr {""} {};
 
     vm_path::vm_path(const char *s):
-        path {std::string(s)} {};
+        repr {std::string(s)} {};
 
     vm_path::vm_path(std::string s):
-        path{std::move(s)} {}
+        repr{std::move(s)} {}
 
     vm_path vm_path::operator/(const vm_path &other) const {
-        return vm_path(path + "/" + other.path);
+        return vm_path(repr + "/" + other.repr);
     }
 
     bool vm_path::operator==(const vm_path &other) const {
-        return path == other.path;
+        return repr == other.repr;
     }
 
     bool vm_path::operator!=(const vm_path &other) const {
-        return path != other.path;
+        return repr != other.repr;
     }
 
 }

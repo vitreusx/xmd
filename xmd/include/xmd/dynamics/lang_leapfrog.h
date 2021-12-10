@@ -18,7 +18,7 @@ namespace xmd {
         array<real> mass, mass_inv;
         xorshift64 *gen;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

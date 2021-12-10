@@ -1,0 +1,5 @@
+langevin:
+  gamma_factor: 2.0 1/tau
+  temperature: 0.38 eps/kB
+integrator:
+  dt: 5e-3 tau

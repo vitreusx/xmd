@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vector.h>
 #include <xmd/types/cyclic_buffer.h>
-#include <xmd/nl/nl_data.h>
+#include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include <xmd/vm/vm.h>
@@ -60,7 +60,7 @@ namespace xmd::qa {
         nl::nl_data *nl;
         free_pair_set *pairs;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

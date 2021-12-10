@@ -6,17 +6,17 @@ namespace xmd {
         auto local_gen = *gen;
         real noise_factor = sqrt(2.0 * kB * temperature);
         true_real dt_inv = 1.0/dt;
+        auto gamma_factor_sqrt = sqrt(gamma_factor);
 
         for (int idx = 0; idx < num_particles; ++idx) {
             auto gamma = gamma_factor * mass[idx];
-            auto noise_sd = noise_factor * sqrt(gamma);
+            auto noise_sd = noise_factor * gamma_factor_sqrt * mass_rsqrt[idx] ;
 
             auto [noise_x, noise_y] = local_gen.normalx2<real>();
             auto noise_z = local_gen.normal<real>();
             auto noise = vec3r(noise_x, noise_y, noise_z);
 
-            auto a_ = F[idx] * mass_inv[idx] - gamma_factor * v[idx] +
-                noise_sd * noise * mass_inv[idx];
+            auto a_ = F[idx] * mass_inv[idx] - gamma * v[idx] + noise_sd * noise;
 
             vec3tr error = y2[idx] - a_ * (dt*dt/2.0);
             y0[idx] -= 3.0/16.0 * error;
@@ -40,24 +40,27 @@ namespace xmd {
         *gen = local_gen;
     }
 
-    void lang_pc_step::bind_to_vm(vm &vm_inst) {
+    void lang_pc_step::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
-        t = &vm_inst.find<real>("t");
         num_particles = vm_inst.find<int>("num_particles");
         mass = vm_inst.find<vector<real>>("mass").to_array();
         gen = &vm_inst.find<xorshift64>("gen");
 
+        F = vm_inst.find_or_emplace<vec3r_vector>("F",
+            num_particles).to_array();
+        t = &vm_inst.find_or_emplace<real>("t", (real)0.0);
         mass_inv = vm_inst.find_or<vector<real>>("mass_inv", [&]() -> auto& {
-            auto& mass_inv_ = vm_inst.emplace<vector<real>>("mass_inv", num_particles);
+            auto& mass_inv_ = vm_inst.emplace<vector<real>>("mass_inv",
+                num_particles);
             for (int idx = 0; idx < num_particles; ++idx)
                 mass_inv_[idx] = (real)1.0 / mass[idx];
             return mass_inv_;
         }).to_array();
-        y0 = vm_inst.find_or<vec3tr_vector>("y0", [&]() -> auto& {
-            auto& y0_ = vm_inst.emplace<vec3tr_vector>("y0", num_particles);
+        y0 = vm_inst.find_or<vec3tr_vector>("true_r", [&]() -> auto& {
+            auto& y0_ = vm_inst.emplace<vec3tr_vector>("true_r",
+                num_particles);
             for (int idx = 0; idx < num_particles; ++idx)
-                y0_[idx] = y0[idx];
+                y0_[idx] = r[idx];
             return y0_;
         }).to_array();
         y1 = vm_inst.find_or_emplace<vec3tr_vector>("y1",
@@ -71,5 +74,19 @@ namespace xmd {
         y5 = vm_inst.find_or_emplace<vec3tr_vector>("y5",
             num_particles).to_array();
         true_t = &vm_inst.find_or_emplace<true_real>("true_t", *t);
+
+        mass_rsqrt = vm_inst.find_or<vector<real>>("mass_rsqrt",
+            [&]() -> auto& {
+                auto& mass_rsqrt_ = vm_inst.emplace<vector<real>>("mass_rsqrt",
+                    num_particles);
+                for (int idx = 0; idx < num_particles; ++idx) {
+                    mass_rsqrt_[idx] = 1.0 / sqrt(mass[idx]);
+                }
+
+                return mass_rsqrt_;
+            }).to_array();
+
+        v = vm_inst.find_or_emplace<vec3r_vector>("v",
+            num_particles).to_array();
     }
 }

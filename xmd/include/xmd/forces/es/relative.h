@@ -15,7 +15,7 @@ namespace xmd {
         es_pair_span es_pairs;
         real *V;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

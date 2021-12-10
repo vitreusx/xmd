@@ -15,7 +15,7 @@ namespace xmd {
 
             static std::unordered_map<std::string, true_real> unit_map = {
                 { "f77unit", f77unit }, { "A", angstrom }, { "nm", nanometer },
-                { "m", meter }, { "ns", nanosecond }, { "tau", tau },
+                { "m", meter }, { "ns", nanosecond }, { "tau", tau }, { "1/tau", 1/tau },
                 { "micros", microsecond }, { "ms", millisecond }, { "s", second },
                 { "atom", atom }, { "mol", mol }, { "eps", eps }, {"kcal", kcal},
                 { "J", Joule }, { "eps/kB", eps_kB }, { "kB", kB }, { "K", Kelvin },

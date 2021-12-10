@@ -31,7 +31,7 @@ namespace xmd {
         tether_pair_span tethers;
         real *V;
 
-        void bind_to_vm(vm& vm_inst) override;
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

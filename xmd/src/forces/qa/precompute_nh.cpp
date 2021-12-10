@@ -15,7 +15,7 @@ namespace xmd::qa {
         }
     }
 
-    void precompute_nh::bind_to_vm(vm &vm_inst) {
+    void precompute_nh::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
 
         n = vm_inst.find_or<vec3r_vector>("qa_n", [&]() -> auto& {
