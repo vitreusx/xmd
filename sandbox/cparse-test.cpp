@@ -8,6 +8,6 @@ int main() {
 
     TokenMap vars;
     vars["pi"] = 3.14;
-    std::cout << calculator::calculate("-pi+1", &vars) << '\n';
+    std::cout << calculator::calculate("2*(-pi+1)", &vars) << '\n';
     return 0;
 }

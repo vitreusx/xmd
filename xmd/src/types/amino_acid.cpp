@@ -52,14 +52,16 @@ namespace xmd {
         return code_to_name.at(code);
     }
 
-    void amino_acid_data::load_from_node(const YAML::Node &root,
-        const std::filesystem::path &pwd [[maybe_unused]]) {
+    amino_acid_data param_value_parser<amino_acid_data>::parse(
+        const param_entry &root) const {
+
+        amino_acid_data parsed;
 
         std::unordered_map<std::string, true_real> def_atom_radii;
         auto def_atom_radii_node = root["default atom radii"];
         for (auto const& entry: root["default atom radii"]) {
             auto name = entry.first.as<std::string>();
-            auto r = parse_qty(entry.second.as<std::string>(), angstrom);
+            auto r = quantity(entry.second.as<std::string>(), angstrom);
             def_atom_radii[name] = r;
         }
 
@@ -68,15 +70,15 @@ namespace xmd {
             auto name = entry.first.as<std::string>();
             auto data_node = entry.second;
 
-            aa_data& res_data = data[amino_acid(name)];
-            res_data.mass = parse_qty(data_node["mass"].as<std::string>(), amu);
-            res_data.radius = parse_qty(data_node["radius"].as<std::string>(), angstrom);
+            aa_data& res_data = parsed.data[amino_acid(name)];
+            res_data.mass = quantity(data_node["mass"].as<std::string>(), amu);
+            res_data.radius = quantity(data_node["radius"].as<std::string>(), angstrom);
 
             auto atom_radii = def_atom_radii;
             if (auto alt_radii_node = data_node["alt atom radii"]; alt_radii_node) {
                 for (auto const& atom_entry: alt_radii_node) {
                     auto atom_name = atom_entry.first.as<std::string>();
-                    auto r = parse_qty(atom_entry.second.as<std::string>(), angstrom);
+                    auto r = quantity(atom_entry.second.as<std::string>(), angstrom);
                     atom_radii[atom_name] = r;
                 }
             }
@@ -114,7 +116,7 @@ namespace xmd {
 
             res_data.charge = 0.0;
             if (auto charge_node = data_node["charge"]; charge_node) {
-                auto charge = parse_qty(charge_node.as<std::string>(), echarge);
+                auto charge = quantity(charge_node.as<std::string>(), echarge);
                 res_data.charge = charge;
             }
 
@@ -138,15 +140,17 @@ namespace xmd {
             }
         }
 
-        auto avg_res_mass = std::accumulate(data.begin(), data.end(), 0.0,
+        auto avg_res_mass = std::accumulate(parsed.data.begin(), parsed.data.end(), 0.0,
             [](auto const& sum, auto const& entry) -> auto {
                 auto const& [name, res_data] = entry;
                 return sum + res_data.mass;
-            }) / (true_real)data.size();
+            }) / (true_real)parsed.data.size();
 
-        for (auto& [name, res_data]: data) {
+        for (auto& [name, res_data]: parsed.data) {
             res_data.mass = (res_data.mass / avg_res_mass) * f77mass;
         }
+
+        return parsed;
     }
 
     aa_data const &amino_acid_data::operator[](const amino_acid &aa) const {

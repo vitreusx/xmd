@@ -1,4 +1,5 @@
 #include "files/csv.h"
+#include <fstream>
 
 namespace xmd {
     csv_record::csv_record(std::vector<std::string> fields):
@@ -140,5 +141,18 @@ namespace xmd {
     void csv_file::set_header(std::vector<std::string> col_names) {
         auto _header = csv_header(std::move(col_names));
         header = std::make_shared<csv_header>(_header);
+    }
+
+    csv_file param_value_parser<csv_file>::parse(
+        const param_entry &entry) const {
+
+        if (auto from_file = entry["from file"]; from_file) {
+            auto file = std::ifstream(from_file.as<std::string>());
+            return csv_file(std::move(file));
+        }
+        else {
+            auto source_txt = entry.as<std::string>();
+            return csv_file(source_txt);
+        }
     }
 }

@@ -1,35 +1,57 @@
 #include "utils/units.h"
+#include <cparse/shunting-yard.h>
+#include <cparse/builtin-features.inc>
 #include <algorithm>
 #include <unordered_map>
 #include <stdexcept>
 
 namespace xmd {
-    true_real parse_qty(std::string const& quantity, true_real def_unit) {
-        auto space = std::find(quantity.begin(), quantity.end(), ' ');
-        if (space == quantity.end()) {
-            return std::stod(quantity) * def_unit;
+    quantity::quantity(true_real value):
+        value {value} {}
+
+    quantity::quantity(const std::string &s, quantity const& def_unit) {
+        struct quantity_calculator_init {
+            quantity_calculator_init() {
+                using namespace cparse;
+                cparse_startup();
+
+                TokenMap& global = TokenMap::default_global();
+
+                std::unordered_map<std::string, true_real> unit_map = {
+                    { "f77unit", f77unit }, { "A", angstrom }, { "nm", nanometer },
+                    { "m", meter }, { "ns", nanosecond }, { "tau", tau }, { "1/tau", 1/tau },
+                    { "micros", microsecond }, { "ms", millisecond }, { "s", second },
+                    { "atom", atom }, { "mol", mol }, { "eps", eps }, {"kcal", kcal},
+                    { "J", Joule }, { "kB", kB }, { "K", Kelvin },
+                    { "kg", kg }, { "amu", amu }, { "f77mass", f77mass }, { "e", echarge },
+                    { "C", Coulomb }, { "Amp", Ampere }, { "c", cspeed }, { "H", Henry },
+                    { "mu_0", mu_0 }, { "eps_0", eps_0 }, { "rad", rad }, { "deg", deg }
+                };
+
+                for (auto const& [name, val]: unit_map) {
+                    global[name] = val;
+                }
+            }
+        };
+        static quantity_calculator_init init;
+
+        auto space = std::find(s.begin(), s.end(), ' ');
+        if (space == s.end()) {
+            auto magnitude = calculator::calculate(s.c_str()).asDouble();
+            value = magnitude * def_unit;
         }
         else {
-            auto value = std::stod(std::string(quantity.begin(), space));
-            auto unit_str = std::string(space + 1, quantity.end());
+            auto mag_str = std::string(s.begin(), space);
+            auto mag = calculator::calculate(mag_str.c_str()).asDouble();
 
-            static std::unordered_map<std::string, true_real> unit_map = {
-                { "f77unit", f77unit }, { "A", angstrom }, { "nm", nanometer },
-                { "m", meter }, { "ns", nanosecond }, { "tau", tau }, { "1/tau", 1/tau },
-                { "micros", microsecond }, { "ms", millisecond }, { "s", second },
-                { "atom", atom }, { "mol", mol }, { "eps", eps }, {"kcal", kcal},
-                { "J", Joule }, { "eps/kB", eps_kB }, { "kB", kB }, { "K", Kelvin },
-                { "kg", kg }, { "amu", amu }, { "f77mass", f77mass }, { "e", echarge },
-                { "C", Coulomb }, { "Amp", Ampere }, { "c", cspeed }, { "H", Henry },
-                { "mu_0", mu_0 }, { "eps_0", eps_0 }, { "rad", rad }, { "deg", deg }
-            };
+            auto unit_str = std::string(space + 1, s.end());
+            auto unit_val = calculator::calculate(unit_str.c_str()).asDouble();
 
-            if (auto iter = unit_map.find(unit_str); iter != unit_map.end()) {
-                return value * iter->second;
-            }
-            else {
-                throw std::runtime_error("unit not found!");
-            }
+            value = mag * unit_val;
         }
     }
+
+    quantity::operator true_real() const {
+        return value;
+    };
 }

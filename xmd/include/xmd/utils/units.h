@@ -61,6 +61,16 @@ namespace xmd {
     Unit deg = (2.0 * M_PI / 360.0) * rad;
 
 #undef Unit
-    true_real parse_qty(std::string const& quantity,
-        true_real def_unit = dimensionless);
+
+    class quantity {
+    public:
+        quantity(true_real value);
+        explicit quantity(std::string const& s,
+            quantity const& def_unit = dimensionless);
+
+        operator true_real() const;
+
+    private:
+        true_real value;
+    };
 };

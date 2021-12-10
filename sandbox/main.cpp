@@ -19,7 +19,7 @@
 using namespace xmd;
 
 int main() {
-    auto seqfile = seq_file("data/models/glut.yml");
+    auto seqfile = seq_file("data/examples/glut/glut.yml");
     auto model = seqfile.to_model();
 
     int seed = 2137;

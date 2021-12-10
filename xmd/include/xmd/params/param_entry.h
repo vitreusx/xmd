@@ -1,13 +1,41 @@
 #pragma once
 #include <yaml-cpp/yaml.h>
 #include <filesystem>
+#include <string>
+#include <optional>
 
 namespace xmd {
-    class param_entry {
-    public:
-        virtual void load_from_node(YAML::Node const& root,
-            std::filesystem::path const& pwd) = 0;
+    template<typename T>
+    struct param_value_parser;
 
-        void load_from_file(std::filesystem::path const& file);
+    class param_entry: public YAML::Node {
+    public:
+        explicit param_entry(YAML::Node const& yaml,
+            std::optional<std::filesystem::path> location);
+
+        template<typename T>
+        T as() const;
+
+        param_entry operator[](std::string const& tag) const;
+        param_entry operator[](char const* tag) const;
+        param_entry operator[](int idx) const;
+
+    private:
+        std::optional<std::filesystem::path> location;
+
+        template<typename T>
+        friend struct param_value_parser;
     };
+
+    template<typename T>
+    struct param_value_parser {
+        T parse(param_entry const& entry) const {
+            return entry.YAML::Node::as<T>();
+        }
+    };
+
+    template<typename T>
+    T param_entry::as() const {
+        return param_value_parser<T>().parse(*this);
+    }
 }

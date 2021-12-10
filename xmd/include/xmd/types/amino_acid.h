@@ -69,15 +69,17 @@ namespace xmd {
         contact_limits limits;
     };
 
-    class amino_acid_data: public param_entry {
+    class amino_acid_data {
     public:
         std::unordered_map<amino_acid, aa_data> data;
-
-    public:
-        void load_from_node(YAML::Node const& root,
-            std::filesystem::path const& pwd) override;
-
         aa_data const& operator[](amino_acid const& aa) const;
+
+        friend struct param_value_parser<amino_acid_data>;
+    };
+
+    template<>
+    struct param_value_parser<amino_acid_data> {
+        amino_acid_data parse(param_entry const& entry) const;
     };
 }
 

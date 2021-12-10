@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
 #include <memory>
+#include <xmd/params/param_entry.h>
 
 namespace xmd {
     class csv_record;
@@ -72,4 +73,8 @@ namespace xmd {
         void set_header(std::vector<std::string> col_names);
     };
 
+    template<>
+    struct param_value_parser<csv_file> {
+        csv_file parse(param_entry const& entry) const;
+    };
 }

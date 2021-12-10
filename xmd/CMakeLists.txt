@@ -37,7 +37,7 @@ find_package(yaml-cpp REQUIRED)
 add_subdirectory(ext/cparse)
 
 target_link_libraries(${TARGET_NAME}
-    PUBLIC Eigen3::Eigen yaml-cpp)
+    PUBLIC Eigen3::Eigen yaml-cpp cparse)
 
 add_custom_command(
     TARGET ${TARGET_NAME}

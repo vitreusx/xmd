@@ -1,9 +1,19 @@
 #include "params/param_entry.h"
 
 namespace xmd {
-    void param_entry::load_from_file(const std::filesystem::path &file) {
-        auto node = YAML::LoadFile(file);
-        auto pwd = file.parent_path();
-        load_from_node(node, pwd);
+    param_entry param_entry::operator[](const std::string &tag) const {
+        return param_entry(YAML::Node::operator[](tag), location);
     }
+
+    param_entry param_entry::operator[](char const* tag) const {
+        return param_entry(YAML::Node::operator[](tag), location);
+    }
+
+    param_entry param_entry::operator[](int idx) const {
+        return param_entry(YAML::Node::operator[](idx), location);
+    }
+
+    param_entry::param_entry(const YAML::Node &yaml,
+        std::optional<std::filesystem::path> location):
+        YAML::Node{yaml}, location{std::move(location)} {};
 }
