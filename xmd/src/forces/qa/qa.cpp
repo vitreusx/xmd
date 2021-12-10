@@ -9,7 +9,25 @@ namespace xmd::qa {
         auto& contacts = vm_inst.find_or_emplace<contact_set>("qa_contacts");
         vm_inst.find<lj_variants>("lj_variants");
 
-        auto sync = vm_inst.find<sync_data_vector>("sync").to_array();
+        auto sync = vm_inst.find_or<sync_data_vector>("sync", [&]() -> auto& {
+            auto num_particles = vm_inst.find<int>("num_particles");
+            auto& sync_vec_ = vm_inst.emplace<sync_data_vector>("sync",
+                num_particles);
+
+            auto& aa_data_ = vm_inst.find_or_emplace<amino_acid_data>(
+                "amino_acid_data");
+            auto& atype = vm_inst.find<vector<amino_acid>>("atype");
+
+            for (int idx = 0; idx < num_particles; ++idx) {
+                auto const& lim = aa_data_[atype[idx]].limits;
+                sync_vec_.back[idx] = lim.back;
+                sync_vec_.side_all[idx] = lim.side_all;
+                sync_vec_.side_polar[idx] = lim.side_polar;
+                sync_vec_.side_hydrophobic[idx] = lim.side_hydrophobic;
+            }
+
+            return sync_vec_;
+        }).to_array();
         auto& t = vm_inst.find<real>("t");
         auto& box = vm_inst.find<xmd::box<vec3r>>("box");
         auto r = vm_inst.find<vec3r_vector>("r").to_array();

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <xmd/types/array.h>
+#include <xmd/types/vector.h>
 
 namespace xmd::qa {
     class sync_data_cref {
@@ -159,6 +160,8 @@ namespace xmd::qa {
     public:
         vector<int8_t> back, side_all, side_polar, side_hydrophobic;
         int size_;
+
+        explicit sync_data_vector(int n = 0);
 
         inline sync_data_ref operator[](int idx) {
             return { back[idx], side_all[idx], side_polar[idx],

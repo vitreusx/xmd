@@ -6,11 +6,7 @@ namespace xmd {
     }
 
     param_entry param_entry::operator[](char const* tag) const {
-        return param_entry(YAML::Node::operator[](tag), location);
-    }
-
-    param_entry param_entry::operator[](int idx) const {
-        return param_entry(YAML::Node::operator[](idx), location);
+        return (*this)[std::string(tag)];
     }
 
     param_entry::param_entry(const YAML::Node &yaml,

@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <string>
 #include <optional>
+#include <unordered_map>
 
 namespace xmd {
     template<typename T>
@@ -18,7 +19,6 @@ namespace xmd {
 
         param_entry operator[](std::string const& tag) const;
         param_entry operator[](char const* tag) const;
-        param_entry operator[](int idx) const;
 
     private:
         std::optional<std::filesystem::path> location;
