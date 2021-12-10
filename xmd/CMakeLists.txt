@@ -28,12 +28,13 @@ target_include_directories(${TARGET_NAME}
 
 target_compile_options(${TARGET_NAME}
     PRIVATE
-    $<$<CONFIG:Debug>:-g;-pg>
+    $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-Ofast;-march=native>>
     $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
+add_subdirectory(ext/cparse)
 
 target_link_libraries(${TARGET_NAME}
     PUBLIC Eigen3::Eigen yaml-cpp)

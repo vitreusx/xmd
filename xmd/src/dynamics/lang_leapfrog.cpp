@@ -1,6 +1,5 @@
 #include "dynamics/lang_leapfrog.h"
 #include <xmd/utils/units.h>
-#include <xmd/
 
 namespace xmd {
     void lang_leapfrog_step::operator()() const {
