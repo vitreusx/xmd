@@ -1,6 +1,8 @@
 #include "forces/tether.h"
 #include <xmd/model/model.h>
 #include <unordered_map>
+#include <xmd/utils/units.h>
+#include <xmd/params/param_file.h>
 
 namespace xmd {
     void eval_tether_forces::operator()() const {
@@ -22,6 +24,14 @@ namespace xmd {
     }
 
     void eval_tether_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        H1 = vm_inst.find_or_emplace<real>("tether_H1",
+            params["tether forces"]["H1"].as<quantity>());
+        H2 = vm_inst.find_or_emplace<real>("tether_H2",
+            params["tether forces"]["H2"].as<quantity>());
+        def_length = vm_inst.find_or_emplace<real>("tether_def_length",
+            params["tether forces"]["def_length"].as<quantity>());
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

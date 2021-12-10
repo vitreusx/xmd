@@ -16,6 +16,7 @@
 #include <xmd/nl/verify.h>
 #include <xmd/nl/divide_into_cells.h>
 #include <xmd/files/seq_file.h>
+#include <xmd/params/param_file.h>
 using namespace xmd;
 
 int main() {
@@ -32,24 +33,12 @@ int main() {
     def_vm.find_or_emplace<real>("V", (real)0.0);
     def_vm.find_or_emplace<xorshift64>("gen", seed);
 
+    auto& pf = def_vm.emplace<param_file>("params", "data/examples/defaults.yml");
     auto& lang_pc_ = def_vm.emplace<lang_pc_step>("lang_pc");
-    lang_pc_.dt = 5e-3*tau;
-    lang_pc_.gamma_factor = 2.0/tau;
-    lang_pc_.temperature = 0.38*eps/kB;
-
     auto& reset_vf_ = def_vm.emplace<reset_vf>("reset_vf");
-
-    eval_tether_forces tethers;
-    tethers.H1 = 100.0*eps/pow(angstrom, 2.0);
-    tethers.H2 = 0.0;
-    tethers.def_length = 3.8*angstrom;
-    auto& tethers_ = def_vm.emplace<eval_tether_forces>("eval_tether", tethers);
-
+    auto& tethers_ = def_vm.emplace<eval_tether_forces>("eval_tether");
     auto& nat_ang_ = def_vm.emplace<eval_native_angle_forces>("eval_nat_ang");
-    nat_ang_.k = 30.0*eps/pow(rad, 2.0);
-
     auto& nat_comp_dih_ = def_vm.emplace<eval_cnd_forces>("eval_cnd");
-    nat_comp_dih_.CDA = nat_comp_dih_.CDB = 3.33*eps/pow(rad, 2.0);
 
     auto& export_pdb_ = def_vm.emplace<export_pdb>("export_pdb");
     export_pdb_.out_file_path = "output.pdb";

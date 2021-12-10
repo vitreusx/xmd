@@ -52,6 +52,18 @@ namespace xmd {
         return code_to_name.at(code);
     }
 
+    std::vector<amino_acid> amino_acid::all() {
+        static const std::vector<amino_acid> all_aminoacids = {
+            amino_acid(ALA), amino_acid(ARG), amino_acid(ASN), amino_acid(ASP),
+            amino_acid(CYS), amino_acid(GLU), amino_acid(GLN), amino_acid(GLY),
+            amino_acid(HIS), amino_acid(ILE), amino_acid(LEU), amino_acid(LYS),
+            amino_acid(MET), amino_acid(PHE), amino_acid(PRO), amino_acid(SER),
+            amino_acid(THR), amino_acid(TRP), amino_acid(TYR), amino_acid(VAL)
+        };
+
+        return all_aminoacids;
+    }
+
     amino_acid_data param_value_parser<amino_acid_data>::parse(
         const param_entry &root) const {
 

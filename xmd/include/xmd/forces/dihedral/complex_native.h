@@ -8,6 +8,8 @@ namespace xmd {
     public:
         real CDA, CDB;
 
+        void init_from_vm(vm& vm_inst) override;
+
     public:
         void operator()() const;
     };

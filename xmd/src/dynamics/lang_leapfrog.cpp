@@ -1,5 +1,6 @@
 #include "dynamics/lang_leapfrog.h"
 #include <xmd/utils/units.h>
+#include <xmd/params/param_file.h>
 
 namespace xmd {
     void lang_leapfrog_step::operator()() const {
@@ -31,6 +32,13 @@ namespace xmd {
     }
 
     void lang_leapfrog_step::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        gamma_factor = vm_inst.find_or_add<real>("gamma_factor",
+            params["langevin"]["gamma factor"].as<quantity>());
+        temperature = vm_inst.find_or_add<real>("temperature",
+            params["langevin"]["temperature"].as<quantity>());
+        dt = vm_inst.find_or_add<true_real>("dt",
+            params["integrator"]["dt"].as<quantity>());
 
         r = vm_inst.find<vec3r_vector>("r").to_array();
         num_particles = vm_inst.find<int>("num_particles");

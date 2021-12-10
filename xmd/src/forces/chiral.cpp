@@ -1,6 +1,8 @@
 #include <xmd/forces/chiral.h>
 #include <xmd/model/model.h>
 #include <unordered_map>
+#include <xmd/params/param_file.h>
+#include <xmd/utils/units.h>
 
 namespace xmd {
     void eval_chiral_forces::operator()() const {
@@ -29,6 +31,10 @@ namespace xmd {
     }
 
     void eval_chiral_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        e_chi = vm_inst.find_or_emplace<real>("e_chi",
+            params["chirality"]["e_chi"].as<quantity>());
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

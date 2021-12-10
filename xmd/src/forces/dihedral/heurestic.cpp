@@ -1,5 +1,8 @@
 #include "forces/dihedral/heurestic.h"
 #include <xmd/model/model.h>
+#include <xmd/params/param_file.h>
+#include <xmd/files/csv.h>
+#include <xmd/utils/units.h>
 
 namespace xmd {
 
@@ -62,6 +65,37 @@ namespace xmd {
     }
 
     void eval_heurestic_dihedral_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+
+        using stored_coeffs_t = std::array<std::array<real, NUM_TERMS>, NUM_TYPES>;
+        auto& stored_coeffs = vm_inst.find_or<stored_coeffs_t>("heur_dih_coeffs",
+            [&]() -> auto& {
+                auto coeffs_csv = params["heurestic dihedrals"]["coefficients"].as<csv_file>();
+                auto& stored_coeffs_ = vm_inst.emplace<stored_coeffs_t>(
+                    "heur_dih_coeffs");
+
+                for (auto const& record: coeffs_csv.records) {
+                    auto type2 = record["type2"], type3 = record["type3"];
+                    auto ord2 = type2 == "G" ? 0 : (type2 == "P" ? 1 : 2);
+                    auto ord3 = type3 == "G" ? 0 : (type3 == "P" ? 1 : 2);
+                    auto ord = 3*ord2+ord3;
+
+                    stored_coeffs_[0][ord] = quantity(record["sin"], eps);
+                    stored_coeffs_[1][ord] = quantity(record["cos"], eps);
+                    stored_coeffs_[2][ord] = quantity(record["sin2"], eps);
+                    stored_coeffs_[3][ord] = quantity(record["cos2"], eps);
+                    stored_coeffs_[4][ord] = quantity(record["sin_cos"], eps);
+                }
+
+                return stored_coeffs_;
+            });
+
+        for (int d = 0; d < NUM_TERMS; ++d) {
+            for (int t = 0; t < NUM_TYPES; ++t) {
+                coeffs[d][t] = stored_coeffs[d][t];
+            }
+        }
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

@@ -1,5 +1,6 @@
 #pragma once
 #include <xmd/types/array.h>
+#include <xmd/types/vector.h>
 #include <xmd/types/scalar.h>
 #include <tuple>
 #include <cmath>
@@ -56,5 +57,14 @@ namespace xmd::pid {
         inline lambda_func operator[](int idx) const {
             return { psi_0[idx], alpha[idx], version };
         }
+    };
+
+    class lambda_func_vector {
+    public:
+        vector<real> psi_0, alpha;
+        lambda_version version;
+
+        explicit lambda_func_vector(int n = 0, lambda_version version = COSINE);
+        lambda_func_array to_array();
     };
 }

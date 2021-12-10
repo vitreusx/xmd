@@ -1,4 +1,7 @@
 #include "forces/qa/sift_candidates.h"
+#include <xmd/params/param_file.h>
+#include <xmd/utils/units.h>
+#include <xmd/forces/primitives/lj_variants.h>
 
 namespace xmd::qa {
 
@@ -70,6 +73,34 @@ namespace xmd::qa {
             candidates->type[slot_idx] = type;
             candidates->sync_diff1[slot_idx] = sync_diff1;
             candidates->sync_diff2[slot_idx] = sync_diff2;
+        }
+    }
+
+    void sift_candidates::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        auto const& sift_params = params["quasi-adiabatic"];
+
+        min_abs_cos_hr = sift_params["min |cos(h, r)|"].as<quantity>();
+        min_abs_cos_hh = sift_params["min |cos(h, h)| for bb"].as<quantity>();
+        max_cos_nr = sift_params["max cos(n, r)"].as<quantity>();
+
+        auto& ljs = vm_inst.find<lj_variants>("lj_variants");
+
+        req_min_dist[(short)contact_type::BACK_BACK()] = ljs.bb.r_min;
+        req_min_dist[(short)contact_type::BACK_SIDE()] = ljs.bs.r_min;
+        req_min_dist[(short)contact_type::SIDE_BACK()] = ljs.sb.r_min;
+        for (auto const& aa1: amino_acid::all()) {
+            for (auto const& aa2: amino_acid::all()) {
+                int ss_idx = (int)aa1 * amino_acid::NUM_AA + (int)aa2;
+                req_min_dist[(short)contact_type::SIDE_SIDE(aa1, aa2)] =
+                    ljs.ss.r_max[ss_idx];
+            }
+        }
+
+        auto& aa_data_ = vm_inst.find_or_emplace<amino_acid_data>(
+            "amino_acid_data");
+        for (auto const& aa: amino_acid::all()) {
+            ptype[(int)aa] = aa_data_[aa].polarization;
         }
     }
 }

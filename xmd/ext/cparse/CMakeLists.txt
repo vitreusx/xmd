@@ -10,7 +10,6 @@ target_compile_features(cparse
 
 target_compile_options(cparse
     PRIVATE
-    -Wall -pedantic -Wmissing-field-initializers -Wuninitialized
     $<$<CONFIG:Debug>:-g>)
 
 function(add_include_directories target dir)

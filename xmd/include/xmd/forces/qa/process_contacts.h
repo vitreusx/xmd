@@ -5,11 +5,12 @@
 #include "contact.h"
 #include "sync_data.h"
 #include <xmd/vm/vm.h>
+#include <xmd/forces/primitives/lj_variants.h>
 
 namespace xmd::qa {
-    class process_contacts {
+    class process_contacts: public vm_aware {
     public:
-        lj_array ljs;
+        lj_variants ljs;
         real cycle_time, cycle_time_inv, breaking_factor;
 
     public:
@@ -18,6 +19,8 @@ namespace xmd::qa {
         contact_set *contacts;
         real *V, *t;
         sync_data_array sync;
+
+        void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;

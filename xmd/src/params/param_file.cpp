@@ -7,11 +7,7 @@ namespace xmd {
 
     param_file::param_file(const YAML::Node &yaml,
         const std::filesystem::path &location):
-        entry(yaml, location) {};
-
-    param_file::operator param_entry const &() const {
-        return entry;
-    }
+        param_entry(yaml, location) {};
 
     param_file param_value_parser<param_file>::parse(
         param_entry const& entry) const {
@@ -21,7 +17,7 @@ namespace xmd {
             for (auto const& relpath: import_from) {
                 auto abspath = entry.location.value() / relpath.as<std::string>();
                 auto imported = param_file(abspath);
-                yaml = merge_nodes(yaml, imported.entry);
+                yaml = merge_nodes(yaml, imported);
             }
         }
 

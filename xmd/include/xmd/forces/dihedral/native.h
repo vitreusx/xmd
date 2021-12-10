@@ -29,6 +29,6 @@ namespace xmd {
         native_dihedral_span dihedrals;
         real *V;
 
-        void init_from_vm(vm& vm_inst) override;
+        virtual void init_from_vm(vm& vm_inst) override;
     };
 }

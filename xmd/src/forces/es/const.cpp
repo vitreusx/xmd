@@ -1,9 +1,11 @@
 #include "forces/es/const.h"
+#include <xmd/utils/units.h>
+#include <xmd/params/param_file.h>
 
 namespace xmd {
 
     void eval_const_es_forces::operator()() const {
-        auto V_factor = 1.0f / (4.0f * (real)M_PI * permittivity);
+        real V_factor = 1.0f / (4.0f * (real)M_PI * permittivity);
 
         for (int idx = 0; idx < es_pairs.size; ++idx) {
             auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];
@@ -25,6 +27,10 @@ namespace xmd {
     }
 
     void eval_const_es_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        permittivity = vm_inst.find_or_add<real>("permittivity",
+            params["const ES"]["permittivity"].as<quantity>());
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

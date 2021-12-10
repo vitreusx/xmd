@@ -1,6 +1,8 @@
 #include "forces/native_ss.h"
 #include <xmd/model/model.h>
 #include <unordered_map>
+#include <xmd/utils/units.h>
+#include <xmd/params/param_file.h>
 
 namespace xmd {
 
@@ -69,6 +71,12 @@ namespace xmd {
     }
 
     void eval_nat_ssbond_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        H1 = vm_inst.find_or_emplace<real>("nat_ss_H1",
+            params["native ssbonds"]["H1"].as<quantity>());
+        nat_r = vm_inst.find_or_emplace<real>("nat_ss_r",
+            params["native ssbonds"]["equilibrium dist"].as<quantity>());
+
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         ssbonds = vm_inst.find<nat_ssbond_vector>("ssbonds").to_span();
         r = vm_inst.find<vec3r_vector>("r").to_array();

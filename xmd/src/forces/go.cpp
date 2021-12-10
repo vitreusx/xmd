@@ -1,6 +1,8 @@
 #include "forces/go.h"
 #include <xmd/model/model.h>
 #include <unordered_map>
+#include <xmd/params/param_file.h>
+#include <xmd/utils/units.h>
 
 namespace xmd {
     void update_go_contacts::operator()() const {
@@ -74,6 +76,10 @@ namespace xmd {
     }
 
     void eval_go_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        depth = vm_inst.find_or_emplace<real>("go_depth",
+            params["native contacts"]["lj depth"].as<quantity>());
+
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         contacts = vm_inst.find<go_contact_vector>("go_contacts").to_span();
         r = vm_inst.find<vec3r_vector>("r").to_array();

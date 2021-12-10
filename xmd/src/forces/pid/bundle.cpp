@@ -17,8 +17,8 @@ namespace xmd::pid {
             bundles->i2p[bundle_idx] = prev2;
             bundles->i2[bundle_idx] = idx2;
             bundles->i2n[bundle_idx] = next2;
-            int16_t type = (int16_t)atype1 +
-                           (int16_t)amino_acid::NUM_AA * (int16_t)atype2;
+            int16_t type = (int16_t)atype1 *
+                (int16_t)amino_acid::NUM_AA + (int16_t)atype2;
             bundles->type[bundle_idx] = type;
         };
 

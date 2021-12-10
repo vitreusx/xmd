@@ -1,5 +1,72 @@
+amino acid data:
+  from file: ./amino-acids.yml
 langevin:
-  gamma_factor: 2.0 1/tau
+  gamma factor: 2.0 1/tau
   temperature: 0.38 eps/kB
 integrator:
   dt: 5e-3 tau
+heurestic angles:
+  coefficients:
+    from file: ./angle.csv
+native angles:
+  k: 30.0 eps/rad**2
+complex native dihedrals:
+  CDA: 0.66 eps/rad**2
+  CDB: 0.66 eps/rad**2
+simple native dihedrals:
+  CDH: 3.33 eps/rad**2
+heurestic dihedrals:
+  coefficients:
+    from file: ./dihedrals.csv
+const ES:
+  permittivity: 80.0 eps_0
+relative ES:
+  A: 4.0 eps_0/A
+lj force variants:
+  bb:
+    r_min: 5.0 A
+    depth: 1.0 eps
+  bs:
+    r_min: 6.8 A
+    depth: 1.0 eps
+  ss:
+    use sinking variant: true
+    default:
+      depth: 1.0 eps
+    per pair:
+      r_max:
+        from file: ./ss-pairs.csv
+pseudo-improper dihedral:
+  lambda func version: cosine
+  bb+:
+    alpha: 6.4 1/rad
+    psi_0: 1.05 rad
+    r_min: 5.6 A
+    depth: 1 eps
+  bb-:
+    alpha: 6.0 1/rad
+    psi_0: -1.44 rad
+    r_min: 6.2 A
+    depth: 1 eps
+  ss:
+    alpha: 1.2 1/rad
+    psi_0: -0.23 rad
+quasi-adiabatic:
+  (de)saturation time: 10 tau
+  breaking factor: 1.5
+  min |cos(h, r)|: 0.92
+  min |cos(h, h)| for bb: 0.75
+  max cos(n, r): 0.5
+chirality:
+  e_chi: 1 eps
+native contacts:
+  lj depth: 1 eps
+native ssbonds:
+  H1: 100 eps/A**2
+  equilibrium dist: 6.0 A
+Pauli exclusion:
+  r_excl: 4 A
+tether forces:
+  H1: 100 eps/A**2
+  H2: 0 eps/A**2
+  def_length: 3.8 A

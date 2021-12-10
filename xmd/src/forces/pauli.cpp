@@ -1,4 +1,6 @@
 #include "forces/pauli.h"
+#include <xmd/utils/units.h>
+#include <xmd/params/param_file.h>
 
 namespace xmd {
 
@@ -21,6 +23,10 @@ namespace xmd {
     }
 
     void update_pauli_pairs::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        r_excl = vm_inst.find_or_emplace<real>("pauli_r_excl",
+            params["Pauli exclusion"]["r_excl"].as<quantity>());
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         nl = &vm_inst.find<nl::nl_data>("nl");

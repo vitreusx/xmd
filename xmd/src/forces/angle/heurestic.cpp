@@ -1,5 +1,9 @@
 #include "forces/angle/heurestic.h"
 #include <xmd/model/model.h>
+#include <xmd/params/param_file.h>
+#include <xmd/files/csv.h>
+#include <xmd/utils/units.h>
+#include <sstream>
 
 namespace xmd {
 
@@ -51,6 +55,40 @@ namespace xmd {
     }
 
     void eval_heurestic_angle_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+
+        using stored_coeffs_t = std::array<std::array<real, POLY_DEG+1>, NUM_TYPES>;
+        auto& stored_poly_coeffs = vm_inst.find_or<stored_coeffs_t>("heur_ang_coeffs",
+            [&]() -> auto& {
+                auto coeffs_csv = params["heurestic angles"]["coefficients"].as<csv_file>();
+                auto& stored_poly_coeffs_ = vm_inst.emplace<stored_coeffs_t>(
+                    "heur_ang_coeffs");
+
+                for (auto const& record: coeffs_csv.records) {
+                    auto type1 = record["type1"], type2 = record["type2"];
+                    auto ord1 = type1 == "G" ? 0 : (type1 == "P" ? 1 : 2);
+                    auto ord2 = type2 == "G" ? 0 : (type2 == "P" ? 1 : 2);
+                    auto ord = 3*ord1+ord2;
+
+                    for (int d = 0; d <= POLY_DEG; ++d) {
+                        std::stringstream sstr;
+                        sstr << "a" << d;
+                        auto col_name = sstr.str();
+
+                        stored_poly_coeffs_[d][ord] = quantity(
+                            record[col_name], eps/pow(rad, d));
+                    }
+                }
+
+                return stored_poly_coeffs_;
+            });
+
+        for (int d = 0; d <= POLY_DEG; ++d) {
+            for (int t = 0; t < NUM_TYPES; ++t) {
+                poly_coeffs[d][t] = stored_poly_coeffs[d][t];
+            }
+        }
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

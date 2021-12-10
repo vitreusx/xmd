@@ -1,3 +1,5 @@
+#include <params/param_file.h>
+#include <utils/units.h>
 #include "forces/dihedral/simple_native.h"
 
 namespace xmd {
@@ -34,5 +36,13 @@ namespace xmd {
             F[i3] -= dV_dphi * dphi_dr3;
             F[i4] -= dV_dphi * dphi_dr4;
         }
+    }
+
+    void eval_snd_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        CDH = vm_inst.find_or_add<real>("CDH",
+            params["simple native dihedrals"]["CDH"].as<quantity>());
+
+        eval_native_dihedral_forces_base::init_from_vm(vm_inst);
     }
 }

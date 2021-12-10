@@ -54,4 +54,10 @@ namespace xmd {
     quantity::operator true_real() const {
         return value;
     };
+
+    quantity param_value_parser<quantity>::parse(
+        const param_entry &entry) const {
+
+        return quantity(entry.as<std::string>());
+    }
 }

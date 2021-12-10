@@ -17,16 +17,13 @@ namespace xmd::qa {
 
     void precompute_nh::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
+        auto num_particles = vm_inst.find<int>("num_particles");
 
-        n = vm_inst.find_or<vec3r_vector>("qa_n", [&]() -> auto& {
-            auto num_particles = vm_inst.find<int>("num_particles");
-            return vm_inst.emplace<vec3r_vector>("qa_n", num_particles);
-        }).to_array();
+        n = vm_inst.find_or_emplace<vec3r_vector>("qa_n",
+            num_particles).to_array();
 
-        h = vm_inst.find_or<vec3r_vector>("qa_h", [&]() -> auto& {
-            auto num_particles = vm_inst.find<int>("num_particles");
-            return vm_inst.emplace<vec3r_vector>("qa_h", num_particles);
-        }).to_array();
+        h = vm_inst.find_or_emplace<vec3r_vector>("qa_h",
+            num_particles).to_array();
 
         bundles = vm_inst.find_or<nh_bundle_vector>("nh_bundles", [&]() -> auto& {
             auto& xmd_model = vm_inst.find<xmd::model>("model");

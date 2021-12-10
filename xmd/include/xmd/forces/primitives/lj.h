@@ -1,6 +1,7 @@
 #pragma once
 #include <tuple>
 #include <xmd/types/array.h>
+#include <xmd/types/vector.h>
 #include <xmd/utils/math.h>
 #include <xmd/types/scalar.h>
 
@@ -29,5 +30,14 @@ namespace xmd {
         inline lj operator[](int idx) const {
             return { depth[idx], r_min[idx] };
         }
+    };
+
+    class lj_vector {
+    public:
+        vector<real> depth, r_min;
+        int size;
+
+        explicit lj_vector(int n);
+        lj_array to_array();
     };
 }

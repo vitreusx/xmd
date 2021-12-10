@@ -1,4 +1,6 @@
 #include "forces/es/relative.h"
+#include <xmd/params/param_file.h>
+#include <xmd/utils/units.h>
 
 namespace xmd {
 
@@ -25,6 +27,10 @@ namespace xmd {
     }
 
     void eval_relative_es_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        A = vm_inst.find_or_add<real>("relative_ES_A",
+            params["relative ES"]["A"].as<quantity>());
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

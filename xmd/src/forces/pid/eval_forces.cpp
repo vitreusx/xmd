@@ -1,4 +1,7 @@
 #include "forces/pid/eval_forces.h"
+#include <xmd/params/param_file.h>
+#include <xmd/utils/units.h>
+#include <xmd/files/csv.h>
 
 namespace xmd::pid {
 
@@ -86,10 +89,10 @@ namespace xmd::pid {
 
             real A = 0.0f, B = 0.0f, C = 0.0f, V_ = 0.0f;
 
-            if (bb_plus_lam.supp(psi1) && bb_plus_lam.supp(psi2)) {
-                auto [lam1, deriv1] = bb_plus_lam(psi1);
-                auto [lam2, deriv2] = bb_plus_lam(psi2);
-                auto [lj_V, lj_dV_dr] = bb_plus_lj(r12_rn);
+            if (conf.bb_plus_lam.supp(psi1) && conf.bb_plus_lam.supp(psi2)) {
+                auto [lam1, deriv1] = conf.bb_plus_lam(psi1);
+                auto [lam2, deriv2] = conf.bb_plus_lam(psi2);
+                auto [lj_V, lj_dV_dr] = conf.bb_plus_lj(r12_rn);
 
                 V_ += lam1 * lam2 * lj_V;
                 A += deriv1 * lam2 * lj_V;
@@ -97,10 +100,10 @@ namespace xmd::pid {
                 C += lam1 * lam2 * lj_dV_dr;
             }
 
-            if (bb_minus_lam.supp(psi1) && bb_minus_lam.supp(psi2)) {
-                auto [lam1, deriv1] = bb_minus_lam(psi1);
-                auto [lam2, deriv2] = bb_minus_lam(psi2);
-                auto [lj_V, lj_dV_dr] = bb_minus_lj(r12_rn);
+            if (conf.bb_minus_lam.supp(psi1) && conf.bb_minus_lam.supp(psi2)) {
+                auto [lam1, deriv1] = conf.bb_minus_lam(psi1);
+                auto [lam2, deriv2] = conf.bb_minus_lam(psi2);
+                auto [lj_V, lj_dV_dr] = conf.bb_minus_lj(r12_rn);
 
                 V_ += lam1 * lam2 * lj_V;
                 A += deriv1 * lam2 * lj_V;
@@ -108,11 +111,10 @@ namespace xmd::pid {
                 C += lam1 * lam2 * lj_dV_dr;
             }
 
-            auto ss_lam = ss_lams[type];
-            auto ss_sink_lj = ss_sink_ljs[type];
-            if (ss_lam.supp(psi1) && ss_lam.supp(psi2)) {
-                auto [lam1, deriv1] = ss_lam(psi1);
-                auto [lam2, deriv2] = ss_lam(psi2);
+            auto ss_sink_lj = conf.ss_ljs[type];
+            if (conf.ss_lam.supp(psi1) && conf.ss_lam.supp(psi2)) {
+                auto [lam1, deriv1] = conf.ss_lam(psi1);
+                auto [lam2, deriv2] = conf.ss_lam(psi2);
                 auto [lj_V, lj_dV_dr] = ss_sink_lj(r12_n, r12_rn);
 
                 V_ += lam1 * lam2 * lj_V;
@@ -133,6 +135,46 @@ namespace xmd::pid {
     }
 
     void eval_pid_forces::init_from_vm(vm &vm_inst) {
+        conf = vm_inst.find_or<conf_t>("pid_conf", [&]() -> auto& {
+            auto& params = vm_inst.find<param_file>("params");
+            auto const& pid_params = params["pseudo-improper dihedral"];
+
+            auto& conf_ = vm_inst.emplace<conf_t>("pid_conf");
+
+            auto lambda_ver = COSINE;
+            auto lambda_ver_str = pid_params["lambda version"].as<std::string>();
+            if (lambda_ver_str == "cosine")
+                lambda_ver = COSINE;
+            else if (lambda_ver_str == "algebraic")
+                lambda_ver = ALGEBRAIC;
+            else if (lambda_ver_str == "gaussian")
+                lambda_ver = GAUSSIAN;
+
+            auto const& bb_plus_params = pid_params["bb+"];
+            conf_.bb_plus_lam.version = lambda_ver;
+            conf_.bb_plus_lam.alpha = bb_plus_params["alpha"].as<quantity>();
+            conf_.bb_plus_lam.psi_0 = bb_plus_params["psi_0"].as<quantity>();
+            conf_.bb_plus_lj.r_min = bb_plus_params["r_min"].as<quantity>();
+            conf_.bb_plus_lj.depth = bb_plus_params["depth"].as<quantity>();
+
+            auto const& bb_minus_params = pid_params["bb-"];
+            conf_.bb_minus_lam.version = lambda_ver;
+            conf_.bb_minus_lam.alpha = bb_minus_params["alpha"].as<quantity>();
+            conf_.bb_minus_lam.psi_0 = bb_minus_params["psi_0"].as<quantity>();
+            conf_.bb_minus_lj.r_min = bb_minus_params["r_min"].as<quantity>();
+            conf_.bb_minus_lj.depth = bb_minus_params["depth"].as<quantity>();
+
+            auto& lj_variants_ = vm_inst.find_or_emplace<lj_variants>(
+                "lj_variants");
+            conf_.ss_ljs = lj_variants_.ss;
+
+            auto const& ss_params = pid_params["ss"];
+            conf_.ss_lam.psi_0 = ss_params["psi_0"].as<quantity>();
+            conf_.ss_lam.alpha = ss_params["alpha"].as<quantity>();
+
+            return conf_;
+        });
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");

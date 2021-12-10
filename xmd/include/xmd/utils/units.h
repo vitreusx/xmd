@@ -3,6 +3,7 @@
 #include <cmath>
 #include <tuple>
 #include <xmd/types/scalar.h>
+#include <xmd/params/param_entry.h>
 
 namespace xmd {
 #define Unit inline constexpr true_real
@@ -72,5 +73,11 @@ namespace xmd {
 
     private:
         true_real value;
+        friend param_value_parser<quantity>;
+    };
+
+    template<>
+    struct param_value_parser<quantity> {
+        quantity parse(param_entry const& entry) const;
     };
 };

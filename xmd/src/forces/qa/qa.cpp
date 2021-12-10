@@ -7,12 +7,14 @@ namespace xmd::qa {
         auto& free_pairs = vm_inst.find_or_emplace<free_pair_set>("qa_free_pairs");
         auto& candidates = vm_inst.find_or_emplace<candidate_list>("qa_candidates");
         auto& contacts = vm_inst.find_or_emplace<contact_set>("qa_contacts");
+        vm_inst.find<lj_variants>("lj_variants");
 
         auto sync = vm_inst.find<sync_data_vector>("sync").to_array();
         auto& t = vm_inst.find<real>("t");
         auto& box = vm_inst.find<xmd::box<vec3r>>("box");
         auto r = vm_inst.find<vec3r_vector>("r").to_array();
 
+        sift_candidates_t.init_from_vm(vm_inst);
         sift_candidates_t.candidates = &candidates;
         sift_candidates_t.atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
         sift_candidates_t.box = &box;
@@ -27,6 +29,7 @@ namespace xmd::qa {
         process_candidates_t.sync = sync;
         process_candidates_t.t = &t;
 
+        process_contacts_t.init_from_vm(vm_inst);
         process_contacts_t.sync = sync;
         process_contacts_t.contacts = &contacts;
         process_contacts_t.box = &box;

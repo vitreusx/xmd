@@ -1,5 +1,7 @@
 #include "forces/angle/native.h"
 #include <xmd/model/model.h>
+#include <xmd/params/param_file.h>
+#include <xmd/utils/units.h>
 
 namespace xmd {
     void eval_native_angle_forces::operator()() const {
@@ -31,6 +33,10 @@ namespace xmd {
     }
 
     void eval_native_angle_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        k = vm_inst.find_or_add<real>("nat_ang_k",
+            params["native angles"]["k"].as<quantity>());
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");
