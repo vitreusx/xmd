@@ -5,6 +5,7 @@
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include <xmd/vm/vm.h>
+#include <xmd/types/amino_acid.h>
 
 namespace xmd {
     struct es_pair_span {
@@ -38,12 +39,14 @@ namespace xmd {
     class update_es_pairs: public vm_aware {
     public:
         real cutoff;
+        real q[amino_acid::NUM_AA];
 
     public:
         vec3r_array r;
         box<vec3r> *box;
         nl::nl_data *nl;
         es_pair_vector *pairs;
+        array<amino_acid> atype;
 
         void init_from_vm(vm& vm_inst) override;
 

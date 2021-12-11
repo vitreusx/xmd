@@ -63,13 +63,4 @@ namespace xmd {
             ss.r_min[ss_idx] = sinking ? bb.r_min : ss.r_max[ss_idx];
         }
     }
-
-    sink_lj lj_variants::operator[](int idx) const {
-        switch (idx) {
-        case 0: return {bb};
-        case 1: return {bs};
-        case 2: return {sb};
-        default: return {ss[idx-3]};
-        };
-    }
 }

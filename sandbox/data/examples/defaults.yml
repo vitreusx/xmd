@@ -20,8 +20,10 @@ heurestic dihedrals:
     from file: ./dihedrals.csv
 const ES:
   permittivity: 80.0 eps_0
+  screening distance: 10.0 A
 relative ES:
   A: 4.0 eps_0/A
+  screening distance: 10.0 A
 lj force variants:
   bb:
     r_min: 5.0 A

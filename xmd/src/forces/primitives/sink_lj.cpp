@@ -12,4 +12,8 @@ namespace xmd {
         a.r_max = r_max.to_array();
         return a;
     };
+
+    real sink_lj::cutoff() const {
+        return (real)2.0 * r_max;
+    }
 }

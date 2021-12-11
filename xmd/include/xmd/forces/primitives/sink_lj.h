@@ -15,7 +15,7 @@ namespace xmd {
         inline sink_lj(real depth, real r_min, real r_max):
             depth{depth}, r_min{r_min}, r_max{r_max} {};
 
-        inline sink_lj(lj const& lj_):
+        inline explicit sink_lj(lj const& lj_):
             depth{lj_.depth}, r_min{lj_.r_min}, r_max{lj_.r_min} {};
 
         inline std::tuple<real, real> operator()(real r, real r_inv) const {
@@ -26,6 +26,8 @@ namespace xmd {
             dV_dr = (r_min < r && r < r_max) ? 0 : dV_dr;
             return std::make_tuple(V, dV_dr);
         }
+
+        real cutoff() const;
     };
 
     struct sink_lj_array {

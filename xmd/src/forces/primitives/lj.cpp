@@ -11,4 +11,8 @@ namespace xmd {
         a.depth = depth.to_array();
         return a;
     };
+
+    real lj::cutoff() const {
+        return 2.0 * r_min;
+    }
 }

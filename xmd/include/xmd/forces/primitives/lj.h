@@ -21,6 +21,8 @@ namespace xmd {
             auto dV_dr = 12.0f * depth * r_inv * (s6 - s12);
             return std::make_tuple(V, dV_dr);
         }
+
+        real cutoff() const;
     };
 
     struct lj_array {
