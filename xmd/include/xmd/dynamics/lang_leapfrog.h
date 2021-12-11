@@ -1,6 +1,6 @@
 #pragma once
 #include <xmd/types/vec3.h>
-#include <xmd/random/xorshift64.h>
+#include <xmd/random/rand_gen.h>
 #include <xmd/vm/vm.h>
 
 namespace xmd {
@@ -16,7 +16,7 @@ namespace xmd {
         true_real *true_t;
         int num_particles;
         array<real> mass, mass_inv;
-        xorshift64 *gen;
+        rand_gen *gen;
 
         void init_from_vm(vm& vm_inst) override;
 

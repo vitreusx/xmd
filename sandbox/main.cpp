@@ -13,27 +13,29 @@
 #include <xmd/io/show_progress_bar.h>
 #include <xmd/io/export_pdb.h>
 #include <xmd/stats/total_energy.h>
-#include <xmd/nl/verify.h>
-#include <xmd/nl/divide_into_cells.h>
-#include <xmd/files/seq_file.h>
 #include <xmd/params/param_file.h>
 using namespace xmd;
 
 int main() {
-    auto seqfile = seq_file("data/examples/glut/glut.yml");
-    auto model = seqfile.to_model();
+    vm def_vm;
+    auto& pf = def_vm.emplace<param_file>("params", "data/examples/defaults.yml");
+
+    auto pdbfile = pdb(std::ifstream("data/examples/1ubq/1ubq.pdb"));
+    auto& aa_data_ = def_vm.find_or_add<amino_acid_data>("amino_acid_data",
+        pf["amino acid data"].as<amino_acid_data>());
+    pdbfile.add_contacts(aa_data_, true);
+
+    auto model = pdbfile.to_model();
 
     int seed = 2137;
     std::default_random_engine eng(seed);
     model.morph_into_saw(eng, 3.8*angstrom, 1e-3*atom/pow(angstrom, 3.0),
         false);
 
-    vm def_vm;
     model_loader(&model).init_from_vm(def_vm);
     def_vm.find_or_emplace<real>("V", (real)0.0);
-    def_vm.find_or_emplace<xorshift64>("gen", seed);
+    def_vm.find_or_emplace<xmd::rand_gen>("gen", seed);
 
-    auto& pf = def_vm.emplace<param_file>("params", "data/examples/defaults.yml");
     auto& lang_pc_ = def_vm.emplace<lang_pc_step>("lang_pc");
     auto& reset_vf_ = def_vm.emplace<reset_vf>("reset_vf");
     auto& tethers_ = def_vm.emplace<eval_tether_forces>("eval_tether");
@@ -55,21 +57,16 @@ int main() {
     auto show_pbar_period = 25.0*tau;
     auto last_show_pbar_t = std::numeric_limits<real>::lowest();
 
-    auto& divide_into_cells_ = def_vm.emplace<nl::divide_into_cells>(
-        "divide_into_cells");
-    auto& verify_ = def_vm.emplace<nl::verify>("nl_verify");
-
-    *divide_into_cells_.cutoff = 10.0*angstrom;
-    *divide_into_cells_.pad = 5.0*angstrom;
+//    auto& divide_into_cells_ = def_vm.emplace<nl::divide_into_cells>(
+//        "divide_into_cells");
+//    auto& verify_ = def_vm.emplace<nl::verify>("nl_verify");
+//
+//    *divide_into_cells_.cutoff = 10.0*angstrom;
+//    *divide_into_cells_.pad = 5.0*angstrom;
 
     auto& t = def_vm.find<real>("t");
     while (t < total_t) {
         reset_vf_();
-
-        verify_();
-        if (*verify_.invalid)
-            divide_into_cells_();
-
         tethers_();
         nat_ang_();
         nat_comp_dih_();

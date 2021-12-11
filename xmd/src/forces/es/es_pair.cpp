@@ -25,13 +25,11 @@ namespace xmd {
     }
 
     void update_es_pairs::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("param_file");
-
         using stored_q_t = std::array<real, amino_acid::NUM_AA>;
         auto& stored_q = vm_inst.find_or<stored_q_t>("stored_q", [&]() -> auto& {
             auto& stored_q_ = vm_inst.emplace<stored_q_t>("stored_q");
 
-            auto& aa_data_ = vm_inst.find_or_emplace<amino_acid_data>(
+            auto& aa_data_ = vm_inst.find<amino_acid_data>(
                 "amino_acid_data");
             for (auto const& aa: amino_acid::all()) {
                 stored_q_[(short)aa] = aa_data_[aa].charge;

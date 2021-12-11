@@ -9,18 +9,12 @@ namespace xmd {
         const std::filesystem::path &location):
         param_entry(yaml, location) {};
 
-    param_file param_value_parser<param_file>::parse(
-        param_entry const& entry) const {
+    param_file param_file::import(param_entry const& root,
+        std::filesystem::path const& relpath) {
 
-        YAML::Node yaml = entry;
-        if (auto import_from = entry["import from"]; import_from) {
-            for (auto const& relpath: import_from) {
-                auto abspath = entry.location.value() / relpath.as<std::string>();
-                auto imported = param_file(abspath);
-                yaml = merge_nodes(yaml, imported);
-            }
-        }
-
-        return param_file(yaml, entry.location.value());
+        auto def_location = std::filesystem::path();
+        auto root_location = root.location.value_or(def_location);
+        auto abspath = root_location.parent_path() / relpath;
+        return param_file(abspath);
     }
 }

@@ -502,7 +502,6 @@ namespace xmd {
                 return at_expr<U>(x, y, z, idx);
             }
 
-        private:
             U *x, *y, *z;
         };
 
@@ -522,7 +521,6 @@ namespace xmd {
                 return size_;
             }
 
-        private:
             U *x, *y, *z;
             int size_;
         };

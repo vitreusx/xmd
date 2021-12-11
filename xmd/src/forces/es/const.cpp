@@ -33,7 +33,7 @@ namespace xmd {
 
         auto screening_dist = vm_inst.find_or_add<real>("screening_dist",
             params["const ES"]["screening distance"].as<quantity>());
-
+        screen_dist_inv = (real)1.0 / screening_dist;
 
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();

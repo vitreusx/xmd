@@ -53,7 +53,7 @@ namespace xmd {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         num_particles = vm_inst.find<int>("num_particles");
         mass = vm_inst.find<vector<real>>("mass").to_array();
-        gen = &vm_inst.find<xorshift64>("gen");
+        gen = &vm_inst.find<rand_gen>("gen");
 
         F = vm_inst.find_or_emplace<vec3r_vector>("F",
             num_particles).to_array();

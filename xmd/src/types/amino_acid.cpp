@@ -1,6 +1,7 @@
 #include "types/amino_acid.h"
 #include "utils/units.h"
 #include <numeric>
+#include <xmd/params/param_file.h>
 
 namespace xmd {
 
@@ -67,18 +68,23 @@ namespace xmd {
     amino_acid_data param_value_parser<amino_acid_data>::parse(
         const param_entry &root) const {
 
+        auto source = root;
+        if (auto from_file_tag = root["from file"]; from_file_tag) {
+            source = param_file::import(root, from_file_tag.as<std::string>());
+        }
+
         amino_acid_data parsed;
 
         std::unordered_map<std::string, true_real> def_atom_radii;
-        auto def_atom_radii_node = root["default atom radii"];
-        for (auto const& entry: root["default atom radii"]) {
+        auto def_atom_radii_node = source["default atom radii"];
+        for (auto const& entry: source["default atom radii"]) {
             auto name = entry.first.as<std::string>();
             auto r = quantity(entry.second.as<std::string>(), angstrom);
             def_atom_radii[name] = r;
         }
 
-        auto amino_acids_node = root["amino acids"];
-        for (auto const& entry: root["amino acids"]) {
+        auto amino_acids_node = source["amino acids"];
+        for (auto const& entry: source["amino acids"]) {
             auto name = entry.first.as<std::string>();
             auto data_node = entry.second;
 

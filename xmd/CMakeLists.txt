@@ -36,8 +36,13 @@ find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
 add_subdirectory(ext/cparse)
 
+set(TF_BUILD_TESTS off)
+set(TF_BUILD_EXAMPLES off)
+set(TF_BUILD_BENCHMARKS off)
+add_subdirectory(ext/taskflow)
+
 target_link_libraries(${TARGET_NAME}
-    PUBLIC Eigen3::Eigen yaml-cpp cparse)
+    PUBLIC Eigen3::Eigen yaml-cpp cparse Taskflow)
 
 add_custom_command(
     TARGET ${TARGET_NAME}

@@ -97,7 +97,7 @@ namespace xmd::qa {
             }
         }
 
-        auto& aa_data_ = vm_inst.find_or_emplace<amino_acid_data>(
+        auto& aa_data_ = vm_inst.find<amino_acid_data>(
             "amino_acid_data");
         for (auto const& aa: amino_acid::all()) {
             ptype[(int)aa] = aa_data_[aa].polarization;

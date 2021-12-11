@@ -20,7 +20,6 @@ namespace xmd {
         param_entry operator[](std::string const& tag) const;
         param_entry operator[](char const* tag) const;
 
-    private:
         std::optional<std::filesystem::path> location;
 
         template<typename T>

@@ -14,7 +14,7 @@ namespace xmd::qa {
             auto& sync_vec_ = vm_inst.emplace<sync_data_vector>("sync",
                 num_particles);
 
-            auto& aa_data_ = vm_inst.find_or_emplace<amino_acid_data>(
+            auto& aa_data_ = vm_inst.find<amino_acid_data>(
                 "amino_acid_data");
             auto& atype = vm_inst.find<vector<amino_acid>>("atype");
 
