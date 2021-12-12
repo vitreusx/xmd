@@ -2,6 +2,7 @@
 #include "candidate.h"
 #include "sync_data.h"
 #include "contact.h"
+#include "free_pair.h"
 
 namespace xmd::qa {
     class process_candidates {
@@ -10,6 +11,7 @@ namespace xmd::qa {
         sync_data_array sync;
         real *t;
         contact_set *contacts;
+        free_pair_set *free_pairs;
 
     public:
         void operator()() const;

@@ -9,12 +9,14 @@ namespace xmd {
     class export_pdb: public vm_aware {
     public:
         std::filesystem::path out_file_path;
+        real period;
 
     public:
         vec3tr_array true_r;
         xmd::model *ref_model;
         res_map_t *res_map;
         int *serial;
+        real *last_t, *t;
 
         void init_from_vm(vm& vm_inst) override;
 

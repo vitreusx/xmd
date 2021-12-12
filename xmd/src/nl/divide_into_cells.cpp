@@ -1,4 +1,6 @@
 #include "nl/divide_into_cells.h"
+#include <xmd/params/param_file.h>
+#include <xmd/utils/units.h>
 
 namespace xmd::nl {
 
@@ -20,7 +22,8 @@ namespace xmd::nl {
             z_max = max(z_max, z_);
         }
 
-        auto req_r = *cutoff + *pad;
+        auto pad = pad_factor * *max_cutoff;
+        auto req_r = *max_cutoff + pad;
         auto cell_a = req_r, cell_a_inv = 1.0f / cell_a;
         auto cell_a_eps = 1e-6;
 
@@ -81,9 +84,14 @@ namespace xmd::nl {
                         auto iy2 = (cell_ny + iy1 + dy) % cell_ny;
                         for (int iz1 = 0; iz1 < cell_nz; ++iz1) {
                             auto cell_idx1 = ix1 + cell_nx * (iy1 + cell_ny * iz1);
+                            if (data->particles.cell_bucket_size[cell_idx1] == 0)
+                                continue;
+
                             for (int dz = -z_scan_r; dz <= z_scan_r; ++dz) {
                                 auto iz2 = (cell_nz + iz1 + dz) % cell_nz;
                                 auto cell_idx2 = ix2 + cell_nx * (iy2 + cell_ny * iz2);
+                                if (data->particles.cell_bucket_size[cell_idx2] == 0)
+                                    continue;
 
                                 if (cell_idx1 <= cell_idx2) {
                                     auto nc_idx = data->neighbor_cells.add();
@@ -107,26 +115,27 @@ namespace xmd::nl {
             auto [nc_beg, nc_end] = data->native_contacts.range(cell_idx1);
 
             for (int bucket_idx1 = part_beg1; bucket_idx1 < part_end1; ++bucket_idx1) {
-                auto part_idx1 = data->particles.item_cell_idx[bucket_idx1];
+                auto part_idx1 = data->particles.item_index_buckets[bucket_idx1];
                 auto r1 = r[part_idx1];
 
                 for (int bucket_idx2 = part_beg2; bucket_idx2 < part_end2; ++bucket_idx2) {
-                    auto part_idx2 = data->particles.item_cell_idx[bucket_idx2];
+                    auto part_idx2 = data->particles.item_index_buckets[bucket_idx2];
                     auto r2 = r[part_idx2];
 
                     if (bucket_idx1 == bucket_idx2 && part_idx1 >= part_idx2)
                         continue;
 
-                    auto r12_n = norm(box->ray(r1, r2));
-                    if (r12_n < *cutoff + *pad) {
+                    if (part_idx2 - part_idx1 < 3)
+                        continue;
+
+                    if (norm(box->ray(r1, r2)) < req_r) {
                         auto pair_idx = data->particle_pairs.push_back();
                         data->particle_pairs.i1[pair_idx] = part_idx1;
                         data->particle_pairs.i2[pair_idx] = part_idx2;
-                        data->particle_pairs.orig_dist[pair_idx] = r12_n;
 
                         bool is_native = false;
                         for (int nat_bucket_idx = nc_beg; nat_bucket_idx < nc_end; ++nat_bucket_idx) {
-                            auto nat_idx = data->native_contacts.item_cell_idx[nat_bucket_idx];
+                            auto nat_idx = data->native_contacts.item_index_buckets[nat_bucket_idx];
                             auto nat_i1 = nat_cont.i1[nat_idx];
                             auto nat_i2 = nat_cont.i2[nat_idx];
 
@@ -141,7 +150,7 @@ namespace xmd::nl {
             }
         }
 
-        data->orig_pad = *pad;
+        data->orig_pad = pad;
         for (int idx = 0; idx < num_particles; ++idx)
             data->orig_r[idx] = r[idx];
         data->orig_box = *box;
@@ -149,6 +158,9 @@ namespace xmd::nl {
     }
 
     void divide_into_cells::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        pad_factor = vm_inst.find_or_emplace<real>("pad_factor",
+            params["neighbor list"]["pad factor"].as<quantity>());
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
 
@@ -163,8 +175,7 @@ namespace xmd::nl {
             data_.orig_r = vec3r_vector(num_particles);
             return data_;
         });
-        cutoff = &vm_inst.find_or_emplace<real>("cutoff");
-        pad = &vm_inst.find_or_emplace<real>("pad");
+        max_cutoff = &vm_inst.find_or_emplace<real>("max_cutoff");
         invalid = &vm_inst.find_or_emplace<bool>("invalid", true);
     }
 

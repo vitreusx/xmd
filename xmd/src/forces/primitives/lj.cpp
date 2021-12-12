@@ -2,7 +2,7 @@
 
 namespace xmd {
     lj_vector::lj_vector(int n):
-        r_min(n), depth(n), size(n) {}
+        depth(n), r_min(n), size(n) {}
 
     lj_array lj_vector::to_array() {
         lj_array a;
@@ -13,6 +13,10 @@ namespace xmd {
     };
 
     real lj::cutoff() const {
+        return lj::cutoff(r_min);
+    }
+
+    real lj::cutoff(real r_min) {
         return 2.0 * r_min;
     }
 }

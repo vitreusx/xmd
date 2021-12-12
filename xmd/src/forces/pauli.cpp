@@ -1,6 +1,7 @@
 #include "forces/pauli.h"
 #include <xmd/utils/units.h>
 #include <xmd/params/param_file.h>
+#include <xmd/forces/primitives/shifted_lj.h>
 
 namespace xmd {
 
@@ -23,14 +24,14 @@ namespace xmd {
     }
 
     void update_pauli_pairs::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        r_excl = vm_inst.find_or_emplace<real>("pauli_r_excl",
-            params["Pauli exclusion"]["r_excl"].as<quantity>());
-
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl");
+        nl = &vm_inst.find<nl::nl_data>("nl_data");
         pairs = &vm_inst.find<pauli_pair_vector>("pauli_pairs");
+
+        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        r_excl = vm_inst.find<real>("pauli_r_excl");
+        max_cutoff = max(max_cutoff, r_excl);
     }
 
     void eval_pauli_exclusion_forces::operator()() const {
@@ -40,10 +41,9 @@ namespace xmd {
             auto r12 = box->ray(r1, r2);
             auto r12_rn = norm_inv(r12);
 
-            auto within = (1.0f < r12_rn * r_excl);
-            if (within) {
+            if (1.0f < r12_rn * r_excl) {
                 auto r12_u = r12 * r12_rn;
-                auto [V_, dV_dr] = lj(depth, r_excl)(r12_rn);
+                auto [V_, dV_dr] = shifted_lj(depth, r_excl)(r12_rn);
 
                 *V += V_;
                 F[i1] += r12_u * dV_dr;
@@ -53,6 +53,12 @@ namespace xmd {
     }
 
     void eval_pauli_exclusion_forces::init_from_vm(vm &vm_inst) {
+        auto& params = vm_inst.find<param_file>("params");
+        r_excl = vm_inst.find_or_emplace<real>("pauli_r_excl",
+            params["Pauli exclusion"]["r_excl"].as<quantity>());
+        depth = vm_inst.find_or_emplace<real>("pauli_depth",
+            params["Pauli exclusion"]["depth"].as<quantity>());
+
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");

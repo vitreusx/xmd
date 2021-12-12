@@ -1,3 +1,6 @@
+general:
+  total time: 20e3 tau
+
 amino acid data:
   from file: ./amino-acids.yml
 
@@ -7,6 +10,9 @@ langevin:
 
 integrator:
   dt: 5e-3 tau
+
+neighbor list:
+  pad factor: 0.5
 
 heurestic angles:
   coefficients:
@@ -82,9 +88,18 @@ native ssbonds:
   equilibrium dist: 6.0 A
 
 Pauli exclusion:
-  r_excl: 4 A
+  r_excl: 4.0 A
+  depth: 1.0 eps
 
 tether forces:
   H1: 100 eps/A**2
   H2: 0 eps/A**2
   def_length: 3.8 A
+
+export pdb:
+  path: "output.pdb"
+  update period: 100 tau
+
+progress bar:
+  width: 50
+  update period: 10 tau

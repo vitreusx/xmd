@@ -6,6 +6,7 @@
 #include "sync_data.h"
 #include <xmd/vm/vm.h>
 #include <xmd/forces/primitives/lj_variants.h>
+#include "free_pair.h"
 
 namespace xmd::qa {
     class process_contacts: public vm_aware {
@@ -19,6 +20,7 @@ namespace xmd::qa {
         contact_set *contacts;
         real *V, *t;
         sync_data_array sync;
+        free_pair_set *free_pairs;
 
         void init_from_vm(vm& vm_inst) override;
 

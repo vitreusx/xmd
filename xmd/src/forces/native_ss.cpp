@@ -22,7 +22,7 @@ namespace xmd {
     void update_nat_ssbonds::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl");
+        nl = &vm_inst.find<nl::nl_data>("nl_data");
         all_ssobnds = &vm_inst.find_or<nat_ssbond_vector>("all_ssbonds",
             [&]() -> auto& {
                 auto& xmd_model = vm_inst.find<xmd::model>("model");
@@ -50,8 +50,14 @@ namespace xmd {
 
                 return all_ssbonds_;
             });
-        ssbonds = &vm_inst.find_or_emplace<nat_ssbond_vector>(
-            "ssbonds");
+
+        ssbonds = &vm_inst.find<nat_ssbond_vector>("ssbonds");
+
+        auto& nat_r = vm_inst.find<real>("nat_ss_r");
+        cutoff = harmonic::cutoff(nat_r);
+
+        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        max_cutoff = max(max_cutoff, cutoff);
     }
 
     void eval_nat_ssbond_forces::operator()() const {
@@ -78,7 +84,7 @@ namespace xmd {
             params["native ssbonds"]["equilibrium dist"].as<quantity>());
 
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        ssbonds = vm_inst.find<nat_ssbond_vector>("ssbonds").to_span();
+        ssbonds = vm_inst.find_or_emplace<nat_ssbond_vector>("ssbonds").to_span();
         r = vm_inst.find<vec3r_vector>("r").to_array();
         V = &vm_inst.find<real>("V");
     }

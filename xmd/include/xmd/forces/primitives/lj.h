@@ -17,12 +17,15 @@ namespace xmd {
 
         inline std::tuple<real, real> operator()(real r_inv) const {
             auto s = r_inv * r_min, s6 = ipow<6>(s), s12 = s6 * s6;
-            auto V = depth * (s12 - 2.0f * s6);
-            auto dV_dr = 12.0f * depth * r_inv * (s6 - s12);
+            auto V = depth * (s12 - (real)2.0 * s6);
+            auto dV_dr = (real)12.0 * depth * r_inv * (s6 - s12);
+            V = adjust<real>(V, -1.0e3, 1.0e3);
+            dV_dr = adjust<real>(dV_dr, -1.0e3, 1.0e3);
             return std::make_tuple(V, dV_dr);
         }
 
         real cutoff() const;
+        static real cutoff(real r_min);
     };
 
     struct lj_array {

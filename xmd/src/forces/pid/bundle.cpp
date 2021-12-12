@@ -37,7 +37,7 @@ namespace xmd::pid {
         next = vm_inst.find<vector<int>>("next").to_array();
         atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl");
+        nl = &vm_inst.find<nl::nl_data>("nl_data");
         bundles = &vm_inst.find<pid_bundle_vector>("pid_bundles");
 
         cutoff = vm_inst.find_or<real>("pid_cutoff", [&]() -> auto& {
@@ -54,6 +54,9 @@ namespace xmd::pid {
 
             return cutoff_;
         });
+
+        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        max_cutoff = max(max_cutoff, cutoff);
     }
 
     int pid_bundle_vector::push_back() {

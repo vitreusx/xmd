@@ -1,6 +1,7 @@
 #pragma once
 #include <tuple>
 #include <xmd/types/scalar.h>
+#include <xmd/utils/math.h>
 
 namespace xmd {
     class harmonic {
@@ -16,7 +17,11 @@ namespace xmd {
             auto dr = r - nat_r, dr2 = dr * dr;
             auto V = (real)0.5 * dr2 * (H1 + H2 * dr2);
             auto dV_dr = dr * (H1 + (real)2.0 * H2 * dr2);
+            V = adjust<real>(V, -1.0e3, 1.0e3);
+            dV_dr = adjust<real>(dV_dr, -1.0e3, 1.0e3);
             return std::make_tuple(V, dV_dr);
         }
+
+        static real cutoff(real nat_r);
     };
 }

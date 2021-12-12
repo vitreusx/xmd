@@ -11,9 +11,10 @@ namespace xmd {
         for (int idx = 0; idx < all_contacts->size; ++idx) {
             auto idx1 = all_contacts->i1[idx], idx2 = all_contacts->i2[idx];
             auto nat_dist = all_contacts->nat_dist[idx];
+            auto cutoff = lj::cutoff(nat_dist);
 
             auto r1 = r[idx1], r2 = r[idx2];
-            if (norm(box->ray(r1, r2)) < nat_dist + nl->orig_pad) {
+            if (norm(box->ray(r1, r2)) < cutoff + nl->orig_pad) {
                 auto cont_idx = contacts->push_back();
                 contacts->i1[cont_idx] = idx1;
                 contacts->i2[cont_idx] = idx2;
@@ -25,7 +26,7 @@ namespace xmd {
     void update_go_contacts::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl");
+        nl = &vm_inst.find<nl::nl_data>("nl_data");
         all_contacts = &vm_inst.find_or<go_contact_vector>("go_all_contacts",
             [&]() -> auto& {
                 auto& xmd_model = vm_inst.find<xmd::model>("model");
@@ -54,8 +55,16 @@ namespace xmd {
 
                 return all_contacts_;
             });
-        contacts = &vm_inst.find_or_emplace<go_contact_vector>(
-            "go_contacts");
+
+        contacts = &vm_inst.find<go_contact_vector>("go_contacts");
+
+        real cutoff = 0.0;
+        for (int cont_idx = 0; cont_idx < all_contacts->size; ++cont_idx) {
+            cutoff = max(cutoff, lj::cutoff(all_contacts->nat_dist[cont_idx]));
+        }
+
+        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        max_cutoff = max(max_cutoff, cutoff);
     }
 
     void eval_go_forces::operator()() const {
@@ -82,9 +91,11 @@ namespace xmd {
             params["native contacts"]["lj depth"].as<quantity>());
 
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        contacts = vm_inst.find<go_contact_vector>("go_contacts").to_span();
+        contacts = vm_inst.find_or_emplace<go_contact_vector>(
+            "go_contacts").to_span();
         r = vm_inst.find<vec3r_vector>("r").to_array();
         V = &vm_inst.find<real>("V");
+        F = vm_inst.find<vec3r_vector>("F").to_array();
     }
 
     go_contact_vector::go_contact_vector(int n):

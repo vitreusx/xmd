@@ -14,6 +14,10 @@ namespace xmd {
     };
 
     real sink_lj::cutoff() const {
-        return (real)2.0 * r_max;
+        return sink_lj::cutoff(r_max);
+    }
+
+    real sink_lj::cutoff(real r_max) {
+        return 2.0 * r_max;
     }
 }

@@ -52,6 +52,9 @@ namespace xmd::qa {
             ref_time.clear();
             sync_diff1.clear();
             sync_diff2.clear();
+            has_item_.clear();
+            vacant_slots.clear();
+            extent_ = 0;
         }
 
         vector<int> i1, i2;

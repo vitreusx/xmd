@@ -32,7 +32,7 @@ namespace xmd {
         auto const& rel_es_params = es_params["relative variant params"];
 
         factor = vm_inst.find_or_add<real>("relative_ES_A",
-            params["relative ES"]["factor"].as<quantity>());
+            rel_es_params["factor"].as<quantity>());
 
         auto screening_dist = vm_inst.find_or_add<real>("screening_dist",
             es_params["screening distance"].as<quantity>());

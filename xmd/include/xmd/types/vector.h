@@ -2,6 +2,7 @@
 #include "span.h"
 #include <xmd/utils/math.h>
 #include <vector>
+#include <iostream>
 
 namespace xmd {
     template<typename T>

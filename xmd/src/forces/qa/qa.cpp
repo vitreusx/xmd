@@ -7,7 +7,6 @@ namespace xmd::qa {
         auto& free_pairs = vm_inst.find_or_emplace<free_pair_set>("qa_free_pairs");
         auto& candidates = vm_inst.find_or_emplace<candidate_list>("qa_candidates");
         auto& contacts = vm_inst.find_or_emplace<contact_set>("qa_contacts");
-        vm_inst.find<lj_variants>("lj_variants");
 
         auto sync = vm_inst.find_or<sync_data_vector>("sync", [&]() -> auto& {
             auto num_particles = vm_inst.find<int>("num_particles");
@@ -45,6 +44,7 @@ namespace xmd::qa {
         process_candidates_t.candidates = &candidates;
         process_candidates_t.contacts = &contacts;
         process_candidates_t.sync = sync;
+        process_candidates_t.free_pairs = &free_pairs;
         process_candidates_t.t = &t;
 
         process_contacts_t.init_from_vm(vm_inst);
@@ -54,6 +54,7 @@ namespace xmd::qa {
         process_contacts_t.V = &vm_inst.find<real>("V");
         process_contacts_t.F = vm_inst.find<vec3r_vector>("F").to_array();
         process_contacts_t.r = r;
+        process_contacts_t.free_pairs = &free_pairs;
     }
 
     void eval_qa_forces::operator()() const {

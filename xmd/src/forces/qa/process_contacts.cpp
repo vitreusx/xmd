@@ -44,6 +44,10 @@ namespace xmd::qa {
                 contacts->remove(idx);
                 sync[i1] += sync_diff1;
                 sync[i2] += sync_diff2;
+
+                int free_idx = free_pairs->add();
+                free_pairs->i1[free_idx] = i1;
+                free_pairs->i2[free_idx] = i2;
             }
         }
     }
@@ -58,5 +62,6 @@ namespace xmd::qa {
         cycle_time_inv = (real)1.0/cycle_time;
         breaking_factor = vm_inst.find_or_emplace<real>("qa_breaking_factor",
             contact_params["breaking factor"].as<quantity>());
+        t = &vm_inst.find<real>("t");
     }
 }

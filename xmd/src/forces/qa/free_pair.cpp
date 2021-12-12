@@ -24,7 +24,7 @@ namespace xmd::qa {
     void update_free_pairs::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl");
+        nl = &vm_inst.find<nl::nl_data>("nl_data");
         pairs = &vm_inst.find<free_pair_set>("qa_free_pairs");
 
         max_formation_min_dist = vm_inst.find_or<real>("max_formation_min_dist",
@@ -42,5 +42,8 @@ namespace xmd::qa {
 
                 return dist_;
             });
+
+        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        max_cutoff = max(max_cutoff, max_formation_min_dist);
     }
 }

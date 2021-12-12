@@ -24,6 +24,8 @@ namespace xmd::qa {
 
                 sync[i1] -= sync_diff1;
                 sync[i2] -= sync_diff2;
+
+                
             }
         }
     }

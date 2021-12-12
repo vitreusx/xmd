@@ -24,10 +24,13 @@ namespace xmd {
             auto V = depth * (s12 - 2.0f * s6);
             auto dV_dr = 12.0f * depth * r_inv * (s6 - s12);
             dV_dr = (r_min < r && r < r_max) ? 0 : dV_dr;
+            V = adjust<real>(V, -1.0e3, 1.0e3);
+            dV_dr = adjust<real>(dV_dr, -1.0e3, 1.0e3);
             return std::make_tuple(V, dV_dr);
         }
 
         real cutoff() const;
+        static real cutoff(real r_max);
     };
 
     struct sink_lj_array {

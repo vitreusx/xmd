@@ -70,6 +70,7 @@ namespace xmd::qa {
             int slot_idx = candidates->add();
             candidates->i1[slot_idx] = i1;
             candidates->i2[slot_idx] = i2;
+            candidates->free_pair_idx[slot_idx] = idx;
             candidates->type[slot_idx] = type;
             candidates->sync_diff1[slot_idx] = sync_diff1;
             candidates->sync_diff2[slot_idx] = sync_diff2;

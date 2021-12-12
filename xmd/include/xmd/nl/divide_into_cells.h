@@ -9,11 +9,14 @@
 namespace xmd::nl {
     class divide_into_cells: public vm_aware {
     public:
+        real pad_factor;
+
+    public:
         vec3r_array r;
         box<vec3r> *box;
         nl_data *data;
         int num_particles;
-        real *cutoff, *pad;
+        real *max_cutoff;
         bool *invalid;
         native_contact_span nat_cont;
 

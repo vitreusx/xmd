@@ -40,6 +40,9 @@ namespace xmd::qa {
         inline void clear() {
             i1.clear();
             i2.clear();
+            has_item_.clear();
+            vacant_slots.clear();
+            extent_ = 0;
         }
 
         vector<int> i1, i2;

@@ -7,7 +7,7 @@
 namespace xmd {
     void lj_variants::init_from_vm(vm &vm_inst) {
         auto& params = vm_inst.find<param_file>("params");
-        auto const& lj_params = params["lj forces"];
+        auto const& lj_params = params["lj force variants"];
 
         bb.r_min = lj_params["bb"]["r_min"].as<quantity>();
         bb.depth = lj_params["bb"]["depth"].as<quantity>();
@@ -41,7 +41,7 @@ namespace xmd {
                     auto aa1 = amino_acid(rec["type"]);
                     for (auto const& aa2: amino_acid::all()) {
                         int ss_idx = amino_acid::NUM_AA*(int)aa1 + (int)aa2;
-                        ss.r_max[ss_idx] = quantity(rec[aa2.name()], f77unit);
+                        ss.r_max[ss_idx] = quantity(rec[aa2.name()], angstrom);
                     }
                 }
             }

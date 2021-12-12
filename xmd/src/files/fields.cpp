@@ -1,42 +1,6 @@
 #include "fields.h"
-#include <algorithm>
+#include <xmd/utils/text.h>
 #include <regex>
-
-static std::string lstrip(std::string const& s) {
-    auto beg = std::find_if_not(s.begin(), s.end(), [](auto c) -> auto {
-        return std::isspace(c);
-    });
-    auto end = s.end();
-    return s.substr(beg - s.begin(), end - beg);
-}
-
-static std::string rstrip(std::string const& s) {
-    auto beg = s.begin();
-    auto end = std::find_if_not(s.rbegin(), s.rend(), [](auto c) -> auto {
-        return std::isspace(c);
-    }).base();
-    return s.substr(beg - s.begin(), end - beg);
-}
-
-static std::string strip(std::string const& s) {
-    return rstrip(lstrip(s));
-}
-
-template<typename... Args>
-std::string format(const char *fmt, Args const&... args) {
-    auto req_len = snprintf(nullptr, 0, fmt, args...);
-    std::string s(req_len, '\0');
-    snprintf(s.data(), req_len, fmt, args...);
-    return s;
-}
-
-template<typename... Args>
-void inplace_format(char *buf, const char *fmt, Args const&... args) {
-    auto req_len = snprintf(nullptr, 0, fmt, args...);
-    std::string s(req_len, '\0');
-    snprintf(s.data(), req_len+1, fmt, args...);
-    memcpy(buf, s.data(), req_len);
-}
 
 namespace xmd::fields {
     achar::achar(size_t i):

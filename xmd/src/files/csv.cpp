@@ -147,8 +147,9 @@ namespace xmd {
         const param_entry &entry) const {
 
         if (auto from_file = entry["from file"]; from_file) {
-            auto file = std::ifstream(from_file.as<std::string>());
-            return csv_file(std::move(file));
+            auto relpath = from_file.as<std::string>();
+            auto path = entry.location.value().parent_path() / relpath;
+            return csv_file(std::ifstream(path));
         }
         else {
             auto source_txt = entry.as<std::string>();
