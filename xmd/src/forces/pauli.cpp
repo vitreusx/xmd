@@ -7,19 +7,19 @@ namespace xmd {
     void update_pauli_pairs::operator()() const {
         pairs->clear();
 
-        auto f = [&](auto idx1, auto idx2) -> auto {
-            int pair_idx = pairs->push_back();
-            pairs->i1[pair_idx] = idx1;
-            pairs->i2[pair_idx] = idx2;
-        };
+        auto cutoff = r_excl;
+        auto min_norm_inv = (real)1.0 / (cutoff + nl->orig_pad);
 
-        nl::iter_over_pairs iter(f);
-        iter.cutoff = r_excl;
-        iter.box = box;
-        iter.nl = nl;
-        iter.r = r;
-
-        iter();
+        for (int pair_idx = 0; pair_idx < nl->particle_pairs.size; ++pair_idx) {
+            auto i1 = nl->particle_pairs.i1[pair_idx];
+            auto i2 = nl->particle_pairs.i2[pair_idx];
+            auto r1 = r[i1], r2 = r[i2];
+            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
+                int pauli_pair_idx = pairs->push_back();
+                pairs->i1[pauli_pair_idx] = i1;
+                pairs->i2[pauli_pair_idx] = i2;
+            }
+        }
     }
 
     void update_pauli_pairs::init_from_vm(vm &vm_inst) {

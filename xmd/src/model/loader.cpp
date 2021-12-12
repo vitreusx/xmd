@@ -1,5 +1,6 @@
 #include "model/loader.h"
 #include <xmd/types/vec3.h>
+#include <xmd/model/native_contacts.h>
 
 namespace xmd {
     static vec3r cast_v(Eigen::Vector3d const& v) {
@@ -43,6 +44,22 @@ namespace xmd {
             box.cell = cast_v(stored_model.model_box.cell);
             box.cell_inv = cast_v(stored_model.model_box.cell_inv);
             return vm_inst.emplace<xmd::box<vec3r>>("box", box);
+        });
+
+        vm_inst.find_or<native_contact_vector>("native_contacts", [&]() -> auto& {
+            auto& nc = vm_inst.emplace<native_contact_vector>(
+                "native_contacts", stored_model.contacts.size());
+
+            for (int nc_idx = 0; nc_idx < nc.size; ++nc_idx) {
+                auto const& xmd_cont = stored_model.contacts[nc_idx];
+                auto i1 = res_map[xmd_cont.res1], i2 = res_map[xmd_cont.res2];
+                if (i1 >= i2) std::swap(i1, i2);
+                nc.i1[nc_idx] = i1;
+                nc.i2[nc_idx] = i2;
+            }
+
+            nc.sort();
+            return nc;
         });
     }
 }

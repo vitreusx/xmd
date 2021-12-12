@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <xmd/files/pdb.h>
+#include <xmd/files/seq_file.h>
 #include <xmd/model/model.h>
 #include <xmd/utils/units.h>
 #include <xmd/vm/vm.h>
@@ -20,12 +21,8 @@ int main() {
     vm def_vm;
     auto& pf = def_vm.emplace<param_file>("params", "data/examples/defaults.yml");
 
-    auto pdbfile = pdb(std::ifstream("data/examples/1ubq/1ubq.pdb"));
-    auto& aa_data_ = def_vm.find_or_add<amino_acid_data>("amino_acid_data",
-        pf["amino acid data"].as<amino_acid_data>());
-    pdbfile.add_contacts(aa_data_, true);
-
-    auto model = pdbfile.to_model();
+    auto seqfile = seq_file("data/examples/glut/glut.yml");
+    auto model = seqfile.to_model();
 
     int seed = 2137;
     std::default_random_engine eng(seed);
@@ -33,6 +30,7 @@ int main() {
         false);
 
     model_loader(&model).init_from_vm(def_vm);
+    auto& t = def_vm.find_or_emplace<real>("t", (real)0.0);
     def_vm.find_or_emplace<real>("V", (real)0.0);
     def_vm.find_or_emplace<xmd::rand_gen>("gen", seed);
 
@@ -41,6 +39,8 @@ int main() {
     auto& tethers_ = def_vm.emplace<eval_tether_forces>("eval_tether");
     auto& nat_ang_ = def_vm.emplace<eval_native_angle_forces>("eval_nat_ang");
     auto& nat_comp_dih_ = def_vm.emplace<eval_cnd_forces>("eval_cnd");
+
+
 
     auto& export_pdb_ = def_vm.emplace<export_pdb>("export_pdb");
     export_pdb_.out_file_path = "output.pdb";
@@ -57,14 +57,6 @@ int main() {
     auto show_pbar_period = 25.0*tau;
     auto last_show_pbar_t = std::numeric_limits<real>::lowest();
 
-//    auto& divide_into_cells_ = def_vm.emplace<nl::divide_into_cells>(
-//        "divide_into_cells");
-//    auto& verify_ = def_vm.emplace<nl::verify>("nl_verify");
-//
-//    *divide_into_cells_.cutoff = 10.0*angstrom;
-//    *divide_into_cells_.pad = 5.0*angstrom;
-
-    auto& t = def_vm.find<real>("t");
     while (t < total_t) {
         reset_vf_();
         tethers_();

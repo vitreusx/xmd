@@ -5,13 +5,13 @@
 #include <xmd/params/param_file.h>
 
 namespace xmd {
-
     void update_nat_ssbonds::operator()() const {
         ssbonds->clear();
+        
         for (int idx = 0; idx < all_ssobnds->size; ++idx) {
             auto idx1 = all_ssobnds->i1[idx], idx2 = all_ssobnds->i2[idx];
             auto r1 = r[idx1], r2 = r[idx2];
-            if (norm(box->ray(r1, r2)) < cutoff + nl->pad) {
+            if (norm(box->ray(r1, r2)) < cutoff + nl->orig_pad) {
                 auto cont_idx = ssbonds->push_back();
                 ssbonds->i1[cont_idx] = idx1;
                 ssbonds->i2[cont_idx] = idx2;

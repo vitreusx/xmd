@@ -16,7 +16,7 @@ namespace xmd {
             auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
             auto r12_u = r12 * r12_rn;
 
-            auto Vij = V_factor * q1_q2 * expf(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
+            auto Vij = V_factor * q1_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
             auto dVij_dr = -Vij*(screen_dist_inv+r12_rn);
 
             *V += Vij;
@@ -28,11 +28,14 @@ namespace xmd {
 
     void eval_const_es_forces::init_from_vm(vm &vm_inst) {
         auto& params = vm_inst.find<param_file>("params");
+        auto const& es_params = params["electrostatic forces"];
+        auto const& const_es_params = es_params["const variant params"];
+
         permittivity = vm_inst.find_or_add<real>("permittivity",
-            params["const ES"]["permittivity"].as<quantity>());
+            const_es_params["permittivity"].as<quantity>());
 
         auto screening_dist = vm_inst.find_or_add<real>("screening_dist",
-            params["const ES"]["screening distance"].as<quantity>());
+            es_params["screening distance"].as<quantity>());
         screen_dist_inv = (real)1.0 / screening_dist;
 
         r = vm_inst.find<vec3r_vector>("r").to_array();

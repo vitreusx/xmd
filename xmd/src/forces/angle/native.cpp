@@ -83,5 +83,4 @@ namespace xmd {
 
     native_angle_vector::native_angle_vector(int n):
         i1{n}, i2{n}, i3{n}, nat_theta{n}, size{n} {};
-
 }

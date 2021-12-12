@@ -1,34 +1,34 @@
 #include "forces/pid/bundle.h"
+#include <xmd/forces/primitives/lj_variants.h>
 
 namespace xmd::pid {
 
     void update_pid_bundles::operator()() const {
         bundles->clear();
 
-        auto f = [&](auto idx1, auto idx2) -> auto {
-            auto prev1 = prev[idx1], next1 = next[idx1];
-            auto prev2 = prev[idx2], next2 = next[idx2];
-            auto atype1 = atype[idx1], atype2 = atype[idx2];
+        auto min_norm_inv = (real)1.0 / (cutoff + nl->orig_pad);
 
-            int bundle_idx = bundles->push_back();
-            bundles->i1p[bundle_idx] = prev1;
-            bundles->i1[bundle_idx] = idx1;
-            bundles->i1n[bundle_idx] = next1;
-            bundles->i2p[bundle_idx] = prev2;
-            bundles->i2[bundle_idx] = idx2;
-            bundles->i2n[bundle_idx] = next2;
-            int16_t type = (int16_t)atype1 *
-                (int16_t)amino_acid::NUM_AA + (int16_t)atype2;
-            bundles->type[bundle_idx] = type;
-        };
+        for (int pair_idx = 0; pair_idx < nl->particle_pairs.size; ++pair_idx) {
+            auto idx1 = nl->particle_pairs.i1[pair_idx];
+            auto idx2 = nl->particle_pairs.i2[pair_idx];
+            auto r1 = r[idx1], r2 = r[idx2];
+            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
+                auto prev1 = prev[idx1], next1 = next[idx1];
+                auto prev2 = prev[idx2], next2 = next[idx2];
+                auto atype1 = atype[idx1], atype2 = atype[idx2];
 
-        nl::iter_over_pairs iter(f);
-        iter.cutoff = cutoff;
-        iter.box = box;
-        iter.nl = nl;
-        iter.r = r;
-
-        iter();
+                int bundle_idx = bundles->push_back();
+                bundles->i1p[bundle_idx] = prev1;
+                bundles->i1[bundle_idx] = idx1;
+                bundles->i1n[bundle_idx] = next1;
+                bundles->i2p[bundle_idx] = prev2;
+                bundles->i2[bundle_idx] = idx2;
+                bundles->i2n[bundle_idx] = next2;
+                int16_t type = (int16_t)atype1 *
+                               (int16_t)amino_acid::NUM_AA + (int16_t)atype2;
+                bundles->type[bundle_idx] = type;
+            }
+        }
     }
 
     void update_pid_bundles::init_from_vm(vm &vm_inst) {
@@ -39,6 +39,21 @@ namespace xmd::pid {
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         nl = &vm_inst.find<nl::nl_data>("nl");
         bundles = &vm_inst.find<pid_bundle_vector>("pid_bundles");
+
+        cutoff = vm_inst.find_or<real>("pid_cutoff", [&]() -> auto& {
+            auto& cutoff_ = vm_inst.emplace<real>("pid_cutoff", 0.0);
+
+            auto& variants = vm_inst.find<lj_variants>("lj_variants");
+            cutoff_ = max(cutoff_, variants.bb.cutoff());
+            cutoff_ = max(cutoff_, variants.bs.cutoff());
+            cutoff_ = max(cutoff_, variants.sb.cutoff());
+            for (int ss_idx = 0; ss_idx < variants.ss.size; ++ss_idx) {
+                auto ss = variants.ss[ss_idx];
+                cutoff_ = max(cutoff_, ss.cutoff());
+            }
+
+            return cutoff_;
+        });
     }
 
     int pid_bundle_vector::push_back() {

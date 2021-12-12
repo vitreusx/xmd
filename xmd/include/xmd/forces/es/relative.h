@@ -7,7 +7,7 @@
 namespace xmd {
     class eval_relative_es_forces: public vm_aware  {
     public:
-        real A, screen_dist_inv;
+        real factor, screen_dist_inv;
 
     public:
         vec3r_array r, F;

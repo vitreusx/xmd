@@ -7,12 +7,13 @@
 namespace xmd {
     void update_go_contacts::operator()() const {
         contacts->clear();
+
         for (int idx = 0; idx < all_contacts->size; ++idx) {
             auto idx1 = all_contacts->i1[idx], idx2 = all_contacts->i2[idx];
             auto nat_dist = all_contacts->nat_dist[idx];
 
             auto r1 = r[idx1], r2 = r[idx2];
-            if (norm(box->ray(r1, r2)) < nat_dist + nl->pad) {
+            if (norm(box->ray(r1, r2)) < nat_dist + nl->orig_pad) {
                 auto cont_idx = contacts->push_back();
                 contacts->i1[cont_idx] = idx1;
                 contacts->i2[cont_idx] = idx2;

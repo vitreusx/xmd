@@ -41,54 +41,48 @@ namespace xmd::nl {
 
         int num_cells = cell_nx * cell_ny * cell_nz;
         data->num_cells = num_cells;
-        data->cell_num_part.resize(num_cells);
-        data->cell_begin.resize(num_cells);
 
-        for (int idx = 0; idx < num_cells; ++idx)
-            data->cell_num_part[idx] = 0;
-
-        for (int idx = 0; idx < num_particles; ++idx) {
-            auto r_ = r[idx];
+        data->particles.reinit(num_cells);
+        prepare(data->particles);
+        for (int part_idx = 0; part_idx < num_particles; ++part_idx) {
+            auto r_ = r[part_idx];
             auto ix = (int)ceil((r_.x() - x_min) * cell_ax_inv);
             auto iy = (int)ceil((r_.y() - y_min) * cell_ay_inv);
             auto iz = (int)ceil((r_.z() - z_min) * cell_az_inv);
+            auto cell_idx = ix + cell_nx * (iy + cell_ny * iz);
 
-            auto cell_idx_ = ix + cell_nx * (iy + cell_ny * iz);
-            data->cell_idx_for_particle[idx] = cell_idx_;
-            ++(data->cell_num_part[cell_idx_]);
+            assign(data->particles, part_idx, cell_idx);
         }
+        derive_rest(data->particles);
 
-        int cur_cell_begin = 0;
-        for (int cell_idx = 0; cell_idx < num_cells; ++cell_idx) {
-            auto cell_num_part_ = data->cell_num_part[cell_idx];
-            data->cell_begin[cell_idx] = cur_cell_begin;
-            cur_cell_begin += cell_num_part_;
-        }
+        data->native_contacts.reinit(num_cells);
+        prepare(data->native_contacts);
+        for (int nat_idx = 0; nat_idx < nat_cont.size; ++nat_idx) {
+            auto i1 = nat_cont.i1[nat_idx];
+            auto cell_idx1 = data->particles.item_cell_idx[i1];
+            assign(data->native_contacts, 2*nat_idx, cell_idx1);
 
-        for (int idx = 0; idx < num_particles; ++idx) {
-            auto cell_idx_ = data->cell_idx_for_particle[idx];
-            data->particle_index_groups[data->cell_begin[cell_idx_]++] = idx;
+            auto i2 = nat_cont.i2[nat_idx];
+            auto cell_idx2 = data->particles.item_cell_idx[i2];
+            assign(data->native_contacts, 2*nat_idx+1, cell_idx2);
         }
-
-        for (int cell_idx = 0; cell_idx < num_cells; ++cell_idx) {
-            data->cell_begin[cell_idx] -= data->cell_num_part[cell_idx];
-        }
+        derive_rest(data->native_contacts);
 
         auto x_scan_r = (int)ceil(req_r / cell_ax);
         auto y_scan_r = (int)ceil(req_r / cell_ay);
         auto z_scan_r = (int)ceil(req_r / cell_az);
 
         data->neighbor_cells.clear();
-        for (int ix = 0; ix < cell_nx; ++ix) {
+        for (int ix1 = 0; ix1 < cell_nx; ++ix1) {
             for (int dx = -x_scan_r; dx <= x_scan_r; ++dx) {
-                auto ix2 = (cell_nx + ix + dx) % cell_nx;
-                for (int iy = 0; iy < cell_ny; ++iy) {
+                auto ix2 = (cell_nx + ix1 + dx) % cell_nx;
+                for (int iy1 = 0; iy1 < cell_ny; ++iy1) {
                     for (int dy = -y_scan_r; dy <= y_scan_r; ++dy) {
-                        auto iy2 = (cell_ny + iy + dy) % cell_ny;
-                        for (int iz = 0; iz < cell_nz; ++iz) {
-                            auto cell_idx1 = ix + cell_nx * (iy + cell_ny * iz);
+                        auto iy2 = (cell_ny + iy1 + dy) % cell_ny;
+                        for (int iz1 = 0; iz1 < cell_nz; ++iz1) {
+                            auto cell_idx1 = ix1 + cell_nx * (iy1 + cell_ny * iz1);
                             for (int dz = -z_scan_r; dz <= z_scan_r; ++dz) {
-                                auto iz2 = (cell_nz + iz + dz) % cell_nz;
+                                auto iz2 = (cell_nz + iz1 + dz) % cell_nz;
                                 auto cell_idx2 = ix2 + cell_nx * (iy2 + cell_ny * iz2);
 
                                 if (cell_idx1 <= cell_idx2) {
@@ -103,29 +97,103 @@ namespace xmd::nl {
             }
         }
 
-        data->pad = *pad;
+        data->particle_pairs.clear();
+        for (int cell_pair_idx = 0; cell_pair_idx < data->neighbor_cells.size(); ++cell_pair_idx) {
+            auto cell_idx1 = data->neighbor_cells.cell_idx1[cell_pair_idx];
+            auto cell_idx2 = data->neighbor_cells.cell_idx2[cell_pair_idx];
+
+            auto [part_beg1, part_end1] = data->particles.range(cell_idx1);
+            auto [part_beg2, part_end2] = data->particles.range(cell_idx2);
+            auto [nc_beg, nc_end] = data->native_contacts.range(cell_idx1);
+
+            for (int bucket_idx1 = part_beg1; bucket_idx1 < part_end1; ++bucket_idx1) {
+                auto part_idx1 = data->particles.item_cell_idx[bucket_idx1];
+                auto r1 = r[part_idx1];
+
+                for (int bucket_idx2 = part_beg2; bucket_idx2 < part_end2; ++bucket_idx2) {
+                    auto part_idx2 = data->particles.item_cell_idx[bucket_idx2];
+                    auto r2 = r[part_idx2];
+
+                    if (bucket_idx1 == bucket_idx2 && part_idx1 >= part_idx2)
+                        continue;
+
+                    auto r12_n = norm(box->ray(r1, r2));
+                    if (r12_n < *cutoff + *pad) {
+                        auto pair_idx = data->particle_pairs.push_back();
+                        data->particle_pairs.i1[pair_idx] = part_idx1;
+                        data->particle_pairs.i2[pair_idx] = part_idx2;
+                        data->particle_pairs.orig_dist[pair_idx] = r12_n;
+
+                        bool is_native = false;
+                        for (int nat_bucket_idx = nc_beg; nat_bucket_idx < nc_end; ++nat_bucket_idx) {
+                            auto nat_idx = data->native_contacts.item_cell_idx[nat_bucket_idx];
+                            auto nat_i1 = nat_cont.i1[nat_idx];
+                            auto nat_i2 = nat_cont.i2[nat_idx];
+
+                            if (part_idx1 == nat_i1 && part_idx2 == nat_i2) {
+                                is_native = true;
+                                break;
+                            }
+                        }
+                        data->particle_pairs.is_native[pair_idx] = is_native;
+                    }
+                }
+            }
+        }
+
+        data->orig_pad = *pad;
         for (int idx = 0; idx < num_particles; ++idx)
-            orig_r[idx] = r[idx];
-        *orig_box = *box;
+            data->orig_r[idx] = r[idx];
+        data->orig_box = *box;
         *invalid = false;
     }
 
     void divide_into_cells::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
+
         num_particles = vm_inst.find<int>("num_particles");
+        nat_cont = vm_inst.find<native_contact_vector>(
+            "native_contacts").to_span();
+
         data = &vm_inst.find_or<nl_data>("nl_data", [&]() -> auto& {
             auto& data_ = vm_inst.emplace<nl_data>("nl_data");
-            data_.cell_idx_for_particle.resize(num_particles);
-            data_.particle_index_groups.resize(num_particles);
+            data_.particles = spatial_data(num_particles);
+            data_.native_contacts = spatial_data(2*nat_cont.size);
+            data_.orig_r = vec3r_vector(num_particles);
             return data_;
         });
         cutoff = &vm_inst.find_or_emplace<real>("cutoff");
         pad = &vm_inst.find_or_emplace<real>("pad");
         invalid = &vm_inst.find_or_emplace<bool>("invalid", true);
+    }
 
-        orig_r = vm_inst.find_or_emplace<vec3r_vector>("orig_r",
-            num_particles).to_array();
-        orig_box = &vm_inst.find_or_emplace<xmd::box<vec3r>>("orig_box");
+    void divide_into_cells::prepare(spatial_data &sd) const {
+        for (int idx = 0; idx < sd.num_cells; ++idx) {
+            sd.cell_bucket_size[idx] = 0;
+        }
+    }
+
+    void
+    divide_into_cells::assign(spatial_data &sd, int item_idx, int cell_idx) const {
+        sd.item_cell_idx[item_idx] = cell_idx;
+        ++sd.cell_bucket_size[cell_idx];
+    }
+
+    void divide_into_cells::derive_rest(spatial_data &sd) const {
+        int cur_bucket_begin = 0;
+        for (int cell_idx = 0; cell_idx < sd.num_cells; ++cell_idx) {
+            sd.cell_bucket_begin[cell_idx] = cur_bucket_begin;
+            cur_bucket_begin += sd.cell_bucket_size[cell_idx];
+        }
+
+        for (int item_idx = 0; item_idx < sd.num_items; ++item_idx) {
+            auto cell_idx = sd.item_cell_idx[item_idx];
+            sd.item_index_buckets[sd.cell_bucket_begin[cell_idx]++] = item_idx;
+        }
+
+        for (int cell_idx = 0; cell_idx < sd.num_cells; ++cell_idx) {
+            sd.cell_bucket_begin[cell_idx] -= sd.cell_bucket_size[cell_idx];
+        }
     }
 }

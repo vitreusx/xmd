@@ -9012,8 +9012,8 @@
     </member>
     <member kind="function">
       <type>T</type>
-      <name>bucket_size</name>
-      <anchorfile>cpp/container/unordered_map/bucket_size</anchorfile>
+      <name>cell_size</name>
+      <anchorfile>cpp/container/unordered_map/cell_size</anchorfile>
       <anchor></anchor>
       <arglist>(T... args)</arglist>
     </member>
@@ -15212,8 +15212,8 @@
     </member>
     <member kind="function">
       <type>T</type>
-      <name>bucket_size</name>
-      <anchorfile>cpp/container/unordered_multimap/bucket_size</anchorfile>
+      <name>cell_size</name>
+      <anchorfile>cpp/container/unordered_multimap/cell_size</anchorfile>
       <anchor></anchor>
       <arglist>(T... args)</arglist>
     </member>
@@ -24701,8 +24701,8 @@
     </member>
     <member kind="function">
       <type>T</type>
-      <name>bucket_size</name>
-      <anchorfile>cpp/container/unordered_multiset/bucket_size</anchorfile>
+      <name>cell_size</name>
+      <anchorfile>cpp/container/unordered_multiset/cell_size</anchorfile>
       <anchor></anchor>
       <arglist>(T... args)</arglist>
     </member>
@@ -31820,8 +31820,8 @@
     </member>
     <member kind="function">
       <type>T</type>
-      <name>bucket_size</name>
-      <anchorfile>cpp/container/unordered_set/bucket_size</anchorfile>
+      <name>cell_size</name>
+      <anchorfile>cpp/container/unordered_set/cell_size</anchorfile>
       <anchor></anchor>
       <arglist>(T... args)</arglist>
     </member>
