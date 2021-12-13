@@ -1,5 +1,6 @@
 #include "files/csv.h"
 #include <fstream>
+#include <sstream>
 
 namespace xmd {
     csv_record::csv_record(std::vector<std::string> fields):
@@ -133,7 +134,7 @@ namespace xmd {
     csv_file::csv_file(const std::string &text, bool header):
         csv_file(std::stringstream(text), header) {};
 
-    std::ostream& csv_file::print(std::ostream& os, bool header) {
+    std::ostream& csv_file::print(std::ostream& os, bool header) const {
         if (header && this->header)
             os << *this->header << '\n';
 
@@ -143,7 +144,7 @@ namespace xmd {
         return os;
     }
 
-    std::string csv_file::print(bool header) {
+    std::string csv_file::print(bool header) const {
         std::stringstream ss {};
         print(ss, header);
         return ss.str();
@@ -170,5 +171,20 @@ namespace xmd {
             auto source_txt = entry.as<std::string>();
             return csv_file(source_txt);
         }
+    }
+}
+
+namespace YAML {
+    Node convert<xmd::csv_file>::encode(const xmd::csv_file &csv) {
+        return convert<std::string>::encode(csv.print());
+    }
+
+    bool convert<xmd::csv_file>::decode(const Node &node, xmd::csv_file &csv) {
+        std::string source;
+        if (!convert<std::string>::decode(node, source))
+            return false;
+
+        csv = xmd::csv_file(source);
+        return true;
     }
 }

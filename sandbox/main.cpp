@@ -14,7 +14,9 @@
 #include <xmd/params/param_file.h>
 #include <xmd/nl/verify.h>
 #include <xmd/nl/divide_into_cells.h>
-#include <xmd/io/stats_reporter.h>
+#include <xmd/io/report_stats.h>
+#include <xmd/io/report_structure.h>
+
 using namespace xmd;
 
 int main() {
@@ -65,7 +67,8 @@ int main() {
 
     auto& export_pdb_ = def_vm.find_or_emplace<export_pdb>("export_pdb");
     auto& show_pbar_ = def_vm.emplace<show_progress_bar>("show_progress_bar");
-    auto& stats_reporter_ = def_vm.emplace<stats_reporter>("stats_reporter");
+    auto& report_stats_ = def_vm.emplace<report_stats>("report_stats");
+    auto& report_structure_ = def_vm.emplace<report_structure>("report_structure");
 
     auto& total_time = def_vm.find_or_emplace<real>("total_time",
         params["general"]["total time"].as<quantity>());
@@ -100,7 +103,8 @@ int main() {
 
         export_pdb_();
         show_pbar_();
-        stats_reporter_();
+        report_stats_();
+        report_structure_();
 
         lang_pc_();
     }

@@ -1,17 +1,16 @@
 #pragma once
 #include <xmd/vm/vm.h>
 #include <xmd/types/scalar.h>
-#include <variant>
+#include <optional>
 #include <vector>
 #include <string>
 #include <filesystem>
 #include <xmd/stats/total_energy.h>
 
 namespace xmd {
-    class stats_reporter: public vm_aware {
+    class report_stats: public vm_aware {
     public:
         real period;
-        std::vector<std::string> stats;
         std::filesystem::path csv_path;
 
     public:

@@ -19,6 +19,8 @@ namespace xmd {
 
     class vm {
     public:
+        bool has(vm_path const& path) const;
+
         template<typename T, typename Function>
         T& find_or(vm_path const& path, Function&& if_not_found) {
             auto iter = resources.find(path);

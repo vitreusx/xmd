@@ -82,6 +82,7 @@ chirality:
 
 native contacts:
   lj depth: 1 eps
+  active threshold factor: 1.5
 
 native ssbonds:
   H1: 100 eps/A**2
@@ -104,7 +105,10 @@ progress bar:
   width: 50
   update period: 10 tau
 
-stats reporter:
+report stats:
   path: "output.csv"
   exec period: 10 tau
-  stats: [t, V, K, E]
+
+report structure:
+  path format: "structure/%.3f.yml"
+  exec period: 50 tau

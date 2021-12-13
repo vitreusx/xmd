@@ -33,10 +33,6 @@ namespace xmd {
 
         std::vector<std::string> fields;
 
-    private:
-        friend class csv_file;
-        friend class csv_header;
-
         std::shared_ptr<csv_header> header;
     };
 
@@ -52,8 +48,6 @@ namespace xmd {
         friend std::ostream& operator<<(std::ostream& os,
             csv_header const& header);
 
-    private:
-        friend class csv_file;
         explicit csv_header(csv_record&& record);
 
         csv_record header_record;
@@ -66,8 +60,8 @@ namespace xmd {
         explicit csv_file(std::istream&& file, bool header = true);
         explicit csv_file(std::string const& text, bool header = true);
 
-        std::ostream& print(std::ostream& os, bool header = true);
-        std::string print(bool header = true);
+        std::ostream& print(std::ostream& os, bool header = true) const;
+        std::string print(bool header = true) const;
 
         csv_record& add_record();
 
@@ -80,5 +74,13 @@ namespace xmd {
     template<>
     struct param_value_parser<csv_file> {
         csv_file parse(param_entry const& entry) const;
+    };
+}
+
+namespace YAML {
+    template<>
+    struct convert<xmd::csv_file> {
+        static Node encode(const xmd::csv_file& csv);
+        static bool decode(const Node& node, xmd::csv_file& csv);
     };
 }

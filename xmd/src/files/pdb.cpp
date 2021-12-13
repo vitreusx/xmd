@@ -280,7 +280,7 @@ namespace xmd {
             auto& xmd_ss = xmd_model.contacts.emplace_back();
             xmd_ss.res1 = res_map[res1];
             xmd_ss.res2 = res_map[res2];
-            xmd_ss.length = pdb_ss.length;
+            xmd_ss.length = (xmd_ss.res1->pos - xmd_ss.res2->pos).norm();
             xmd_ss.type = xmd::model::NAT_SS;
 
             cont_res_pairs.insert(std::make_pair(res1, res2));
@@ -297,7 +297,7 @@ namespace xmd {
             auto& xmd_cont = xmd_model.contacts.emplace_back();
             xmd_cont.res1 = res_map[res1];
             xmd_cont.res2 = res_map[res2];
-            xmd_cont.length = pdb_link.length;
+            xmd_cont.length = (xmd_cont.res1->pos - xmd_cont.res2->pos).norm();
 
             auto back1 = pdb_link.a1->in_backbone();
             auto back2 = pdb_link.a2->in_backbone();
