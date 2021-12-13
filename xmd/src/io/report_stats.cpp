@@ -19,20 +19,27 @@ namespace xmd {
 
         V = &vm_inst.find<real>("V");
         comp_tot_ene_t.init_from_vm(vm_inst);
+        comp_asph_t.init_from_vm(vm_inst);
+        comp_gyr_t.init_from_vm(vm_inst);
     }
 
     void report_stats::operator()() const {
         if (*t - *last_t >= period) {
             csv_file stats_csv;
-            stats_csv.set_header({ "t", "V", "K", "E" });
+            stats_csv.set_header({ "t", "V", "K", "E", "Rg", "W" });
 
             auto& record = stats_csv.add_record();
 
             comp_tot_ene_t();
+            comp_asph_t();
+            comp_gyr_t();
+
             record["t"] = std::to_string(*t);
             record["V"] = std::to_string(*V);
             record["K"] = std::to_string(*comp_tot_ene_t.K);
             record["E"] = std::to_string(*comp_tot_ene_t.E);
+            record["Rg"] = std::to_string(*comp_gyr_t.gyration_radius);
+            record["W"] = std::to_string(*comp_asph_t.asphericity);
 
             if (*first_time) {
                 std::ofstream csv_file_stream(csv_path);
