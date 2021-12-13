@@ -12,7 +12,7 @@ integrator:
   dt: 5e-3 tau
 
 neighbor list:
-  pad factor: 0.5
+  pad factor: 0.25
 
 heurestic angles:
   coefficients:
@@ -99,7 +99,7 @@ tether forces:
 
 export pdb:
   path: "output.pdb"
-  exec period: 100 tau
+  exec period: 10 tau
 
 progress bar:
   width: 50
