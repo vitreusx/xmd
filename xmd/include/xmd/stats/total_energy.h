@@ -8,7 +8,7 @@ namespace xmd {
         vec3r_array v;
         array<real> mass;
         int num_particles;
-        real *V, *E;
+        real *K, *V, *E;
 
         void init_from_vm(vm& vm_inst) override;
 

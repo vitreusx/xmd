@@ -11,10 +11,10 @@
 #include <xmd/forces/all.h>
 #include <xmd/io/show_progress_bar.h>
 #include <xmd/io/export_pdb.h>
-#include <xmd/stats/total_energy.h>
 #include <xmd/params/param_file.h>
 #include <xmd/nl/verify.h>
 #include <xmd/nl/divide_into_cells.h>
+#include <xmd/io/stats_reporter.h>
 using namespace xmd;
 
 int main() {
@@ -65,6 +65,7 @@ int main() {
 
     auto& export_pdb_ = def_vm.find_or_emplace<export_pdb>("export_pdb");
     auto& show_pbar_ = def_vm.emplace<show_progress_bar>("show_progress_bar");
+    auto& stats_reporter_ = def_vm.emplace<stats_reporter>("stats_reporter");
 
     auto& total_time = def_vm.find_or_emplace<real>("total_time",
         params["general"]["total time"].as<quantity>());
@@ -99,6 +100,7 @@ int main() {
 
         export_pdb_();
         show_pbar_();
+        stats_reporter_();
 
         lang_pc_();
     }

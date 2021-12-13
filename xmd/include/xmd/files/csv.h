@@ -17,9 +17,16 @@ namespace xmd {
     class csv_record {
     public:
         explicit csv_record(std::vector<std::string> fields);
+        explicit csv_record(std::shared_ptr<csv_header> header = nullptr);
+
+        explicit csv_record(const std::string& line,
+            std::shared_ptr<csv_header> header = nullptr);
 
         std::string const& operator[](size_t col_idx) const;
+        std::string& operator[](size_t col_idx);
+
         std::string const& operator[](std::string const& col_name) const;
+        std::string& operator[](std::string const& col_name);
 
         friend std::ostream& operator<<(std::ostream& os,
             csv_record const& record);
@@ -31,10 +38,6 @@ namespace xmd {
         friend class csv_header;
 
         std::shared_ptr<csv_header> header;
-
-        csv_record() = default;
-        explicit csv_record(const std::string& line,
-            std::shared_ptr<csv_header> header = nullptr);
     };
 
     class csv_header {
@@ -43,6 +46,7 @@ namespace xmd {
         explicit csv_header(std::vector<std::string> fields);
 
         std::string const& operator[](size_t idx) const;
+        size_t num_columns() const;
         size_t operator[](std::string const& s) const;
 
         friend std::ostream& operator<<(std::ostream& os,
@@ -65,7 +69,7 @@ namespace xmd {
         std::ostream& print(std::ostream& os, bool header = true);
         std::string print(bool header = true);
 
-        csv_file& operator<<(csv_record record);
+        csv_record& add_record();
 
         std::shared_ptr<csv_header> header;
         std::vector<csv_record> records;

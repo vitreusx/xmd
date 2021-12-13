@@ -2,11 +2,12 @@
 
 namespace xmd {
     void compute_total_energy::operator()() const {
-        real K = 0.0;
+        real K_ = 0.0;
         for (int idx = 0; idx < num_particles; ++idx) {
-            K += (real)0.5 * mass[idx] * v3::norm_squared(v[idx]);
+            K_ += (real)0.5 * mass[idx] * v3::norm_squared(v[idx]);
         }
-        *E = *V + K;
+        *K = K_;
+        *E = *V + K_;
     }
 
     void compute_total_energy::init_from_vm(vm &vm_inst) {
@@ -14,6 +15,7 @@ namespace xmd {
         mass = vm_inst.find<vector<real>>("mass").to_array();
         num_particles = vm_inst.find<int>("num_particles");
         V = &vm_inst.find<real>("V");
+        K = &vm_inst.find_or_emplace<real>("K", (real)0.0);
         E = &vm_inst.find_or_emplace<real>("E", (real)0.0);
     }
 }

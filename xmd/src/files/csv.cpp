@@ -5,12 +5,19 @@ namespace xmd {
     csv_record::csv_record(std::vector<std::string> fields):
         fields{std::move(fields)} {};
 
-    std::string const&csv_record::operator[](size_t col_idx) const {
+    std::string const& csv_record::operator[](size_t col_idx) const {
         return fields[col_idx];
     }
 
-    std::string const &
-    csv_record::operator[](const std::string &col_name) const {
+    std::string& csv_record::operator[](size_t col_idx) {
+        return fields[col_idx];
+    }
+
+    std::string const& csv_record::operator[](const std::string &col_name) const {
+        return fields[(*header)[col_name]];
+    }
+
+    std::string &csv_record::operator[](const std::string &col_name) {
         return fields[(*header)[col_name]];
     }
 
@@ -61,6 +68,15 @@ namespace xmd {
             }
         }
         return fields;
+    }
+
+    size_t csv_header::num_columns() const {
+        return header_record.fields.size();
+    }
+
+    csv_record::csv_record(std::shared_ptr<csv_header> header) {
+        if (header) fields = std::vector<std::string>(header->num_columns());
+        this->header = std::move(header);
     }
 
     csv_record::csv_record(const std::string &line,
@@ -133,14 +149,13 @@ namespace xmd {
         return ss.str();
     }
 
-    csv_file& csv_file::operator<<(csv_record record) {
-        records.emplace_back(std::move(record));
-        return *this;
-    }
-
     void csv_file::set_header(std::vector<std::string> col_names) {
         auto _header = csv_header(std::move(col_names));
         header = std::make_shared<csv_header>(_header);
+    }
+
+    csv_record &csv_file::add_record() {
+        return records.emplace_back(header);
     }
 
     csv_file param_value_parser<csv_file>::parse(

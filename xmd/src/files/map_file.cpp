@@ -32,36 +32,33 @@ namespace YAML {
         auto contacts_csv = xmd::csv_file();
         contacts_csv.set_header({"i1", "i2", "length"});
         for (auto const& cont: mf.contacts) {
-            contacts_csv << xmd::csv_record({
-                std::to_string(cont.i1),
-                std::to_string(cont.i2),
-                std::to_string(cont.length)
-            });
+            auto& record = contacts_csv.add_record();
+            record["i1"] = std::to_string(cont.i1);
+            record["i2"] = std::to_string(cont.i2);
+            record["length"] = std::to_string(cont.length);
         }
         node["contacts"] = contacts_csv.print();
 
         auto angles_csv = xmd::csv_file();
         angles_csv.set_header({"i1", "i2", "i3", "theta"});
         for (auto const& angle: mf.angles) {
-            contacts_csv << xmd::csv_record({
-                std::to_string(angle.i1),
-                std::to_string(angle.i2),
-                std::to_string(angle.i3),
-                std::to_string(angle.theta)
-            });
+            auto& record = contacts_csv.add_record();
+            record["i1"] = std::to_string(angle.i1);
+            record["i2"] = std::to_string(angle.i2);
+            record["i3"] = std::to_string(angle.i3);
+            record["theta"] = std::to_string(angle.theta);
         }
         node["angles"] = angles_csv.print();
 
         auto dihedrals_csv = xmd::csv_file();
         dihedrals_csv.set_header({"i1", "i2", "i3", "i4", "phi"});
         for (auto const& dihedral: mf.dihedrals) {
-            contacts_csv << xmd::csv_record({
-                std::to_string(dihedral.i1),
-                std::to_string(dihedral.i2),
-                std::to_string(dihedral.i3),
-                std::to_string(dihedral.i4),
-                std::to_string(dihedral.phi)
-            });
+            auto& record = contacts_csv.add_record();
+            record["i1"] = std::to_string(dihedral.i1);
+            record["i2"] = std::to_string(dihedral.i2);
+            record["i3"] = std::to_string(dihedral.i3);
+            record["i4"] = std::to_string(dihedral.i4);
+            record["phi"] = std::to_string(dihedral.phi);
         }
         node["dihedrals"] = dihedrals_csv.print();
 

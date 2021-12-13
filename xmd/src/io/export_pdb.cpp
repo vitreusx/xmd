@@ -38,7 +38,7 @@ namespace xmd {
         out_file_path = vm_inst.find_or_emplace<std::filesystem::path>(
             "export_pdb_path", params["export pdb"]["path"].as<std::string>());
         period = vm_inst.find_or_emplace<real>("export_pdb_period",
-            params["export pdb"]["update period"].as<quantity>());
+            params["export pdb"]["exec period"].as<quantity>());
 
         true_r = vm_inst.find<vec3tr_vector>("true_r").to_array();
         ref_model = &vm_inst.find<xmd::model>("model");

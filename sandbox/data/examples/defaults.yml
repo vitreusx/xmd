@@ -98,8 +98,13 @@ tether forces:
 
 export pdb:
   path: "output.pdb"
-  update period: 100 tau
+  exec period: 100 tau
 
 progress bar:
   width: 50
   update period: 10 tau
+
+stats reporter:
+  path: "output.csv"
+  exec period: 10 tau
+  stats: [t, V, K, E]
