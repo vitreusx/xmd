@@ -28,7 +28,7 @@ target_include_directories(${TARGET_NAME}
 
 target_compile_options(${TARGET_NAME}
     PRIVATE
-    $<$<CONFIG:Debug>:$<$<COMPILE_LANGUAGE:CXX>:-Og>>
+    $<$<CONFIG:Debug>:$<$<COMPILE_LANGUAGE:CXX>:-O2>>
     $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-Ofast;-march=native>>
     $<$<COMPILE_LANGUAGE:CXX>:-g;-Wall;-Wextra;-Wpedantic>)
 

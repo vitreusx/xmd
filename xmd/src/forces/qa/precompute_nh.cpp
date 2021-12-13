@@ -49,7 +49,7 @@ namespace xmd::qa {
 
     tf::Task precompute_nh::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, bundles.size, 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 
     nh_bundle_span nh_bundle_vector::to_span() {

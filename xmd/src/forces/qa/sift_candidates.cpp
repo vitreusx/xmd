@@ -112,15 +112,13 @@ namespace xmd::qa {
     }
 
     void sift_candidates_tf::init_from_vm(vm &vm_inst) {
-        sift_candidates_.init_from_vm(vm_inst);
-
-        clear = module.emplace([=]() -> void {
+        clear = module.emplace([this]() -> void {
             sift_candidates_.candidates->clear();
         });
 
         auto size_ref = std::ref(sift_candidates_.free_pairs->size());
         loop = module.for_each_index(0, size_ref, 1,
-            [=](auto idx) -> void { sift_candidates_.loop_iter(idx); });
+            [this](auto idx) -> void { sift_candidates_.loop_iter(idx); });
 
         clear.precede(loop);
     }

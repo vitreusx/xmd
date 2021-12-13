@@ -50,7 +50,7 @@ namespace xmd {
 
     tf::Task eval_native_angle_forces::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, angles.size, 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 
     void eval_native_angle_forces::loop_iter(int idx) const {

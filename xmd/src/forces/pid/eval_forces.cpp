@@ -187,6 +187,6 @@ namespace xmd::pid {
 
     tf::Task eval_pid_forces::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, std::ref(bundles.size), 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 }

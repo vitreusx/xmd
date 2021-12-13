@@ -86,7 +86,7 @@ namespace xmd {
 
     tf::Task eval_chiral_forces::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, quads.size, 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 
     chiral_quad_vector::chiral_quad_vector(int n):

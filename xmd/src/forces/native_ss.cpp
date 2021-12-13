@@ -94,7 +94,7 @@ namespace xmd {
 
     tf::Task eval_nat_ssbond_forces::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, std::ref(ssbonds.size), 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 
     int nat_ssbond_vector::push_back()  {

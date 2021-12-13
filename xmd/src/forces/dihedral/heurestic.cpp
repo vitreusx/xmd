@@ -101,7 +101,7 @@ namespace xmd {
     tf::Task
     eval_heurestic_dihedral_forces::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, dihedrals.size, 1,
-            [=](int idx) -> void { loop_iter(idx); });
+            [this](int idx) -> void { loop_iter(idx); });
     }
 
     void eval_heurestic_dihedral_forces::loop_iter(int idx) const {

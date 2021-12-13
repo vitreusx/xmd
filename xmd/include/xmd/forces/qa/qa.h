@@ -22,8 +22,10 @@ namespace xmd::qa {
 
     class eval_qa_forces_tf: public vm_aware {
     public:
-        eval_qa_forces inner;
-        sift_candidates_tf sift_candidates_tf_;
+        precompute_nh precompute_nh_t;
+        sift_candidates_tf sift_candidates_tf_t;
+        process_candidates process_candidates_t;
+        process_contacts process_contacts_t;
 
         tf::Task precomp_nh_t, sift_cand_t, process_cand_t, process_cont_t;
         tf::Taskflow module;

@@ -133,7 +133,7 @@ namespace xmd {
 
     tf::Task eval_heurestic_angle_forces::tf_impl(tf::Taskflow& taskflow) const {
         return taskflow.for_each_index(0, angles.size, 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 
     heurestic_angle_span heurestic_angle_vector::to_span()  {

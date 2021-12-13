@@ -50,6 +50,6 @@ namespace xmd {
 
     tf::Task eval_relative_es_forces::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, std::ref(es_pairs.size), 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 }

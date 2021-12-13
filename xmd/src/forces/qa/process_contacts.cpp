@@ -19,6 +19,7 @@ namespace xmd::qa {
         breaking_factor = vm_inst.find_or_emplace<real>("qa_breaking_factor",
             contact_params["breaking factor"].as<quantity>());
         t = &vm_inst.find<real>("t");
+        mut = &vm_inst.emplace<std::mutex>("qa_contacts_mut");
 
         factor = breaking_factor * pow(2.0f, -1.0f/6.0f);
     }
@@ -71,6 +72,6 @@ namespace xmd::qa {
 
     tf::Task process_contacts::tf_impl(tf::Taskflow &taskflow) const {
         return taskflow.for_each_index(0, std::ref(contacts->extent()), 1,
-            [=](auto idx) -> void { loop_iter(idx); });
+            [this](auto idx) -> void { loop_iter(idx); });
     }
 }
