@@ -5,6 +5,7 @@
 #include <xmd/nl/data.h>
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/vm/vm.h>
+#include <taskflow/taskflow.hpp>
 
 namespace xmd {
     struct pauli_pair_span {
@@ -52,6 +53,8 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void loop_iter(int idx) const;
         void operator()() const;
+        tf::Task tf_impl(tf::Taskflow& taskflow) const;
     };
 }

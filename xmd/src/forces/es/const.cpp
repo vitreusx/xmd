@@ -5,25 +5,8 @@
 namespace xmd {
 
     void eval_const_es_forces::operator()() const {
-        real V_factor = 1.0f / (4.0f * (real)M_PI * permittivity);
-
-        for (int idx = 0; idx < es_pairs.size; ++idx) {
-            auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];
-            auto q1_q2 = es_pairs.q1_q2[idx];
-
-            auto r1 = r[i1], r2 = r[i2];
-            auto r12 = box->ray(r1, r2);
-            auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
-            auto r12_u = r12 * r12_rn;
-
-            auto Vij = V_factor * q1_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
-            auto dVij_dr = -Vij*(screen_dist_inv+r12_rn);
-
-            *V += Vij;
-            auto f = r12_u * dVij_dr;
-            F[i1] += f;
-            F[i2] -= f;
-        }
+        for (int idx = 0; idx < es_pairs.size; ++idx)
+            loop_iter(idx);
     }
 
     void eval_const_es_forces::init_from_vm(vm &vm_inst) {
@@ -43,5 +26,30 @@ namespace xmd {
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         es_pairs = vm_inst.find_or_emplace<es_pair_vector>("es_pairs").to_span();
+
+        V_factor = 1.0f / (4.0f * (real)M_PI * permittivity);
+    }
+
+    void eval_const_es_forces::loop_iter(int idx) const {
+        auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];
+        auto q1_q2 = es_pairs.q1_q2[idx];
+
+        auto r1 = r[i1], r2 = r[i2];
+        auto r12 = box->ray(r1, r2);
+        auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
+        auto r12_u = r12 * r12_rn;
+
+        auto Vij = V_factor * q1_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
+        auto dVij_dr = -Vij*(screen_dist_inv+r12_rn);
+
+        *V += Vij;
+        auto f = r12_u * dVij_dr;
+        F[i1] += f;
+        F[i2] -= f;
+    }
+
+    tf::Task eval_const_es_forces::tf_impl(tf::Taskflow &taskflow) const {
+        return taskflow.for_each_index(0, std::ref(es_pairs.size), 1,
+            [=](auto idx) -> void { loop_iter(idx); });
     }
 }

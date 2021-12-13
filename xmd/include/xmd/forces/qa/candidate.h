@@ -10,7 +10,7 @@ namespace xmd::qa {
         vector<contact_type> type;
         sync_data_vector sync_diff1, sync_diff2;
 
-        inline int size() const {
+        inline int const& size() const {
             return size_;
         }
 

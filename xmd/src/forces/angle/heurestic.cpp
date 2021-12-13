@@ -23,35 +23,8 @@ namespace xmd {
         val{val} {};
 
     void eval_heurestic_angle_forces::operator()() const {
-        for (int idx = 0; idx < angles.size; ++idx) {
-            auto i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
-            auto type_val = (int8_t)angles.type[idx];
-
-            auto r1 = r[i1], r2 = r[i2], r3 = r[i3];
-            auto r12 = r2 - r1, r23 = r3 - r2;
-
-            auto x12_23 = cross(r12, r23);
-            auto r12_rn = norm_inv(r12), r23_rn = norm_inv(r23);
-
-            auto dtheta_dr1 = unit(cross(r12, x12_23)) * r12_rn;
-            auto dtheta_dr3 = unit(cross(r23, x12_23)) * r23_rn;
-            auto dtheta_dr2 = -dtheta_dr1-dtheta_dr3;
-
-            auto cos_theta = -dot(r12, r23) * r12_rn * r23_rn;
-            auto theta = acos(cos_theta);
-
-            real angle_V = 0.0f, dV_dtheta = 0.0f;
-            for (int d = POLY_DEG; d >= 0; --d) {
-                auto coeff = poly_coeffs[d][type_val];
-                if (d > 0) dV_dtheta = (real)d * coeff + theta * dV_dtheta;
-                angle_V = coeff + theta * angle_V;
-            }
-
-            *V += angle_V;
-            F[i1] -= dV_dtheta * dtheta_dr1;
-            F[i2] -= dV_dtheta * dtheta_dr2;
-            F[i3] -= dV_dtheta * dtheta_dr3;
-        }
+        for (int idx = 0; idx < angles.size; ++idx)
+            loop_iter(idx);
     }
 
     void eval_heurestic_angle_forces::init_from_vm(vm &vm_inst) {
@@ -126,6 +99,41 @@ namespace xmd {
 
                 return angles_vec;
             }).to_span();
+    }
+
+    void eval_heurestic_angle_forces::loop_iter(int idx) const {
+        auto i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
+        auto type_val = (int8_t)angles.type[idx];
+
+        auto r1 = r[i1], r2 = r[i2], r3 = r[i3];
+        auto r12 = r2 - r1, r23 = r3 - r2;
+
+        auto x12_23 = cross(r12, r23);
+        auto r12_rn = norm_inv(r12), r23_rn = norm_inv(r23);
+
+        auto dtheta_dr1 = unit(cross(r12, x12_23)) * r12_rn;
+        auto dtheta_dr3 = unit(cross(r23, x12_23)) * r23_rn;
+        auto dtheta_dr2 = -dtheta_dr1-dtheta_dr3;
+
+        auto cos_theta = -dot(r12, r23) * r12_rn * r23_rn;
+        auto theta = acos(cos_theta);
+
+        real angle_V = 0.0f, dV_dtheta = 0.0f;
+        for (int d = POLY_DEG; d >= 0; --d) {
+            auto coeff = poly_coeffs[d][type_val];
+            if (d > 0) dV_dtheta = (real)d * coeff + theta * dV_dtheta;
+            angle_V = coeff + theta * angle_V;
+        }
+
+        *V += angle_V;
+        F[i1] -= dV_dtheta * dtheta_dr1;
+        F[i2] -= dV_dtheta * dtheta_dr2;
+        F[i3] -= dV_dtheta * dtheta_dr3;
+    }
+
+    tf::Task eval_heurestic_angle_forces::tf_impl(tf::Taskflow& taskflow) const {
+        return taskflow.for_each_index(0, angles.size, 1,
+            [=](auto idx) -> void { loop_iter(idx); });
     }
 
     heurestic_angle_span heurestic_angle_vector::to_span()  {

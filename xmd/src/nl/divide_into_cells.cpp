@@ -76,31 +76,38 @@ namespace xmd::nl {
         auto z_scan_r = (int)ceil(req_r / cell_az);
 
         data->neighbor_cells.clear();
-        for (int ix1 = 0; ix1 < cell_nx; ++ix1) {
-            for (int dx = -x_scan_r; dx <= x_scan_r; ++dx) {
+
+        std::vector<std::tuple<int, int, int>> scan_xyz;
+        for (int dx = -x_scan_r; dx <= x_scan_r; ++dx) {
+            for (int dy = -y_scan_r; dy <= y_scan_r; ++dy) {
+                for (int dz = -z_scan_r; dz <= z_scan_r; ++dz) {
+                    scan_xyz.emplace_back(dx, dy, dz);
+                }
+            }
+        }
+
+        for (int cell_idx1 = 0; cell_idx1 < num_cells; ++cell_idx1) {
+            auto ix1 = cell_idx1 % cell_nx;
+            auto rem_xy1 = (cell_idx1 - ix1) / cell_nx;
+            auto iy1 = rem_xy1 % cell_ny;
+            auto iz1 = rem_xy1 / cell_ny;
+
+            if (data->particles.cell_bucket_size[cell_idx1] == 0)
+                continue;
+
+            for (auto const& [dx, dy, dz]: scan_xyz) {
                 auto ix2 = (cell_nx + ix1 + dx) % cell_nx;
-                for (int iy1 = 0; iy1 < cell_ny; ++iy1) {
-                    for (int dy = -y_scan_r; dy <= y_scan_r; ++dy) {
-                        auto iy2 = (cell_ny + iy1 + dy) % cell_ny;
-                        for (int iz1 = 0; iz1 < cell_nz; ++iz1) {
-                            auto cell_idx1 = ix1 + cell_nx * (iy1 + cell_ny * iz1);
-                            if (data->particles.cell_bucket_size[cell_idx1] == 0)
-                                continue;
+                auto iy2 = (cell_ny + iy1 + dy) % cell_ny;
+                auto iz2 = (cell_nz + iz1 + dz) % cell_nz;
+                auto cell_idx2 = ix2 + cell_nx * (iy2 + cell_ny * iz2);
 
-                            for (int dz = -z_scan_r; dz <= z_scan_r; ++dz) {
-                                auto iz2 = (cell_nz + iz1 + dz) % cell_nz;
-                                auto cell_idx2 = ix2 + cell_nx * (iy2 + cell_ny * iz2);
-                                if (data->particles.cell_bucket_size[cell_idx2] == 0)
-                                    continue;
+                if (data->particles.cell_bucket_size[cell_idx2] == 0)
+                    continue;
 
-                                if (cell_idx1 <= cell_idx2) {
-                                    auto nc_idx = data->neighbor_cells.add();
-                                    data->neighbor_cells.cell_idx1[nc_idx] = cell_idx1;
-                                    data->neighbor_cells.cell_idx2[nc_idx] = cell_idx2;
-                                }
-                            }
-                        }
-                    }
+                if (cell_idx1 <= cell_idx2) {
+                    auto nc_idx = data->neighbor_cells.add();
+                    data->neighbor_cells.cell_idx1[nc_idx] = cell_idx1;
+                    data->neighbor_cells.cell_idx2[nc_idx] = cell_idx2;
                 }
             }
         }

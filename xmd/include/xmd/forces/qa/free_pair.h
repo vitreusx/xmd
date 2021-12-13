@@ -13,7 +13,7 @@ namespace xmd::qa {
             return has_item_[idx];
         }
 
-        inline int size() const {
+        inline int const& size() const {
             return extent_;
         }
 

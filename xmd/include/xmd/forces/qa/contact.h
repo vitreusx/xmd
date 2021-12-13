@@ -15,7 +15,7 @@ namespace xmd::qa {
             return has_item_[idx];
         }
 
-        inline int extent() const {
+        inline int const& extent() const {
             return extent_;
         }
 

@@ -62,17 +62,6 @@ namespace xmd {
 
     void eval_nat_ssbond_forces::operator()() const {
         for (int idx = 0; idx < ssbonds.size; ++idx) {
-            auto cys_i1 = ssbonds.i1[idx], cys_i2 = ssbonds.i2[idx];
-            auto r1 = r[cys_i1], r2 = r[cys_i2];
-            auto r12 = box->ray(r1, r2);
-
-            auto r12_n = norm(r12);
-            auto [V_, dV_dr] = harmonic(H1, 0.0f, nat_r)(r12_n);
-
-            auto r12_u = r12 / r12_n;
-            *V += V_;
-            F[cys_i1] += dV_dr * r12_u;
-            F[cys_i2] -= dV_dr * r12_u;
         }
     }
 
@@ -87,6 +76,25 @@ namespace xmd {
         ssbonds = vm_inst.find_or_emplace<nat_ssbond_vector>("ssbonds").to_span();
         r = vm_inst.find<vec3r_vector>("r").to_array();
         V = &vm_inst.find<real>("V");
+    }
+
+    void eval_nat_ssbond_forces::loop_iter(int idx) const {
+        auto cys_i1 = ssbonds.i1[idx], cys_i2 = ssbonds.i2[idx];
+        auto r1 = r[cys_i1], r2 = r[cys_i2];
+        auto r12 = box->ray(r1, r2);
+
+        auto r12_n = norm(r12);
+        auto [V_, dV_dr] = harmonic(H1, 0.0f, nat_r)(r12_n);
+
+        auto r12_u = r12 / r12_n;
+        *V += V_;
+        F[cys_i1] += dV_dr * r12_u;
+        F[cys_i2] -= dV_dr * r12_u;
+    }
+
+    tf::Task eval_nat_ssbond_forces::tf_impl(tf::Taskflow &taskflow) const {
+        return taskflow.for_each_index(0, std::ref(ssbonds.size), 1,
+            [=](auto idx) -> void { loop_iter(idx); });
     }
 
     int nat_ssbond_vector::push_back()  {

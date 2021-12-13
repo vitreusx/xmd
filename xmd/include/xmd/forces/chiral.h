@@ -2,6 +2,7 @@
 #include <xmd/types/vec3.h>
 #include <xmd/utils/math.h>
 #include <xmd/vm/vm.h>
+#include <taskflow/taskflow.hpp>
 
 namespace xmd {
     struct chiral_quad_span {
@@ -33,6 +34,8 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void loop_iter(int idx) const;
         void operator()() const;
+        tf::Task tf_impl(tf::Taskflow& taskflow) const;
     };
 }

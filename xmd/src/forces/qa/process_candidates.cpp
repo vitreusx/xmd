@@ -1,7 +1,6 @@
 #include "forces/qa/process_candidates.h"
 
 namespace xmd::qa {
-
     void process_candidates::operator()() const {
         for (int idx = 0; idx < candidates->size(); ++idx) {
             auto i1 = candidates->i1[idx], i2 = candidates->i2[idx];
@@ -24,8 +23,6 @@ namespace xmd::qa {
 
                 sync[i1] -= sync_diff1;
                 sync[i2] -= sync_diff2;
-
-                
             }
         }
     }

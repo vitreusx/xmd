@@ -63,4 +63,24 @@ namespace xmd::qa {
         process_candidates_t();
         process_contacts_t();
     }
+
+    void eval_qa_forces_tf::init_from_vm(vm &vm_inst) {
+        inner.init_from_vm(vm_inst);
+        sift_candidates_tf_.init_from_vm(vm_inst);
+
+        precomp_nh_t = inner.precompute_nh_t.tf_impl(module);
+        sift_cand_t = sift_candidates_tf_.tf_impl(module);
+        process_cand_t = module.emplace([=]() -> void {
+            inner.process_candidates_t();
+        });
+        process_cont_t = inner.process_contacts_t.tf_impl(module);
+
+        precomp_nh_t.precede(sift_cand_t);
+        sift_cand_t.precede(process_cand_t);
+        process_cand_t.precede(process_cont_t);
+    }
+
+    tf::Task eval_qa_forces_tf::tf_impl(tf::Taskflow &taskflow) {
+        return taskflow.composed_of(module);
+    }
 }
