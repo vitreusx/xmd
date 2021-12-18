@@ -23,22 +23,6 @@ namespace xmd {
         pauli_pair_span to_span();
     };
 
-    class update_pauli_pairs: public vm_aware {
-    public:
-        real r_excl;
-
-    public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        pauli_pair_vector *pairs;
-
-        void init_from_vm(vm& vm_inst) override;
-
-    public:
-        void operator()() const;
-    };
-
     class eval_pauli_exclusion_forces: public vm_aware {
     public:
         real depth, r_excl;
@@ -48,6 +32,23 @@ namespace xmd {
         box<vec3r> *box;
         pauli_pair_span pairs;
         real *V;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
+    };
+
+    class update_pauli_pairs: public vm_aware {
+    public:
+        real r_excl;
+
+    public:
+        vec3r_array r;
+        box<vec3r> *box;
+        nl::nl_data *nl;
+        pauli_pair_vector *pairs;
+        eval_pauli_exclusion_forces *eval;
 
         void init_from_vm(vm& vm_inst) override;
 

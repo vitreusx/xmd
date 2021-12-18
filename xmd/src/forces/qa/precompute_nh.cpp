@@ -4,6 +4,7 @@
 
 namespace xmd::qa {
     void precompute_nh::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < bundles.size; ++idx) {
             auto iprev = bundles.iprev[idx], icur = bundles.icur[idx],
                 inext = bundles.inext[idx];

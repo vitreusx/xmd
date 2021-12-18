@@ -22,6 +22,7 @@ namespace xmd {
         val{val} {};
 
     void eval_heurestic_dihedral_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < dihedrals.size; ++idx) {
             auto i1 = dihedrals.i1[idx], i2 = dihedrals.i2[idx],
                 i3 = dihedrals.i3[idx], i4 = dihedrals.i4[idx];
@@ -42,6 +43,7 @@ namespace xmd {
             auto sin2_phi = sin_phi*sin_phi, cos2_phi = cos_phi*cos_phi,
                 sin_phi_cos_phi = sin_phi*cos_phi;
 
+//#pragma omp atomic update
             *V += coeffs[0][type_val] + coeffs[1][type_val]*sin_phi +
                   coeffs[2][type_val]*cos_phi + coeffs[3][type_val]*sin2_phi +
                   coeffs[4][type_val]*cos2_phi + coeffs[5][type_val]*sin_phi_cos_phi;

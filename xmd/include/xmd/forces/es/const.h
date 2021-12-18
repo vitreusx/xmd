@@ -20,4 +20,14 @@ namespace xmd {
     public:
         void operator()() const;
     };
+
+    class update_const_es: public update_es_base {
+    public:
+        eval_const_es_forces *eval;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
+    };
 }

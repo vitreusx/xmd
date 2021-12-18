@@ -7,16 +7,21 @@
 namespace xmd {
     void update_nat_ssbonds::operator()() const {
         ssbonds->clear();
-        
+
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < all_ssobnds->size; ++idx) {
             auto idx1 = all_ssobnds->i1[idx], idx2 = all_ssobnds->i2[idx];
             auto r1 = r[idx1], r2 = r[idx2];
             if (norm(box->ray(r1, r2)) < cutoff + nl->orig_pad) {
-                auto cont_idx = ssbonds->push_back();
+                int cont_idx;
+#pragma omp critical
+                cont_idx = ssbonds->push_back();
                 ssbonds->i1[cont_idx] = idx1;
                 ssbonds->i2[cont_idx] = idx2;
             }
         }
+
+        eval->ssbonds = ssbonds->to_span();
     }
 
     void update_nat_ssbonds::init_from_vm(vm &vm_inst) {
@@ -58,9 +63,12 @@ namespace xmd {
 
         auto& max_cutoff = vm_inst.find<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
+
+        eval = &vm_inst.find<eval_nat_ssbond_forces>("eval_ss");
     }
 
     void eval_nat_ssbond_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < ssbonds.size; ++idx) {
             auto cys_i1 = ssbonds.i1[idx], cys_i2 = ssbonds.i2[idx];
             auto r1 = r[cys_i1], r2 = r[cys_i2];
@@ -70,6 +78,7 @@ namespace xmd {
             auto [V_, dV_dr] = harmonic(H1, 0.0f, nat_r)(r12_n);
 
             auto r12_u = r12 / r12_n;
+//#pragma omp atomic update
             *V += V_;
             F[cys_i1] += dV_dr * r12_u;
             F[cys_i2] -= dV_dr * r12_u;

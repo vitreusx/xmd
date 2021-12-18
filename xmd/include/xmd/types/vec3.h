@@ -54,40 +54,52 @@ namespace xmd {
 
             template<typename E>
             auto& operator=(expr<E> const& e) {
-                x() = e.x();
-                y() = e.y();
-                z() = e.z();
+                x_ = e.x();
+                y_ = e.y();
+                z_ = e.z();
                 return *this;
             }
 
             template<typename E2>
             auto& operator+=(expr<E2> const& e2) {
+//#pragma omp atomic update
                 x() += e2.x();
+//#pragma omp atomic update
                 y() += e2.y();
+//#pragma omp atomic update
                 z() += e2.z();
                 return *this;
             }
 
             template<typename E2>
             auto& operator-=(expr<E2> const& e2) {
+//#pragma omp atomic update
                 x() -= e2.x();
+//#pragma omp atomic update
                 y() -= e2.y();
+//#pragma omp atomic update
                 z() -= e2.z();
                 return *this;
             }
 
             template<typename S>
             auto& operator*=(S const& s) {
+//#pragma omp atomic update
                 x() *= s;
+//#pragma omp atomic update
                 y() *= s;
+//#pragma omp atomic update
                 z() *= s;
                 return *this;
             }
 
             template<typename S>
             auto& operator/=(S const& s) {
+//#pragma omp atomic update
                 x() /= s;
+//#pragma omp atomic update
                 y() /= s;
+//#pragma omp atomic update
                 z() /= s;
                 return *this;
             }
@@ -400,8 +412,11 @@ namespace xmd {
             void _add_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
                 U* __restrict__ zptr, expr<E> const& e) const {
 
+//#pragma omp atomic update
                 *xptr += e.x();
+//#pragma omp atomic update
                 *yptr += e.y();
+//#pragma omp atomic update
                 *zptr += e.z();
             }
 
@@ -417,8 +432,11 @@ namespace xmd {
             void _sub_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
                 U* __restrict__ zptr, expr<E> const& e) const {
 
+//#pragma omp atomic update
                 *xptr -= e.x();
+//#pragma omp atomic update
                 *yptr -= e.y();
+//#pragma omp atomic update
                 *zptr -= e.z();
             }
 
@@ -434,8 +452,11 @@ namespace xmd {
             void _scalar_mul_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
                 U* __restrict__ zptr, S const& s) const {
 
+//#pragma omp atomic update
                 *xptr *= s;
+//#pragma omp atomic update
                 *yptr *= s;
+//#pragma omp atomic update
                 *zptr *= s;
             }
 
@@ -450,8 +471,11 @@ namespace xmd {
             void _scalar_div_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
                 U* __restrict__ zptr, S const& s) const {
 
+//#pragma omp atomic update
                 *xptr /= s;
+//#pragma omp atomic update
                 *yptr /= s;
+//#pragma omp atomic update
                 *zptr /= s;
             }
 

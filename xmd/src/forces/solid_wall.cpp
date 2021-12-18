@@ -4,11 +4,15 @@ namespace xmd {
 
     void update_solid_wall_pairs::operator()() const {
         pairs->clear();
+
+//#pragma omp taskloop default(none) nogroup
         for (int part_idx = 0; part_idx < num_particles; ++part_idx) {
             auto r_ = r[part_idx];
             for (int wall_idx = 0; wall_idx < walls.size(); ++wall_idx) {
                 if (abs(signed_dist(r_, walls[wall_idx])) < cutoff) {
-                    auto pair_idx = pairs->push_back();
+                    int pair_idx;
+#pragma omp critical
+                    pair_idx = pairs->push_back();
                     pairs->part_idx[pair_idx] = part_idx;
                     pairs->wall_idx[pair_idx] = wall_idx;
                 }

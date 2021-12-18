@@ -5,7 +5,9 @@
 namespace xmd::qa {
 
     void process_contacts::operator()() const {
-        real factor = breaking_factor * pow(2.0f, -1.0f/6.0f);
+        real factor = breaking_factor * (real)pow(2.0f, -1.0f/6.0f);
+
+//#pragma omp taskloop default(none) private(factor) nogroup
         for (int idx = 0; idx < contacts->extent(); ++idx) {
             if (!contacts->has_item(idx))
                 continue;
@@ -29,6 +31,7 @@ namespace xmd::qa {
             auto lj_force = ljs[(short)type];
             auto r12_n = r12_rn * v3::norm_squared(r12);
             auto [Vij, dVij_dr] = lj_force(r12_n, r12_rn);
+//#pragma omp atomic update
             *V += saturation * Vij;
             auto f = saturation * dVij_dr * r12_u;
             F[i1] += f;
@@ -41,11 +44,16 @@ namespace xmd::qa {
                 }
             }
             else if (status == BREAKING && saturation == 0.0f) {
+#pragma omp critical
                 contacts->remove(idx);
+
                 sync[i1] += sync_diff1;
                 sync[i2] += sync_diff2;
 
-                int free_idx = free_pairs->add();
+                int free_idx;
+#pragma omp critical
+                { free_idx = free_pairs->add(); };
+
                 free_pairs->i1[free_idx] = i1;
                 free_pairs->i2[free_idx] = i2;
             }
@@ -63,5 +71,13 @@ namespace xmd::qa {
         breaking_factor = vm_inst.find_or_emplace<real>("qa_breaking_factor",
             contact_params["breaking factor"].as<quantity>());
         t = &vm_inst.find<real>("t");
+
+        sync = vm_inst.find<sync_data_vector>("sync").to_array();
+        contacts = &vm_inst.find<contact_set>("qa_contacts");
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        V = &vm_inst.find<real>("V");
+        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        free_pairs = &vm_inst.find<free_pair_set>("qa_free_pairs");
     }
 }

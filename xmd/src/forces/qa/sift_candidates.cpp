@@ -8,6 +8,7 @@ namespace xmd::qa {
     void sift_candidates::operator()() const {
         candidates->clear();
 
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < free_pairs->size(); ++idx) {
             if (!free_pairs->has_item(idx))
                 continue;
@@ -67,7 +68,10 @@ namespace xmd::qa {
             if (!sync2_after_formation.is_valid())
                 continue;
 
-            int slot_idx = candidates->add();
+            int slot_idx;
+#pragma omp critical
+            slot_idx = candidates->add();
+
             candidates->i1[slot_idx] = i1;
             candidates->i2[slot_idx] = i2;
             candidates->free_pair_idx[slot_idx] = idx;
@@ -103,5 +107,14 @@ namespace xmd::qa {
         for (auto const& aa: amino_acid::all()) {
             ptype[(int)aa] = aa_data_[aa].polarization;
         }
+
+        candidates = &vm_inst.find<candidate_list>("qa_candidates");
+        atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        free_pairs = &vm_inst.find<free_pair_set>("qa_free_pairs");
+        sync = vm_inst.find<sync_data_vector>("sync").to_array();
+        n = vm_inst.find<vec3r_vector>("qa_n").to_array();
+        h = vm_inst.find<vec3r_vector>("qa_h").to_array();
     }
 }

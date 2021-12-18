@@ -18,4 +18,15 @@ namespace xmd::qa {
     public:
         void operator()() const;
     };
+
+    class update_qa: public vm_aware {
+    public:
+        update_free_pairs update_free_pairs_;
+        eval_qa_forces *eval;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
+    };
 }

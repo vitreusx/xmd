@@ -7,6 +7,7 @@ namespace xmd {
     void eval_const_es_forces::operator()() const {
         real V_factor = 1.0f / (4.0f * (real)M_PI * permittivity);
 
+//#pragma omp taskloop default(none) private(V_factor) nogroup
         for (int idx = 0; idx < es_pairs.size; ++idx) {
             auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];
             auto q1_q2 = es_pairs.q1_q2[idx];
@@ -19,7 +20,9 @@ namespace xmd {
             auto Vij = V_factor * q1_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
             auto dVij_dr = -Vij*(screen_dist_inv+r12_rn);
 
+//#pragma omp atomic update
             *V += Vij;
+
             auto f = r12_u * dVij_dr;
             F[i1] += f;
             F[i2] -= f;
@@ -43,5 +46,15 @@ namespace xmd {
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         es_pairs = vm_inst.find_or_emplace<es_pair_vector>("es_pairs").to_span();
+    }
+
+    void update_const_es::init_from_vm(vm &vm_inst) {
+        update_es_base::init_from_vm(vm_inst);
+        eval = &vm_inst.find<eval_const_es_forces>("eval_const_es");
+    }
+
+    void update_const_es::operator()() const {
+        update_es_base::operator()();
+        eval->es_pairs = pairs->to_span();
     }
 }

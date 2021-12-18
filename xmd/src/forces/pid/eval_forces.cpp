@@ -6,6 +6,7 @@
 namespace xmd::pid {
 
     void eval_pid_forces::operator()() {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < bundles.size; ++idx) {
             real psi1, psi2;
             vec3r dpsi1_dr1p, dpsi1_dr1, dpsi1_dr1n, dpsi1_dr2;
@@ -123,8 +124,10 @@ namespace xmd::pid {
                 C += lam1 * lam2 * lj_dV_dr;
             }
 
-            auto r12_u = r12 * r12_rn;
+//#pragma omp atomic update
             *V += V_;
+
+            auto r12_u = r12 * r12_rn;
             F[i1p] -= A * dpsi1_dr1p;
             F[i1] -= A * dpsi1_dr1 + B * dpsi2_dr1 + C * r12_u;
             F[i1n] -= A * dpsi1_dr1n;

@@ -46,19 +46,6 @@ namespace xmd {
         }
     };
 
-    class update_go_contacts: public vm_aware {
-    public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        go_contact_vector *all_contacts, *contacts;
-
-        void init_from_vm(vm& vm_inst) override;
-
-    public:
-        void operator()() const;
-    };
-
     class eval_go_forces: public vm_aware {
     public:
         real depth;
@@ -68,6 +55,20 @@ namespace xmd {
         box<vec3r> *box;
         go_contact_span contacts;
         real *V;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
+    };
+
+    class update_go_contacts: public vm_aware {
+    public:
+        vec3r_array r;
+        box<vec3r> *box;
+        nl::nl_data *nl;
+        go_contact_vector *all_contacts, *contacts;
+        eval_go_forces *eval;
 
         void init_from_vm(vm& vm_inst) override;
 

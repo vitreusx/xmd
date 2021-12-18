@@ -5,6 +5,7 @@
 
 namespace xmd {
     void eval_native_angle_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < angles.size; ++idx) {
             int i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
             auto nat_theta = angles.nat_theta[idx];
@@ -23,6 +24,7 @@ namespace xmd {
             auto theta = acos(cos_theta);
 
             auto dtheta = theta - nat_theta;
+//#pragma omp atomic update
             *V += (real)0.5 * k * dtheta * dtheta;
             auto dV_dtheta = k * dtheta;
 

@@ -24,22 +24,6 @@ namespace xmd {
         nat_ssbond_span to_span();
     };
 
-    class update_nat_ssbonds: public vm_aware {
-    public:
-        real cutoff;
-
-    public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        nat_ssbond_vector *all_ssobnds, *ssbonds;
-
-        void init_from_vm(vm& vm_inst) override;
-
-    public:
-        void operator()() const;
-    };
-
     class eval_nat_ssbond_forces: public vm_aware {
     public:
         real H1, nat_r;
@@ -49,6 +33,23 @@ namespace xmd {
         box<vec3r> *box;
         nat_ssbond_span ssbonds;
         real *V;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
+    };
+
+    class update_nat_ssbonds: public vm_aware {
+    public:
+        real cutoff;
+
+    public:
+        vec3r_array r;
+        box<vec3r> *box;
+        nl::nl_data *nl;
+        nat_ssbond_vector *all_ssobnds, *ssbonds;
+        eval_nat_ssbond_forces *eval;
 
         void init_from_vm(vm& vm_inst) override;
 

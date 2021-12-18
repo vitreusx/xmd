@@ -5,6 +5,7 @@
 namespace xmd {
 
     void eval_snd_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < dihedrals.size; ++idx) {
             int i1 = dihedrals.i1[idx], i2 = dihedrals.i2[idx],
                 i3 = dihedrals.i3[idx], i4 = dihedrals.i4[idx];
@@ -20,6 +21,7 @@ namespace xmd {
             if (dot(x12_23, r34) < 0.0f) phi = -phi;
 
             auto diff = phi - dihedrals.nat_phi[idx];
+//#pragma omp atomic update
             *V += 0.5f * CDH * diff * diff;
             auto dV_dphi = CDH * diff;
 

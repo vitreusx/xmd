@@ -8,6 +8,7 @@ namespace xmd::nl {
         }
         else {
             real max_r_disp = 0.0f;
+//#pragma omp taskloop default(none) reduction(max:max_r_disp)
             for (int idx = 0; idx < num_particles; ++idx) {
                 auto r_ = r[idx], orig_r_ = data->orig_r[idx];
                 auto dr = box->ray(r_, orig_r_);

@@ -53,13 +53,13 @@ namespace xmd::nl {
             auto iy = (int)ceil((r_.y() - y_min) * cell_ay_inv);
             auto iz = (int)ceil((r_.z() - z_min) * cell_az_inv);
             auto cell_idx = ix + cell_nx * (iy + cell_ny * iz);
-
             assign(data->particles, part_idx, cell_idx);
         }
         derive_rest(data->particles);
 
         data->native_contacts.reinit(num_cells);
         prepare(data->native_contacts);
+
         for (int nat_idx = 0; nat_idx < nat_cont.size; ++nat_idx) {
             auto i1 = nat_cont.i1[nat_idx];
             auto cell_idx1 = data->particles.item_cell_idx[i1];

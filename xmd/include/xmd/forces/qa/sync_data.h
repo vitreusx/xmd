@@ -95,49 +95,73 @@ namespace xmd::qa {
         }
 
         inline auto& operator+=(sync_data_cref const& other) {
+//#pragma omp atomic update
             back += other.back;
+//#pragma omp atomic update
             side_all += other.side_all;
+//#pragma omp atomic update
             side_polar += other.side_polar;
+//#pragma omp atomic update
             side_hydrophobic += other.side_hydrophobic;
             return *this;
         }
 
         inline auto& operator-=(sync_data_cref const& other) {
+//#pragma omp atomic update
             back -= other.back;
+//#pragma omp atomic update
             side_all -= other.side_all;
+//#pragma omp atomic update
             side_polar -= other.side_polar;
+//#pragma omp atomic update
             side_hydrophobic -= other.side_hydrophobic;
             return *this;
         }
 
         inline auto& operator+=(sync_data const& other) {
+//#pragma omp atomic update
             back += other.back;
+//#pragma omp atomic update
             side_all += other.side_all;
+//#pragma omp atomic update
             side_polar += other.side_polar;
+//#pragma omp atomic update
             side_hydrophobic += other.side_hydrophobic;
             return *this;
         }
 
         inline auto& operator-=(sync_data const& other) {
+//#pragma omp atomic update
             back -= other.back;
+//#pragma omp atomic update
             side_all -= other.side_all;
+//#pragma omp atomic update
             side_polar -= other.side_polar;
+//#pragma omp atomic update
             side_hydrophobic -= other.side_hydrophobic;
             return *this;
         }
 
         inline auto& operator+=(sync_data_ref const& other) {
+//#pragma omp atomic update
             back += other.back;
+//#pragma omp atomic update
             side_all += other.side_all;
+//#pragma omp atomic update
             side_polar += other.side_polar;
+//#pragma omp atomic update
             side_hydrophobic += other.side_hydrophobic;
             return *this;
         }
 
         inline auto& operator-=(sync_data_ref const& other) {
+//#pragma omp atomic update
             back -= other.back;
+//#pragma omp atomic update
             side_all -= other.side_all;
+//#pragma omp atomic update
             side_polar -= other.side_polar;
+//#pragma omp atomic update
             side_hydrophobic -= other.side_hydrophobic;
             return *this;
         }

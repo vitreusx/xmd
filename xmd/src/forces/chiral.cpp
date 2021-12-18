@@ -6,6 +6,7 @@
 
 namespace xmd {
     void eval_chiral_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < quads.size; ++idx) {
             auto i1 = quads.i1[idx], i2 = quads.i2[idx], i3 = quads.i3[idx],
                 i4 = quads.i4[idx];
@@ -20,6 +21,7 @@ namespace xmd {
             auto chir = dot(r12, x23_34) * nat_factor;
             auto chir_diff = chir - nat_chir;
 
+//#pragma omp atomic update
             *V += 0.5f * e_chi * chir_diff * chir_diff;
 
             auto f = e_chi * chir_diff * nat_factor;

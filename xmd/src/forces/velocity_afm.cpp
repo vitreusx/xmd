@@ -3,6 +3,7 @@
 namespace xmd {
 
     void eval_velocity_afm_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < bundles.size; ++idx) {
             auto pulled_idx = bundles.pulled_idx[idx];
             auto r_ = r[pulled_idx];

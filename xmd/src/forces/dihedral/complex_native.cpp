@@ -5,6 +5,7 @@
 namespace xmd {
 
     void eval_cnd_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < dihedrals.size; ++idx) {
             auto i1 = dihedrals.i1[idx], i2 = dihedrals.i2[idx],
                 i3 = dihedrals.i3[idx], i4 = dihedrals.i4[idx];
@@ -25,6 +26,7 @@ namespace xmd {
             auto sin_diff = sin(diff), cos_diff = cos(diff);
             auto sin_3diff = sin(3.0f*diff), cos_3diff = cos(3.0f*diff);
 
+//#pragma omp atomic update
             *V += CDA * (1.0f - cos_diff) + CDB * (1.0f - cos_3diff);
             auto dV_dphi = CDA * sin_diff + CDB * 3.0f * sin_3diff;
 

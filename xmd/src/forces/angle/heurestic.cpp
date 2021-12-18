@@ -23,6 +23,7 @@ namespace xmd {
         val{val} {};
 
     void eval_heurestic_angle_forces::operator()() const {
+//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < angles.size; ++idx) {
             auto i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
             auto type_val = (int8_t)angles.type[idx];
@@ -47,7 +48,9 @@ namespace xmd {
                 angle_V = coeff + theta * angle_V;
             }
 
+//#pragma omp atomic update
             *V += angle_V;
+
             F[i1] -= dV_dtheta * dtheta_dr1;
             F[i2] -= dV_dtheta * dtheta_dr2;
             F[i3] -= dV_dtheta * dtheta_dr3;

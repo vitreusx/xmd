@@ -36,7 +36,7 @@ namespace xmd {
         es_pair_span to_span();
     };
 
-    class update_es_pairs: public vm_aware {
+    class update_es_base: public vm_aware {
     public:
         real cutoff;
         real q[amino_acid::NUM_AA];
