@@ -47,8 +47,13 @@ namespace xmd {
         auto signed_dist(expr<E> const& point, plane<U> const& plane) {
             return dot(plane.normal, point - plane.origin);
         }
+
+        template<typename E, typename U>
+        auto project(expr<E> const& point, plane<U> const& plane) {
+            return point - plane.normal * signed_dist(point, plane);
+        }
     }
 
     using aff3f = v3::aff3<float>;
-    using planef = v3::plane<float>;
+    using plane = v3::plane<float>;
 }

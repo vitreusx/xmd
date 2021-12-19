@@ -33,6 +33,8 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void iter(int idx) const;
         void operator()() const;
+        void omp_async() const;
     };
 }

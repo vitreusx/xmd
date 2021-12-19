@@ -75,22 +75,8 @@ namespace xmd {
     }
 
     void eval_go_forces::operator()() const {
-//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < contacts.size; ++idx) {
-            auto i1 = contacts.i1[idx], i2 = contacts.i2[idx];
-            auto nat_dist = contacts.nat_dist[idx];
-
-            auto r1 = r[i1], r2 = r[i2];
-            auto r12 = box->ray(r1, r2);
-            auto r12_rn = norm_inv(r12);
-
-            auto r12_u = r12 * r12_rn;
-            auto [V_, dV_dr] = lj(depth, nat_dist)(r12_rn);
-
-//#pragma omp atomic update
-            *V += V_;
-            F[i1] += r12_u * dV_dr;
-            F[i2] -= r12_u * dV_dr;
+            iter(idx);
         }
     }
 
@@ -105,6 +91,30 @@ namespace xmd {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         V = &vm_inst.find<real>("V");
         F = vm_inst.find<vec3r_vector>("F").to_array();
+    }
+
+    void eval_go_forces::iter(int idx) const {
+        auto i1 = contacts.i1[idx], i2 = contacts.i2[idx];
+        auto nat_dist = contacts.nat_dist[idx];
+
+        auto r1 = r[i1], r2 = r[i2];
+        auto r12 = box->ray(r1, r2);
+        auto r12_rn = norm_inv(r12);
+
+        auto r12_u = r12 * r12_rn;
+        auto [V_, dV_dr] = lj(depth, nat_dist)(r12_rn);
+
+//#pragma omp atomic update
+        *V += V_;
+        F[i1] += r12_u * dV_dr;
+        F[i2] -= r12_u * dV_dr;
+    }
+
+    void eval_go_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < contacts.size; ++idx) {
+            iter(idx);
+        }
     }
 
     go_contact_vector::go_contact_vector(int n):

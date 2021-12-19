@@ -68,20 +68,8 @@ namespace xmd {
     }
 
     void eval_nat_ssbond_forces::operator()() const {
-//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < ssbonds.size; ++idx) {
-            auto cys_i1 = ssbonds.i1[idx], cys_i2 = ssbonds.i2[idx];
-            auto r1 = r[cys_i1], r2 = r[cys_i2];
-            auto r12 = box->ray(r1, r2);
-
-            auto r12_n = norm(r12);
-            auto [V_, dV_dr] = harmonic(H1, 0.0f, nat_r)(r12_n);
-
-            auto r12_u = r12 / r12_n;
-//#pragma omp atomic update
-            *V += V_;
-            F[cys_i1] += dV_dr * r12_u;
-            F[cys_i2] -= dV_dr * r12_u;
+            iter(idx);
         }
     }
 
@@ -96,6 +84,28 @@ namespace xmd {
         ssbonds = vm_inst.find_or_emplace<nat_ssbond_vector>("ssbonds").to_span();
         r = vm_inst.find<vec3r_vector>("r").to_array();
         V = &vm_inst.find<real>("V");
+    }
+
+    void eval_nat_ssbond_forces::iter(int idx) const {
+        auto cys_i1 = ssbonds.i1[idx], cys_i2 = ssbonds.i2[idx];
+        auto r1 = r[cys_i1], r2 = r[cys_i2];
+        auto r12 = box->ray(r1, r2);
+
+        auto r12_n = norm(r12);
+        auto [V_, dV_dr] = harmonic(H1, 0.0f, nat_r)(r12_n);
+
+        auto r12_u = r12 / r12_n;
+//#pragma omp atomic update
+        *V += V_;
+        F[cys_i1] += dV_dr * r12_u;
+        F[cys_i2] -= dV_dr * r12_u;
+    }
+
+    void eval_nat_ssbond_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < ssbonds.size; ++idx) {
+            iter(idx);
+        }
     }
 
     int nat_ssbond_vector::push_back()  {

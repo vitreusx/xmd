@@ -13,6 +13,7 @@ namespace xmd::qa {
     public:
         lj_variants ljs;
         real cycle_time, cycle_time_inv, breaking_factor;
+        real factor;
 
     public:
         vec3r_array r, F;
@@ -25,6 +26,8 @@ namespace xmd::qa {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void iter(int idx) const;
         void operator()() const;
+        void omp_async() const;
     };
 }

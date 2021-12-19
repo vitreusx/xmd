@@ -85,36 +85,98 @@ int main() {
     auto &total_time = def_vm.find_or_emplace<real>("total_time",
         params["general"]["total time"].as<quantity>());
 
-    while (t < total_time) {
-        reset_vf_();
-        nl_verify_();
+    reset_vf_();
+    nl_verify_();
 
-        if (invalid) {
-            divide_into_cells_();
+    if (invalid) {
+        divide_into_cells_();
 
-            update_pauli_();
-            update_go_();
-            update_ss_();
-            update_const_es_();
-            update_qa_();
-        }
-
-        tethers_();
-        nat_ang_();
-        nat_comp_dih_();
-        eval_pauli_();
-        eval_go_();
-        eval_ss_();
-        eval_const_es_();
-        eval_qa_();
-
-        export_pdb_();
-        show_pbar_();
-        report_stats_();
-        report_structure_();
-
-        lang_pc_();
+        update_pauli_();
+        update_go_();
+        update_ss_();
+        update_const_es_();
+        update_qa_();
     }
+
+#pragma omp parallel
+    {
+        while (t < total_time) {
+            tethers_.omp_async();
+            nat_ang_.omp_async();
+            nat_comp_dih_.omp_async();
+            eval_pauli_.omp_async();
+            eval_go_.omp_async();
+            eval_ss_.omp_async();
+            eval_const_es_.omp_async();
+            eval_qa_.precompute_nh_t.omp_async();
+            eval_qa_.sift_candidates_t.omp_async();
+            eval_qa_.process_contacts_t.omp_async();
+
+#pragma omp barrier
+
+#pragma omp master
+            {
+                export_pdb_();
+                show_pbar_();
+                report_stats_();
+                report_structure_();
+
+                lang_pc_();
+
+                reset_vf_();
+                nl_verify_();
+                eval_qa_.process_candidates_t();
+                eval_qa_.sift_candidates_t.omp_prep();
+
+                if (invalid) {
+                    divide_into_cells_();
+
+                    update_pauli_();
+                    update_go_();
+                    update_ss_();
+                    update_const_es_();
+                    update_qa_();
+                }
+            }
+
+#pragma omp barrier
+        }
+    };
+
+//    while (t < total_time) {
+//        tethers_();
+//        nat_ang_();
+//        nat_comp_dih_();
+//        eval_pauli_();
+//        eval_go_();
+//        eval_ss_();
+//        eval_const_es_();
+//        eval_qa_.precompute_nh_t();
+//        eval_qa_.sift_candidates_t();
+//        eval_qa_.process_contacts_t();
+//
+//        export_pdb_();
+//        show_pbar_();
+//        report_stats_();
+//        report_structure_();
+//
+//        lang_pc_();
+//
+//        reset_vf_();
+//        nl_verify_();
+//        eval_qa_.process_candidates_t();
+//        eval_qa_.sift_candidates_t.omp_prep();
+//
+//        if (invalid) {
+//            divide_into_cells_();
+//
+//            update_pauli_();
+//            update_go_();
+//            update_ss_();
+//            update_const_es_();
+//            update_qa_();
+//        }
+//    }
 
     return EXIT_SUCCESS;
 }

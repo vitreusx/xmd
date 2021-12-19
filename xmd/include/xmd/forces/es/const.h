@@ -8,6 +8,7 @@ namespace xmd {
     class eval_const_es_forces: public vm_aware {
     public:
         real permittivity, screen_dist_inv;
+        real V_factor;
 
     public:
         vec3r_array r, F;
@@ -18,7 +19,9 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void iter(int idx) const;
         void operator()() const;
+        void omp_async() const;
     };
 
     class update_const_es: public update_es_base {

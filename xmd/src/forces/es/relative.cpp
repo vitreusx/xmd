@@ -5,27 +5,8 @@
 namespace xmd {
 
     void eval_relative_es_forces::operator()() const {
-        auto V_factor = 1.0f / (4.0f * (real)M_PI * factor);
-
-//#pragma omp taskloop default(none) private(V_factor) nogroup
         for (int idx = 0; idx < es_pairs.size; ++idx) {
-            auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];
-            auto q1_q2 = es_pairs.q1_q2[idx];
-
-            auto r1 = r[i1], r2 = r[i2];
-            auto r12 = box->ray(r1, r2);
-            auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
-            auto r12_u = r12 * r12_rn;
-
-            auto Vij = V_factor * q1_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
-            auto dVij_dr = -Vij*(screen_dist_inv+2.0f*r12_rn);
-
-//#pragma omp atomic update
-            *V += Vij;
-
-            auto f = r12_u * dVij_dr;
-            F[i1] += f;
-            F[i2] -= f;
+            iter(idx);
         }
     }
 
@@ -36,6 +17,7 @@ namespace xmd {
 
         factor = vm_inst.find_or_add<real>("relative_ES_A",
             rel_es_params["factor"].as<quantity>());
+        V_factor = 1.0f / (4.0f * (real)M_PI * factor);
 
         auto screening_dist = vm_inst.find_or_add<real>("screening_dist",
             es_params["screening distance"].as<quantity>());
@@ -46,6 +28,34 @@ namespace xmd {
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         es_pairs = vm_inst.find_or_emplace<es_pair_vector>("es_pairs").to_span();
+    }
+
+    void eval_relative_es_forces::iter(int idx) const {
+        auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];
+        auto q1_q2 = es_pairs.q1_q2[idx];
+
+        auto r1 = r[i1], r2 = r[i2];
+        auto r12 = box->ray(r1, r2);
+        auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
+        auto r12_u = r12 * r12_rn;
+
+        auto Vij = V_factor * q1_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
+        auto dVij_dr = -Vij*(screen_dist_inv+2.0f*r12_rn);
+
+//#pragma omp atomic update
+        *V += Vij;
+
+        auto f = r12_u * dVij_dr;
+        F[i1] += f;
+        F[i2] -= f;
+
+    }
+
+    void eval_relative_es_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < es_pairs.size; ++idx) {
+            iter(idx);
+        }
     }
 
     void update_relative_es::init_from_vm(vm &vm_inst) {

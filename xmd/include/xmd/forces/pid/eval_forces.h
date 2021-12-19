@@ -24,6 +24,8 @@ namespace xmd::pid {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void iter(int idx) const;
         void operator()();
+        void omp_async() const;
     };
 }

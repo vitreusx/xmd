@@ -6,29 +6,8 @@
 
 namespace xmd {
     void eval_chiral_forces::operator()() const {
-//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < quads.size; ++idx) {
-            auto i1 = quads.i1[idx], i2 = quads.i2[idx], i3 = quads.i3[idx],
-                i4 = quads.i4[idx];
-            auto nat_chir = quads.nat_chir[idx];
-            auto nat_factor = quads.nat_factor[idx];
-
-            auto r1 = r[i1], r2 = r[i2], r3 = r[i3], r4 = r[i4];
-            auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
-            auto x12_23 = cross(r12, r23), x12_34 = cross(r12, r34),
-                x23_34 = cross(r23, r34);
-
-            auto chir = dot(r12, x23_34) * nat_factor;
-            auto chir_diff = chir - nat_chir;
-
-//#pragma omp atomic update
-            *V += 0.5f * e_chi * chir_diff * chir_diff;
-
-            auto f = e_chi * chir_diff * nat_factor;
-            F[i1] += f * x12_23;
-            F[i2] -= f * (x12_34 + x23_34);
-            F[i3] += f * (x12_23 + x12_34);
-            F[i4] -= f * x12_23;
+            iter(idx);
         }
     }
 
@@ -81,6 +60,38 @@ namespace xmd {
 
                 return quads_vec;
             }).to_span();
+    }
+
+    void eval_chiral_forces::iter(int idx) const {
+        auto i1 = quads.i1[idx], i2 = quads.i2[idx], i3 = quads.i3[idx],
+            i4 = quads.i4[idx];
+        auto nat_chir = quads.nat_chir[idx];
+        auto nat_factor = quads.nat_factor[idx];
+
+        auto r1 = r[i1], r2 = r[i2], r3 = r[i3], r4 = r[i4];
+        auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
+        auto x12_23 = cross(r12, r23), x12_34 = cross(r12, r34),
+            x23_34 = cross(r23, r34);
+
+        auto chir = dot(r12, x23_34) * nat_factor;
+        auto chir_diff = chir - nat_chir;
+
+//#pragma omp atomic update
+        *V += 0.5f * e_chi * chir_diff * chir_diff;
+
+        auto f = e_chi * chir_diff * nat_factor;
+        F[i1] += f * x12_23;
+        F[i2] -= f * (x12_34 + x23_34);
+        F[i3] += f * (x12_23 + x12_34);
+        F[i4] -= f * x12_23;
+
+    }
+
+    void eval_chiral_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < quads.size; ++idx) {
+            iter(idx);
+        }
     }
 
     chiral_quad_vector::chiral_quad_vector(int n):

@@ -42,22 +42,8 @@ namespace xmd {
     }
 
     void eval_pauli_exclusion_forces::operator()() const {
-//#pragma omp taskloop default(none) nogroup
         for (int idx = 0; idx < pairs.size; ++idx) {
-            auto i1 = pairs.i1[idx], i2 = pairs.i2[idx];
-            auto r1 = r[i1], r2 = r[i2];
-            auto r12 = box->ray(r1, r2);
-            auto r12_rn = norm_inv(r12);
-
-            if (1.0f < r12_rn * r_excl) {
-                auto r12_u = r12 * r12_rn;
-                auto [V_, dV_dr] = shifted_lj(depth, r_excl)(r12_rn);
-
-//#pragma omp atomic update
-                *V += V_;
-                F[i1] += r12_u * dV_dr;
-                F[i2] -= r12_u * dV_dr;
-            }
+            iter(idx);
         }
     }
 
@@ -74,6 +60,30 @@ namespace xmd {
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         pairs = vm_inst.find_or_emplace<pauli_pair_vector>(
             "pauli_pairs").to_span();
+    }
+
+    void eval_pauli_exclusion_forces::iter(int idx) const {
+        auto i1 = pairs.i1[idx], i2 = pairs.i2[idx];
+        auto r1 = r[i1], r2 = r[i2];
+        auto r12 = box->ray(r1, r2);
+        auto r12_rn = norm_inv(r12);
+
+        if (1.0f < r12_rn * r_excl) {
+            auto r12_u = r12 * r12_rn;
+            auto [V_, dV_dr] = shifted_lj(depth, r_excl)(r12_rn);
+
+//#pragma omp atomic update
+            *V += V_;
+            F[i1] += r12_u * dV_dr;
+            F[i2] -= r12_u * dV_dr;
+        }
+    }
+
+    void eval_pauli_exclusion_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < pairs.size; ++idx) {
+            iter(idx);
+        }
     }
 
     int pauli_pair_vector::push_back()  {

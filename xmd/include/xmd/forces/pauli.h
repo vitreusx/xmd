@@ -36,7 +36,9 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void iter(int idx) const;
         void operator()() const;
+        void omp_async() const;
     };
 
     class update_pauli_pairs: public vm_aware {
