@@ -12,15 +12,14 @@ namespace xmd {
 
     void eval_relative_es_forces::init_from_vm(vm &vm_inst) {
         auto& params = vm_inst.find<param_file>("params");
-        auto const& es_params = params["electrostatic forces"];
-        auto const& rel_es_params = es_params["relative variant params"];
+        auto const& rel_es_params = params["relative ES"];
 
         factor = vm_inst.find_or_add<real>("relative_ES_A",
             rel_es_params["factor"].as<quantity>());
         V_factor = 1.0f / (4.0f * (real)M_PI * factor);
 
         auto screening_dist = vm_inst.find_or_add<real>("screening_dist",
-            es_params["screening distance"].as<quantity>());
+            rel_es_params["screening distance"].as<quantity>());
         screen_dist_inv = (real)1.0 / screening_dist;
 
         r = vm_inst.find<vec3r_vector>("r").to_array();
@@ -61,6 +60,15 @@ namespace xmd {
     void update_relative_es::init_from_vm(vm &vm_inst) {
         update_es_base::init_from_vm(vm_inst);
         eval = &vm_inst.find<eval_relative_es_forces>("eval_rel_es");
+
+        auto& params = vm_inst.find<param_file>("params");
+        auto const& rel_es_params = params["relative ES"];
+        auto screening_dist = vm_inst.find_or_emplace<real>("screening_dist",
+            rel_es_params["screening distance"].as<quantity>());
+        cutoff = 2.0 * screening_dist;
+
+        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        max_cutoff = max(max_cutoff, cutoff);
     }
 
     void update_relative_es::operator()() const {

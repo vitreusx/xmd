@@ -21,9 +21,6 @@
 using namespace xmd;
 
 int main() {
-//    omp_set_dynamic(0);
-//    omp_set_num_threads(8);
-
     vm def_vm;
     auto &params = def_vm.emplace<param_file>("params",
         "data/examples/defaults.yml");
@@ -76,6 +73,12 @@ int main() {
     auto &update_qa_ = def_vm.find_or_emplace<qa::update_free_pairs>(
         "update_qa");
 
+    auto &eval_solid_ = def_vm.find_or_emplace<eval_solid_wall_forces>("eval_solid");
+    auto &eval_lj_attr_ = def_vm.find_or_emplace<eval_lj_attr_wall_forces>("eval_lj_attr");
+
+    auto &eval_vel_afm_ = def_vm.find_or_emplace<eval_velocity_afm_forces>("eval_vel_afm");
+    auto &eval_force_afm_ = def_vm.find_or_emplace<eval_force_afm_forces>("eval_force_afm");
+
     auto &export_pdb_ = def_vm.find_or_emplace<export_pdb>("export_pdb");
     auto &show_pbar_ = def_vm.emplace<show_progress_bar>("show_progress_bar");
     auto &report_stats_ = def_vm.emplace<report_stats>("report_stats");
@@ -111,6 +114,10 @@ int main() {
             eval_qa_.precompute_nh_t.omp_async();
             eval_qa_.sift_candidates_t.omp_async();
             eval_qa_.process_contacts_t.omp_async();
+            eval_solid_.omp_async();
+            eval_lj_attr_.omp_async();
+            eval_vel_afm_.omp_async();
+            eval_force_afm_.omp_async();
 
 #pragma omp barrier
 
@@ -142,41 +149,6 @@ int main() {
 #pragma omp barrier
         }
     };
-
-//    while (t < total_time) {
-//        tethers_();
-//        nat_ang_();
-//        nat_comp_dih_();
-//        eval_pauli_();
-//        eval_go_();
-//        eval_ss_();
-//        eval_const_es_();
-//        eval_qa_.precompute_nh_t();
-//        eval_qa_.sift_candidates_t();
-//        eval_qa_.process_contacts_t();
-//
-//        export_pdb_();
-//        show_pbar_();
-//        report_stats_();
-//        report_structure_();
-//
-//        lang_pc_();
-//
-//        reset_vf_();
-//        nl_verify_();
-//        eval_qa_.process_candidates_t();
-//        eval_qa_.sift_candidates_t.omp_prep();
-//
-//        if (invalid) {
-//            divide_into_cells_();
-//
-//            update_pauli_();
-//            update_go_();
-//            update_ss_();
-//            update_const_es_();
-//            update_qa_();
-//        }
-//    }
 
     return EXIT_SUCCESS;
 }

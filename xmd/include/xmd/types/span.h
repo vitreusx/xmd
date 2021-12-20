@@ -5,7 +5,7 @@ namespace xmd {
     template<typename T>
     class span {
     public:
-        inline explicit span(T *data, int size):
+        inline explicit span(T *data = nullptr, int size = 0):
             data_{data}, size_{size} {};
 
         int size() const {

@@ -9,6 +9,8 @@ namespace xmd {
         real H1, H2;
         real nat_r;
 
+        harmonic() = default;
+
         inline harmonic(real H1, real H2, real nat_r):
             H1{H1}, H2{H2}, nat_r{nat_r} {};
 

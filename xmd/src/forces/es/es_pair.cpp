@@ -50,12 +50,6 @@ namespace xmd {
         nl = &vm_inst.find<nl::nl_data>("nl_data");
         pairs = &vm_inst.find<es_pair_vector>("es_pairs");
         atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
-
-        auto screening_dist = vm_inst.find<real>("screening_dist");
-        cutoff = 2.0 * screening_dist;
-
-        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
-        max_cutoff = max(max_cutoff, cutoff);
     }
 
     es_pair_span es_pair_vector::to_span() {

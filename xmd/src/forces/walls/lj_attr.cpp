@@ -55,7 +55,7 @@ namespace xmd {
 
         walls = vm_inst.find_or<vector<plane>>("lj_attr_walls", [&]() -> auto& {
             auto& walls_ = vm_inst.emplace<vector<plane>>("lj_attr_walls");
-            for (auto const& plane_node: params["LJ attractive"]["planes"]) {
+            for (auto const& plane_node: params["LJ attractive walls"]["planes"]) {
                 plane p;
                 p.normal = plane_node["normal"].as<vec3r>();
                 p.origin = plane_node["origin"].as<vec3r>();
