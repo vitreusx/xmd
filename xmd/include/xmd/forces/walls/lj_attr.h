@@ -6,7 +6,7 @@
 #include <xmd/model/box.h>
 
 namespace xmd {
-    enum lj_attr_pair_status: bool {
+    enum lj_attr_pair_status: int8_t {
         FREE, FORMING_OR_FORMED, BREAKING
     };
 
@@ -26,7 +26,7 @@ namespace xmd {
         vector<real> ref_t;
         int size;
 
-        explicit lj_attr_wall_pairs_vector(int n = 0);
+        explicit lj_attr_pairs_vector(int n = 0);
         lj_attr_pairs_span to_span();
     };
 
@@ -38,7 +38,7 @@ namespace xmd {
         real breaking_factor, factor;
 
     public:
-        vec3r_array r, F;
+        vec3r_array r, F, wall_F;
         box<vec3r> *box;
         span<plane> walls;
         real *V, *t;

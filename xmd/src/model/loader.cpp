@@ -40,10 +40,10 @@ namespace xmd {
         vm_inst.find_or_emplace<vector<real>>("mass", num_particles, (real)1.0);
 
         vm_inst.find_or<xmd::box<vec3r>>("box", [&]() -> auto& {
-            xmd::box<vec3r> box;
+            auto& box = vm_inst.emplace<xmd::box<vec3r>>("box");
             box.cell = cast_v(stored_model.model_box.cell);
             box.cell_inv = cast_v(stored_model.model_box.cell_inv);
-            return vm_inst.emplace<xmd::box<vec3r>>("box", box);
+            return box;
         });
 
         vm_inst.find_or<native_contact_vector>("native_contacts", [&]() -> auto& {

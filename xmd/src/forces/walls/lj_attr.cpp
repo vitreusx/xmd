@@ -5,7 +5,7 @@
 
 namespace xmd {
     lj_attr_pairs_vector::lj_attr_pairs_vector(int n):
-        part_idx{n}, wall_idx{n}, status{n}, join_r{n}, ref_t{n}, size{n} {};
+        part_idx{n}, wall_idx{n}, status{n}, joint_r{n}, ref_t{n}, size{n} {};
 
     lj_attr_pairs_span lj_attr_pairs_vector::to_span() {
         lj_attr_pairs_span s;
@@ -30,7 +30,6 @@ namespace xmd {
 
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
-        walls = vm_inst.find<vector<plane>>("lj_attr_walls").to_array();
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         num_particles = vm_inst.find<int>("num_particles");
@@ -38,7 +37,8 @@ namespace xmd {
 
         pairs = vm_inst.find_or<lj_attr_pairs_vector>("lj_attr_pairs", [&]() -> auto& {
             auto num_pairs = num_particles * walls.size();
-            auto& pairs_ = vm_inst.emplace<lj_attr_pairs_vector>(num_pairs);
+            auto& pairs_ = vm_inst.emplace<lj_attr_pairs_vector>("lj_attr_pairs",
+                num_pairs);
 
             auto pair_idx = 0;
             for (int wall_idx = 0; wall_idx < walls.size(); ++wall_idx) {
@@ -52,6 +52,20 @@ namespace xmd {
 
             return pairs_;
         }).to_span();
+
+        walls = vm_inst.find_or<vector<plane>>("lj_attr_walls", [&]() -> auto& {
+            auto& walls_ = vm_inst.emplace<vector<plane>>("lj_attr_walls");
+            for (auto const& plane_node: params["LJ attractive"]["planes"]) {
+                plane p;
+                p.normal = plane_node["normal"].as<vec3r>();
+                p.origin = plane_node["origin"].as<vec3r>();
+                walls_.push_back(p);
+            }
+            return walls_;
+        }).to_span();
+
+        wall_F = vm_inst.find_or_emplace<vec3r_vector>("lj_attr_wall_F",
+            walls.size()).to_array();
     }
 
     void eval_lj_attr_wall_forces::loop(int idx) const {
@@ -81,7 +95,8 @@ namespace xmd {
 
             auto r12_u = r12 * r12_rn;
             auto f = saturation * dV_dr * r12_u;
-            F[part_idx] += saturation * dV_dr * r12_u;
+            F[part_idx] += f;
+            wall_F[wall_idx] -= f;
 
             if (status == FORMING_OR_FORMED && saturation == 1.0f) {
                 if (factor * wall_min_dist * r12_rn < 1.0f) {
@@ -96,14 +111,14 @@ namespace xmd {
     }
 
     void eval_lj_attr_wall_forces::operator()() const {
-        for (int idx = 0; idx < pairs.size(); ++idx) {
+        for (int idx = 0; idx < pairs.size; ++idx) {
             loop(idx);
         }
     }
 
     void eval_lj_attr_wall_forces::omp_async() const {
-#pragma omp for nowait
-        for (int idx = 0; idx < pairs.size(); ++idx) {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < pairs.size; ++idx) {
             loop(idx);
         }
     }

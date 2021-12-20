@@ -2,6 +2,7 @@
 #include <xmd/utils/math.h>
 #include <xmd/types/vector.h>
 #include <xmd/types/scalar.h>
+#include <yaml-cpp/yaml.h>
 
 namespace xmd {
     namespace v3 {
@@ -634,4 +635,12 @@ namespace xmd {
     using vec3tr_array = v3::vec_array<true_real>;
     using vec3tr_span = v3::vec_span<true_real>;
     using vec3tr_vector = v3::vec_vector<true_real>;
+}
+
+namespace YAML {
+    template<>
+    struct convert<xmd::vec3r> {
+        static Node encode(const xmd::vec3r& v);
+        static bool decode(const Node& node, xmd::vec3r& v);
+    };
 }

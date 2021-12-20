@@ -16,6 +16,7 @@
 #include "go.h"
 #include "native_ss.h"
 #include "pauli.h"
-#include "solid_wall.h"
+#include "walls/solid.h"
+#include "walls/lj_attr.h"
 #include "tether.h"
 #include "velocity_afm.h"

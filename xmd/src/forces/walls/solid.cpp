@@ -18,16 +18,27 @@ namespace xmd {
 
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
-        walls = vm_inst.find<vector<plane>>("solid_walls").to_span();
-        wall_F = vm_inst.find_or_emplace<vec3r_vector>("solid_wall_F",
-            walls.size()).to_array();
         V = &vm_inst.find<real>("V");
         num_particles = vm_inst.find<int>("num_particles");
-        box = &vm_inst.find<box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+
+        walls = vm_inst.find_or<vector<plane>>("solid_walls", [&]() -> auto& {
+            auto& walls_ = vm_inst.emplace<vector<plane>>("solid_walls");
+            for (auto const& plane_node: params["solid walls"]["planes"]) {
+                plane p;
+                p.normal = plane_node["normal"].as<vec3r>();
+                p.origin = plane_node["origin"].as<vec3r>();
+                walls_.push_back(p);
+            }
+            return walls_;
+        }).to_span();
+
+        wall_F = vm_inst.find_or_emplace<vec3r_vector>("solid_wall_F",
+            walls.size()).to_array();
     }
 
     void eval_solid_wall_forces::omp_async() const {
-#pragma omp for nowait
+#pragma omp for nowait schedule(dynamic, 512)
         for (int idx = 0; idx < num_particles; ++idx)
             iter(idx);
     }
