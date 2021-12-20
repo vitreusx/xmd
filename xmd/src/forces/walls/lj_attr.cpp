@@ -71,7 +71,7 @@ namespace xmd {
     void eval_lj_attr_wall_forces::loop(int idx) const {
         auto part_idx = pairs.part_idx[idx], wall_idx = pairs.wall_idx[idx];
         auto status = pairs.status[idx];
-        auto r_ = box->warp_to_box(r[part_idx]);
+        auto r_ = box->wrap(r[part_idx]);
         auto wall = walls[wall_idx];
 
         if (status == FREE) {

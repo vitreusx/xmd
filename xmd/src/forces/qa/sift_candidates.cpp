@@ -56,7 +56,7 @@ namespace xmd::qa {
         auto i1 = free_pairs->i1[idx], i2 = free_pairs->i2[idx];
 
         auto r1 = r[i1], r2 = r[i2];
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_rn = norm_inv(r12);
         auto r12_u = r12 * r12_rn;
 

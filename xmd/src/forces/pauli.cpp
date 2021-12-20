@@ -2,6 +2,7 @@
 #include <xmd/utils/units.h>
 #include <xmd/params/param_file.h>
 #include <xmd/forces/primitives/shifted_lj.h>
+#include <iostream>
 
 namespace xmd {
 
@@ -16,9 +17,9 @@ namespace xmd {
             auto i1 = nl->particle_pairs.i1[pair_idx];
             auto i2 = nl->particle_pairs.i2[pair_idx];
             auto r1 = r[i1], r2 = r[i2];
-            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
+            if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
                 int pauli_pair_idx;
-#pragma omp critical
+//#pragma omp critical
                 pauli_pair_idx = pairs->push_back();
                 pairs->i1[pauli_pair_idx] = i1;
                 pairs->i2[pauli_pair_idx] = i2;
@@ -64,8 +65,9 @@ namespace xmd {
 
     void eval_pauli_exclusion_forces::iter(int idx) const {
         auto i1 = pairs.i1[idx], i2 = pairs.i2[idx];
+
         auto r1 = r[i1], r2 = r[i2];
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_rn = norm_inv(r12);
 
         if (1.0f < r12_rn * r_excl) {

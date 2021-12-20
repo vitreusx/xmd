@@ -19,6 +19,7 @@ namespace xmd {
         real total_mass = 0.0;
         for (int idx = 0; idx < num_particles; ++idx) {
             center_of_mass += mass[idx] * r[idx];
+            total_mass += mass[idx];
         }
         center_of_mass /= total_mass;
 

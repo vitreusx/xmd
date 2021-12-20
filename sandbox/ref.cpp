@@ -1,12 +1,9 @@
-#include <fstream>
-#include <iostream>
-#include <xmd/files/pdb.h>
-#include <xmd/files/seq_file.h>
-#include <xmd/model/model.h>
 #include <xmd/utils/units.h>
 #include <xmd/vm/vm.h>
 #include <xmd/model/loader.h>
 #include <xmd/dynamics/reset_vf.h>
+#include <xmd/dynamics/setup_vf_omp.h>
+#include <xmd/dynamics/reduce_vf_omp.h>
 #include <xmd/dynamics/lang_pc.h>
 #include <xmd/forces/all.h>
 #include <xmd/io/show_progress_bar.h>
@@ -18,29 +15,32 @@
 #include <xmd/io/report_structure.h>
 #include <omp.h>
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <fenv.h>
+
 using namespace xmd;
 
 int main() {
+//    omp_set_num_threads(1);
+//    feenableexcept(FE_DIVBYZERO | FE_INVALID);
+
     vm def_vm;
     auto &params = def_vm.emplace<param_file>("params",
         "data/examples/defaults.yml");
+
+    auto& seed = def_vm.find_or_emplace<int>("seed",
+        params["general"]["seed"].as<int>());
+    def_vm.find_or_emplace<xmd::rand_gen>("gen", seed);
+
+    model_loader().init_from_vm(def_vm);
+
+    auto &t = def_vm.find_or_emplace<real>("t", (real) 0.0);
+    def_vm.find_or_emplace<real>("V", (real) 0.0);
     def_vm.find_or_emplace<amino_acid_data>("amino_acid_data",
         params["amino acid data"].as<amino_acid_data>());
     def_vm.find_or_emplace<lj_variants>("lj_variants");
-
-    auto seqfile = seq_file("data/examples/glut/glut.yml");
-    auto model = seqfile.to_model();
-
-    int seed = def_vm.find_or_emplace<int>("seed",
-        params["general"]["seed"].as<int>());
-    std::default_random_engine eng(seed);
-    model.morph_into_saw(eng, 3.8 * angstrom, 1e-3 * atom / pow(angstrom, 3.0),
-        false);
-
-    model_loader(&model).init_from_vm(def_vm);
-    auto &t = def_vm.find_or_emplace<real>("t", (real) 0.0);
-    def_vm.find_or_emplace<real>("V", (real) 0.0);
-    def_vm.find_or_emplace<xmd::rand_gen>("gen", seed);
 
     auto &lang_pc_enabled = def_vm.find_or_emplace<bool>("lang_pc_enabled",
         params["langevin"]["enabled"].as<bool>());
@@ -172,9 +172,34 @@ int main() {
             update_pid_();
     }
 
-#pragma omp parallel
+#pragma omp parallel default(shared) firstprivate(eval_chir_,tethers_,nat_ang_,\
+nat_comp_dih_,eval_pauli_,eval_go_,eval_ss_,eval_const_es_,eval_rel_es_,\
+eval_qa_,eval_solid_,eval_lj_attr_,eval_vel_afm_,eval_force_afm_)
     {
+        auto thread_vm = def_vm;
+        auto& setup_vf_omp_ = thread_vm.emplace<setup_vf_omp>("setup_vf_omp");
+        auto& reduce_vf_omp_ = thread_vm.emplace<reduce_vf_omp>("reduce_vf_omp");
+
+        eval_chir_.init_from_vm(thread_vm);
+        tethers_.init_from_vm(thread_vm);
+        nat_ang_.init_from_vm(thread_vm);
+        nat_comp_dih_.init_from_vm(thread_vm);
+        nat_simp_dih_.init_from_vm(thread_vm);
+        eval_pauli_.init_from_vm(thread_vm);
+        eval_go_.init_from_vm(thread_vm);
+        eval_ss_.init_from_vm(thread_vm);
+        eval_const_es_.init_from_vm(thread_vm);
+        eval_rel_es_.init_from_vm(thread_vm);
+        eval_qa_.init_from_vm(thread_vm);
+        eval_solid_.init_from_vm(thread_vm);
+        eval_lj_attr_.init_from_vm(thread_vm);
+        eval_vel_afm_.init_from_vm(thread_vm);
+        eval_force_afm_.init_from_vm(thread_vm);
+
         while (t < total_time) {
+            reset_vf_.omp_async();
+            setup_vf_omp_();
+
             if (chir_enabled)
                 eval_chir_.omp_async();
             if (tethers_enabled)
@@ -200,6 +225,8 @@ int main() {
                 eval_qa_.sift_candidates_t.omp_async();
                 eval_qa_.process_contacts_t.omp_async();
             }
+            if (pid_enabled)
+                eval_pid_.omp_async();
             if (solid_enabled)
                 eval_solid_.omp_async();
             if (lj_attr_enabled)
@@ -208,6 +235,8 @@ int main() {
                 eval_vel_afm_.omp_async();
             if (force_afm_enabled)
                 eval_force_afm_.omp_async();
+
+            reduce_vf_omp_();
 
 #pragma omp barrier
 
@@ -243,6 +272,8 @@ int main() {
                         update_ss_();
                     if (const_es_enabled)
                         update_const_es_();
+                    if (rel_es_enabled)
+                        update_rel_es_();
                     if (qa_enabled)
                         update_qa_();
                     if (pid_enabled)

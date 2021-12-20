@@ -15,7 +15,7 @@ namespace xmd {
             auto cutoff = lj::cutoff(nat_dist);
 
             auto r1 = r[idx1], r2 = r[idx2];
-            if (norm(box->ray(r1, r2)) < cutoff + nl->orig_pad) {
+            if (norm(box->r_uv(r1, r2)) < cutoff + nl->orig_pad) {
                 int cont_idx;
 #pragma omp critical
                 cont_idx = contacts->push_back();
@@ -98,7 +98,7 @@ namespace xmd {
         auto nat_dist = contacts.nat_dist[idx];
 
         auto r1 = r[i1], r2 = r[i2];
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_rn = norm_inv(r12);
 
         auto r12_u = r12 * r12_rn;
@@ -118,5 +118,5 @@ namespace xmd {
     }
 
     go_contact_vector::go_contact_vector(int n):
-        i1{n}, i2{n}, nat_dist{n} {};
+        i1{n}, i2{n}, nat_dist{n}, size{n} {};
 }

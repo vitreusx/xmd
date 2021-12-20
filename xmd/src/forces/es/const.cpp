@@ -34,7 +34,7 @@ namespace xmd {
         auto q1_q2 = es_pairs.q1_q2[idx];
 
         auto r1 = r[i1], r2 = r[i2];
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
         auto r12_u = r12 * r12_rn;
 

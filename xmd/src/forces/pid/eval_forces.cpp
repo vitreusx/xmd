@@ -69,12 +69,12 @@ namespace xmd::pid {
         auto i2p = bundles.i2p[idx], i2 = bundles.i2[idx], i2n = bundles.i2n[idx];
         auto type = bundles.type[idx];
 
-        auto r1p = r[i1p], r1 = r[i1], r1n = r[i1n];
-        auto r2p = r[i2p], r2 = r[i2], r2n = r[i2n];
+        vec3r r1p = r[i1p], r1 = r[i1], r1n = r[i1n];
+        vec3r r2p = r[i2p], r2 = r[i2], r2n = r[i2n];
 
         {
             auto &r1_ = r1p, &r2_ = r1, &r3_ = r1n, &r4_ = r2;
-            auto r24 = box->ray(r2_, r4_);
+            auto r24 = box->r_uv(r2_, r4_);
             auto r12 = r2_ - r1_;
             auto r23 = r3_ - r2_;
             auto r13 = r3_ - r1_;
@@ -107,7 +107,7 @@ namespace xmd::pid {
 
         {
             auto &r1_ = r2p, &r2_ = r2, &r3_ = r2n, &r4_ = r1;
-            auto r24 = box->ray(r2_, r4_);
+            auto r24 = box->r_uv(r2_, r4_);
             auto r12 = r2_ - r1_;
             auto r23 = r3_ - r2_;
             auto r13 = r3_ - r1_;
@@ -138,7 +138,7 @@ namespace xmd::pid {
             if (dot(rij, rn) < 0.0f) psi2 = -psi2;
         }
 
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
 
         real A = 0.0f, B = 0.0f, C = 0.0f, V_ = 0.0f;

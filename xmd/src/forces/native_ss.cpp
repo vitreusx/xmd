@@ -12,7 +12,7 @@ namespace xmd {
         for (int idx = 0; idx < all_ssobnds->size; ++idx) {
             auto idx1 = all_ssobnds->i1[idx], idx2 = all_ssobnds->i2[idx];
             auto r1 = r[idx1], r2 = r[idx2];
-            if (norm(box->ray(r1, r2)) < cutoff + nl->orig_pad) {
+            if (norm(box->r_uv(r1, r2)) < cutoff + nl->orig_pad) {
                 int cont_idx;
 #pragma omp critical
                 cont_idx = ssbonds->push_back();
@@ -89,7 +89,7 @@ namespace xmd {
     void eval_nat_ssbond_forces::iter(int idx) const {
         auto cys_i1 = ssbonds.i1[idx], cys_i2 = ssbonds.i2[idx];
         auto r1 = r[cys_i1], r2 = r[cys_i2];
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
 
         auto r12_n = norm(r12);
         auto [V_, dV_dr] = harmonic(H1, 0.0f, nat_r)(r12_n);

@@ -15,7 +15,7 @@ namespace xmd::qa {
             auto i2 = nl->particle_pairs.i2[pair_idx];
             auto r1 = r[i1], r2 = r[i2];
 
-            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
+            if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
                 int free_pair_idx;
 #pragma omp critical
                 free_pair_idx = pairs->add();

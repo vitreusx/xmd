@@ -1,6 +1,7 @@
 #include "nl/divide_into_cells.h"
 #include <xmd/params/param_file.h>
 #include <xmd/utils/units.h>
+#include <iostream>
 
 namespace xmd::nl {
 
@@ -12,7 +13,7 @@ namespace xmd::nl {
         auto x_max = min_val, y_max = min_val, z_max = min_val;
 
         for (int idx = 0; idx < num_particles; ++idx) {
-            auto r_ = box->warp_to_box(r[idx]);
+            auto r_ = box->wrap(r[idx]);
             auto x_ = r_.x(), y_ = r_.y(), z_ = r_.z();
             x_min = min(x_min, x_);
             x_max = max(x_max, x_);
@@ -25,22 +26,21 @@ namespace xmd::nl {
         auto pad = pad_factor * *max_cutoff;
         auto req_r = *max_cutoff + pad;
         auto cell_a = req_r, cell_a_inv = 1.0f / cell_a;
-        auto cell_a_eps = 1e-6;
 
         auto x_ext = x_max - x_min;
         auto cell_nx = (int)ceil(x_ext * cell_a_inv);
-        auto cell_ax = x_ext * (1.0f / (real)cell_nx + cell_a_eps);
-        auto cell_ax_inv = 1.0f / cell_ax;
+        if (cell_nx < 1) cell_nx = 1;
+        auto cell_ax = x_ext / (real)cell_nx, cell_ax_inv = (real)1.0 / cell_ax;
 
         auto y_ext = y_max - y_min;
         auto cell_ny = (int)ceil(y_ext * cell_a_inv);
-        auto cell_ay = y_ext * (1.0f / (real)cell_ny + cell_a_eps);
-        auto cell_ay_inv = 1.0f / cell_ay;
+        if (cell_ny < 1) cell_nx = 1;
+        auto cell_ay = y_ext / (real)cell_ny, cell_ay_inv = (real)1.0 / cell_ay;
 
         auto z_ext = z_max - z_min;
         auto cell_nz = (int)ceil(z_ext * cell_a_inv);
-        auto cell_az = z_ext * (1.0f / (real)cell_nz + cell_a_eps);
-        auto cell_az_inv = 1.0f / cell_az;
+        if (cell_nz < 1) cell_nx = 1;
+        auto cell_az = z_ext / (real)cell_nz, cell_az_inv = (real)1.0 / cell_az;
 
         int num_cells = cell_nx * cell_ny * cell_nz;
         data->num_cells = num_cells;
@@ -49,27 +49,36 @@ namespace xmd::nl {
         prepare(data->particles);
         for (int part_idx = 0; part_idx < num_particles; ++part_idx) {
             auto r_ = r[part_idx];
-            auto ix = (int)ceil((r_.x() - x_min) * cell_ax_inv);
-            auto iy = (int)ceil((r_.y() - y_min) * cell_ay_inv);
-            auto iz = (int)ceil((r_.z() - z_min) * cell_az_inv);
+            auto ix = adjust<int>(
+                floor((r_.x() - x_min) * cell_ax_inv),
+                0, cell_nx-1);
+            auto iy = adjust<int>(
+                floor((r_.y() - y_min) * cell_ay_inv),
+                0, cell_ny-1);
+            auto iz = adjust<int>(
+                floor((r_.z() - z_min) * cell_az_inv),
+                0, cell_nz-1);
+
             auto cell_idx = ix + cell_nx * (iy + cell_ny * iz);
             assign(data->particles, part_idx, cell_idx);
         }
         derive_rest(data->particles);
+        data->particles.validate();
 
-        data->native_contacts.reinit(num_cells);
-        prepare(data->native_contacts);
-
-        for (int nat_idx = 0; nat_idx < nat_cont.size; ++nat_idx) {
-            auto i1 = nat_cont.i1[nat_idx];
-            auto cell_idx1 = data->particles.item_cell_idx[i1];
-            assign(data->native_contacts, 2*nat_idx, cell_idx1);
-
-            auto i2 = nat_cont.i2[nat_idx];
-            auto cell_idx2 = data->particles.item_cell_idx[i2];
-            assign(data->native_contacts, 2*nat_idx+1, cell_idx2);
-        }
-        derive_rest(data->native_contacts);
+//        data->native_contacts.reinit(num_cells);
+//        prepare(data->native_contacts);
+//
+//        for (int nat_idx = 0; nat_idx < nat_cont.size; ++nat_idx) {
+//            auto i1 = nat_cont.i1[nat_idx];
+//            auto cell_idx1 = data->particles.item_cell_idx[i1];
+//            assign(data->native_contacts, 2*nat_idx, cell_idx1);
+//
+//            auto i2 = nat_cont.i2[nat_idx];
+//            auto cell_idx2 = data->particles.item_cell_idx[i2];
+//            assign(data->native_contacts, 2*nat_idx+1, cell_idx2);
+//        }
+//        derive_rest(data->native_contacts);
+//        data->native_contacts.validate();
 
         auto x_scan_r = (int)ceil(req_r / cell_ax);
         auto y_scan_r = (int)ceil(req_r / cell_ay);
@@ -105,6 +114,13 @@ namespace xmd::nl {
             }
         }
 
+        for (int pair_idx = 0; pair_idx < data->neighbor_cells.size(); ++pair_idx) {
+            auto cell_idx1 = data->neighbor_cells.cell_idx1[pair_idx];
+            auto cell_idx2 = data->neighbor_cells.cell_idx2[pair_idx];
+            if (!(0 <= cell_idx1 && cell_idx1 < num_cells && 0 <= cell_idx2 && cell_idx2 < num_cells))
+                throw;
+        }
+
         data->particle_pairs.clear();
         for (int cell_pair_idx = 0; cell_pair_idx < data->neighbor_cells.size(); ++cell_pair_idx) {
             auto cell_idx1 = data->neighbor_cells.cell_idx1[cell_pair_idx];
@@ -112,7 +128,7 @@ namespace xmd::nl {
 
             auto [part_beg1, part_end1] = data->particles.range(cell_idx1);
             auto [part_beg2, part_end2] = data->particles.range(cell_idx2);
-            auto [nc_beg, nc_end] = data->native_contacts.range(cell_idx1);
+//            auto [nc_beg, nc_end] = data->native_contacts.range(cell_idx1);
 
             for (int bucket_idx1 = part_beg1; bucket_idx1 < part_end1; ++bucket_idx1) {
                 auto part_idx1 = data->particles.item_index_buckets[bucket_idx1];
@@ -128,26 +144,36 @@ namespace xmd::nl {
                     if (part_idx2 - part_idx1 < 3)
                         continue;
 
-                    if (norm(box->ray(r1, r2)) < req_r) {
+                    if (norm(box->r_uv(r1, r2)) < req_r) {
                         auto pair_idx = data->particle_pairs.push_back();
+                        if (part_idx1 > 1000000 || part_idx2 > 1000000) {
+                            std::cout << part_idx1 << " " << part_idx2 << '\n';
+                        }
                         data->particle_pairs.i1[pair_idx] = part_idx1;
                         data->particle_pairs.i2[pair_idx] = part_idx2;
 
                         bool is_native = false;
-                        for (int nat_bucket_idx = nc_beg; nat_bucket_idx < nc_end; ++nat_bucket_idx) {
-                            auto nat_idx = data->native_contacts.item_index_buckets[nat_bucket_idx];
-                            auto nat_i1 = nat_cont.i1[nat_idx];
-                            auto nat_i2 = nat_cont.i2[nat_idx];
-
-                            if (part_idx1 == nat_i1 && part_idx2 == nat_i2) {
-                                is_native = true;
-                                break;
-                            }
-                        }
+//                        for (int nat_bucket_idx = nc_beg; nat_bucket_idx < nc_end; ++nat_bucket_idx) {
+//                            auto nat_idx = data->native_contacts.item_index_buckets[nat_bucket_idx];
+//                            auto nat_i1 = nat_cont.i1[nat_idx];
+//                            auto nat_i2 = nat_cont.i2[nat_idx];
+//
+//                            if (part_idx1 == nat_i1 && part_idx2 == nat_i2) {
+//                                is_native = true;
+//                                break;
+//                            }
+//                        }
                         data->particle_pairs.is_native[pair_idx] = is_native;
                     }
                 }
             }
+        }
+
+        for (int pair_idx = 0; pair_idx < data->particle_pairs.size; ++pair_idx) {
+            auto i1 = data->particle_pairs.i1[pair_idx];
+            auto i2 = data->particle_pairs.i2[pair_idx];
+            if (!(0 <= i1 && i1 < num_particles && 0 <= i2 && i2 < num_particles))
+                throw;
         }
 
         data->orig_pad = pad;

@@ -3,16 +3,15 @@
 #include <xmd/vm/vm.h>
 
 namespace xmd {
-    class reset_vf: public vm_aware {
+    class reduce_vf_omp: public vm_aware {
     public:
-        vec3r_array F;
-        real *V;
+        vec3r_array shared_F, thread_F;
+        real *shared_V, *thread_V;
         int num_particles;
 
         void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
-        void omp_async() const;
     };
 }

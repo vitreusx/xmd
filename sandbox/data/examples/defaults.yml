@@ -5,6 +5,13 @@ general:
 amino acid data:
   from file: ./amino-acids.yml
 
+model:
+  seqfile: ./data/examples/glut/glut.yml
+  morph into SAW:
+    bond distance: 3.8 A
+    residue density: 1e-3 atom/A**3
+    infer box: false
+
 langevin:
   enabled: true
   gamma factor: 2.0 1/tau
@@ -123,7 +130,7 @@ export pdb:
 progress bar:
   enabled: true
   width: 50
-  update period: 5 tau
+  update period: 10 tau
 
 report stats:
   enabled: true

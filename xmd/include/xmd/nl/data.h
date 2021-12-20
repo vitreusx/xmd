@@ -16,6 +16,7 @@ namespace xmd::nl {
 
         explicit spatial_data(int num_items = 0);
         void reinit(int num_cells);
+        void validate() const;
 
         inline std::pair<int, int> range(int cell_idx) const {
             auto beg = cell_bucket_begin[cell_idx];

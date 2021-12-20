@@ -24,6 +24,7 @@ namespace xmd {
 
             for (residue*& res: xmd_chain->residues) {
                 res = res_map[res];
+                res->parent = xmd_chain.get();
             }
         }
 

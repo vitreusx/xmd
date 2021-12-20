@@ -66,7 +66,7 @@ namespace xmd {
 
         t = &vm_inst.find<real>("t");
         V = &vm_inst.find<real>("V");
-        first_time = &vm_inst.emplace<bool>("first_time", true);
+        first_time = &vm_inst.emplace<bool>("pbar_first_time", true);
         start_wall_time = &vm_inst.emplace<time_point_t>("start_wall_time");
         start_t = &vm_inst.emplace<real>("pbar_start_t");
         last_t = &vm_inst.emplace<real>("pbar_last_t");

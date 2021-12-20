@@ -143,7 +143,7 @@ namespace xmd {
 
         template<typename E>
         auto norm_squared(v3::expr<E> const& e) {
-            return dot(e, e);
+            return e.x() * e.x() + e.y() * e.y() + e.z() * e.z();
         }
 
         template<typename E>
@@ -387,102 +387,147 @@ namespace xmd {
 
             template<typename E>
             __attribute__((always_inline))
-            void _assign_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
-                U* __restrict__ zptr, expr<E> const& e) const {
-
-                *xptr = e.x();
-                *yptr = e.y();
-                *zptr = e.z();
-            }
-
-            template<typename E>
-            __attribute__((always_inline))
             auto& operator=(expr<E> const& e) const {
-                _assign_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
+                x_[idx] = e.x();
+                y_[idx] = e.y();
+                z_[idx] = e.z();
                 return *this;
             }
 
             __attribute__((always_inline))
             auto& operator=(at_expr<U> const& e) const {
-                _assign_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
+                x_[idx] = e.x();
+                y_[idx] = e.y();
+                z_[idx] = e.z();
                 return *this;
-            }
-
-            template<typename E>
-            __attribute__((always_inline))
-            void _add_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
-                U* __restrict__ zptr, expr<E> const& e) const {
-
-//#pragma omp atomic update
-                *xptr += e.x();
-//#pragma omp atomic update
-                *yptr += e.y();
-//#pragma omp atomic update
-                *zptr += e.z();
             }
 
             template<typename E>
             __attribute__((always_inline))
             auto& operator+=(expr<E> const& e) const {
-                _add_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
+                x_[idx] += e.x();
+                y_[idx] += e.y();
+                z_[idx] += e.z();
                 return *this;
-            }
-
-            template<typename E>
-            __attribute__((always_inline))
-            void _sub_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
-                U* __restrict__ zptr, expr<E> const& e) const {
-
-//#pragma omp atomic update
-                *xptr -= e.x();
-//#pragma omp atomic update
-                *yptr -= e.y();
-//#pragma omp atomic update
-                *zptr -= e.z();
             }
 
             template<typename E>
             __attribute__((always_inline))
             auto& operator-=(expr<E> const& e) const {
-                _sub_op_internal(x_ + idx, y_ + idx, z_ + idx, e);
+                x_[idx] -= e.x();
+                y_[idx] -= e.y();
+                z_[idx] -= e.z();
                 return *this;
-            }
-
-            template<typename S>
-            __attribute__((always_inline))
-            void _scalar_mul_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
-                U* __restrict__ zptr, S const& s) const {
-
-//#pragma omp atomic update
-                *xptr *= s;
-//#pragma omp atomic update
-                *yptr *= s;
-//#pragma omp atomic update
-                *zptr *= s;
             }
 
             template<typename S>
             __attribute__((always_inline)) auto& operator*=(S const& s) const {
-                _scalar_mul_op_internal(x_ + idx, y_ + idx, z_ + idx, s);
+                x_[idx] *= s;
+                y_[idx] *= s;
+                z_[idx] *= s;
                 return *this;
             }
 
             template<typename S>
-            __attribute__((always_inline))
-            void _scalar_div_op_internal(U* __restrict__ xptr, U* __restrict__ yptr,
-                U* __restrict__ zptr, S const& s) const {
+            __attribute__((always_inline)) auto& operator/=(S const& s) const {
+                x_[idx] /= s;
+                y_[idx] /= s;
+                z_[idx] /= s;
+                return *this;
+            }
 
-//#pragma omp atomic update
-                *xptr /= s;
-//#pragma omp atomic update
-                *yptr /= s;
-//#pragma omp atomic update
-                *zptr /= s;
+        private:
+            U *x_, *y_, *z_;
+            int idx;
+        };
+
+        template<typename U>
+        class atomic_at_expr: public expr<at_expr<U>> {
+        public:
+            atomic_at_expr(U* x, U* y, U* z, int idx):
+                x_{x}, y_{y}, z_{z}, idx{idx} {};
+
+            atomic_at_expr(at_expr<U> const& other):
+                x_{other.x_}, y_{other.y_}, z_{other.z_}, idx{other.idx} {};
+
+            __attribute__((always_inline)) auto& x() const {
+                return x_[idx];
+            }
+
+            __attribute__((always_inline)) auto& y() const {
+                return y_[idx];
+            }
+
+            __attribute__((always_inline)) auto& z() const {
+                return z_[idx];
+            }
+
+            template<typename E>
+            __attribute__((always_inline))
+            auto& operator=(expr<E> const& e) const {
+#pragma omp atomic write
+                x_[idx] = e.x();
+#pragma omp atomic write
+                y_[idx] = e.y();
+#pragma omp atomic write
+                z_[idx] = e.z();
+                return *this;
+            }
+
+            __attribute__((always_inline))
+            auto& operator=(atomic_at_expr<U> const& e) const {
+#pragma omp atomic write
+                x_[idx] = e.x();
+#pragma omp atomic write
+                y_[idx] = e.y();
+#pragma omp atomic write
+                z_[idx] = e.z();
+                return *this;
+            }
+
+            template<typename E>
+            __attribute__((always_inline))
+            auto& operator+=(expr<E> const& e) const {
+#pragma omp atomic update
+                x_[idx] += e.x();
+#pragma omp atomic update
+                y_[idx] += e.y();
+#pragma omp atomic update
+                z_[idx] += e.z();
+                return *this;
+            }
+
+            template<typename E>
+            __attribute__((always_inline))
+            auto& operator-=(expr<E> const& e) const {
+#pragma omp atomic update
+                x_[idx] -= e.x();
+#pragma omp atomic update
+                y_[idx] -= e.y();
+#pragma omp atomic update
+                z_[idx] -= e.z();
+                return *this;
+            }
+
+            template<typename S>
+            __attribute__((always_inline)) auto& operator*=(S const& s) const {
+#pragma omp atomic update
+                x_[idx] *= s;
+#pragma omp atomic update
+                y_[idx] *= s;
+#pragma omp atomic update
+                z_[idx] *= s;
+                return *this;
             }
 
             template<typename S>
             __attribute__((always_inline)) auto& operator/=(S const& s) const {
-                _scalar_div_op_internal(x_ + idx, y_ + idx, z_ + idx, s);
+#pragma omp atomic update
+                x_[idx] /= s;
+#pragma omp atomic update
+                y_[idx] /= s;
+#pragma omp atomic update
+                z_[idx] /= s;
                 return *this;
             }
 
@@ -527,6 +572,10 @@ namespace xmd {
                 return at_expr<U>(x, y, z, idx);
             }
 
+            auto atomic_at(int const& idx) const {
+                return atomic_at_expr<U>(x, y, z, idx);
+            }
+
             U *x, *y, *z;
         };
 
@@ -540,6 +589,10 @@ namespace xmd {
 
             auto operator[](int const& idx) const {
                 return at_expr<U>(x, y, z, idx);
+            }
+
+            auto atomic_at(int const& idx) const {
+                return atomic_at_expr<U>(x, y, z, idx);
             }
 
             int size() const {
@@ -600,6 +653,10 @@ namespace xmd {
 
             auto operator[](int const& idx) {
                 return at_expr<U>(x.data(), y.data(), z.data(), idx);
+            }
+
+            auto atomic_at(int const& idx) {
+                return atomic_at_expr<U>(x.data(), y.data(), z.data(), idx);
             }
 
             auto operator[](int const& idx) const {

@@ -14,7 +14,7 @@ namespace xmd {
             auto idx2 = nl->particle_pairs.i2[pair_idx];
             auto r1 = r[idx1], r2 = r[idx2];
 
-            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
+            if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
                 auto q1_q2 = q[(short)atype[idx1]] * q[(short)atype[idx2]];
                 if (q1_q2 != 0.0) {
                     int es_pair_idx;

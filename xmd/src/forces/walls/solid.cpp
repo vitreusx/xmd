@@ -44,7 +44,7 @@ namespace xmd {
     }
 
     void eval_solid_wall_forces::iter(int idx) const {
-        auto part_r = box->warp_to_box(r[idx]);
+        auto part_r = box->wrap(r[idx]);
         for (int wall_idx = 0; wall_idx < walls.size(); ++wall_idx) {
             auto wall = walls[wall_idx];
             auto x = signed_dist(part_r, wall);

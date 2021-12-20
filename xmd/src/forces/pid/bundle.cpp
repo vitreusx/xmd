@@ -14,7 +14,7 @@ namespace xmd::pid {
             auto idx2 = nl->particle_pairs.i2[pair_idx];
             auto r1 = r[idx1], r2 = r[idx2];
 
-            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
+            if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
                 auto prev1 = prev[idx1], next1 = next[idx1];
                 auto prev2 = prev[idx2], next2 = next[idx2];
                 if (prev1 < 0 || next1 < 0 || prev2 < 0 || next2 < 0)
