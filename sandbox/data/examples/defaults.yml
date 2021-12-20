@@ -66,7 +66,8 @@ lj force variants:
         from file: ./ss-pairs.csv
 
 pseudo-improper dihedral:
-  lambda func version: cosine
+  enabled: false
+  lambda version: cosine
   bb+:
     alpha: 6.4 1/rad
     psi_0: 1.05 rad
@@ -82,6 +83,7 @@ pseudo-improper dihedral:
     psi_0: -0.23 rad
 
 quasi-adiabatic:
+  enabled: true
   (de)saturation time: 10 tau
   breaking factor: 1.5
   min |cos(h, r)|: 0.92
@@ -89,56 +91,69 @@ quasi-adiabatic:
   max cos(n, r): 0.5
 
 chirality:
+  enabled: false
   e_chi: 1 eps
 
 native contacts:
+  enabled: true
   lj depth: 1 eps
   active threshold factor: 1.5
 
 native ssbonds:
+  enabled: true
   H1: 100 eps/A**2
   equilibrium dist: 6.0 A
 
 Pauli exclusion:
+  enabled: true
   r_excl: 4.0 A
   depth: 1.0 eps
 
 tether forces:
+  enabled: true
   H1: 100 eps/A**2
   H2: 0 eps/A**2
   def_length: 3.8 A
 
 export pdb:
+  enabled: true
   path: "output.pdb"
-  exec period: 10 tau
+  exec period: 50 tau
 
 progress bar:
+  enabled: true
   width: 50
-  update period: 10 tau
+  update period: 5 tau
 
 report stats:
+  enabled: true
   path: "output.csv"
   exec period: 10 tau
 
 report structure:
+  enabled: true
   path format: "structure/%.3f.yml"
   exec period: 50 tau
 
 solid walls:
+  enabled: false
   depth: 1 eps
   cutoff: 5.0 A
   planes: []
 
 LJ attractive walls:
+  enabled: false
   wall min dist: 5.0 A
   breaking factor: 1.5
   cycle time: 10 tau
   planes: []
 
 velocity AFM:
+  enabled: false
   H1: 0.06 eps/A**2
   H2: 0 eps/A**2
   AFM tips: []
 
 force AFM:
+  enabled: false
   AFM tips: []

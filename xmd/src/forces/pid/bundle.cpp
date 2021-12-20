@@ -17,6 +17,9 @@ namespace xmd::pid {
             if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
                 auto prev1 = prev[idx1], next1 = next[idx1];
                 auto prev2 = prev[idx2], next2 = next[idx2];
+                if (prev1 < 0 || next1 < 0 || prev2 < 0 || next2 < 0)
+                    continue;
+
                 auto atype1 = atype[idx1], atype2 = atype[idx2];
 
                 int bundle_idx;

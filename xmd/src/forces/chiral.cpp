@@ -27,15 +27,15 @@ namespace xmd {
                     xmd::model::residue*, int>;
                 auto& res_map = vm_inst.find<res_map_t>("res_map");
 
-                auto& quads_vec = vm_inst.emplace<chiral_quad_vector>(
+                auto& quads_ = vm_inst.emplace<chiral_quad_vector>(
                     "chiral_quads", xmd_model.dihedrals.size());
 
                 auto quads_idx = 0;
                 for (auto const& dihedral: xmd_model.dihedrals) {
-                    quads.i1[quads_idx] = res_map[dihedral.res1];
-                    quads.i2[quads_idx] = res_map[dihedral.res2];
-                    quads.i3[quads_idx] = res_map[dihedral.res3];
-                    quads.i4[quads_idx] = res_map[dihedral.res4];
+                    quads_.i1[quads_idx] = res_map[dihedral.res1];
+                    quads_.i2[quads_idx] = res_map[dihedral.res2];
+                    quads_.i3[quads_idx] = res_map[dihedral.res3];
+                    quads_.i4[quads_idx] = res_map[dihedral.res4];
 
                     auto const& cast_vec = [](Eigen::Vector3d const& v) -> vec3r {
                         return { (real)v.x(), (real)v.y(), (real)v.z() };
@@ -52,13 +52,13 @@ namespace xmd {
                     auto nat_factor = ipow<3>(norm_inv(nat_r23));
                     auto nat_chir = dot(nat_r12, cross(nat_r23, nat_r34)) * nat_factor;
 
-                    quads.nat_factor[quads_idx] = nat_factor;
-                    quads.nat_chir[quads_idx] = nat_chir;
+                    quads_.nat_factor[quads_idx] = nat_factor;
+                    quads_.nat_chir[quads_idx] = nat_chir;
 
                     ++quads_idx;
                 }
 
-                return quads_vec;
+                return quads_;
             }).to_span();
     }
 
