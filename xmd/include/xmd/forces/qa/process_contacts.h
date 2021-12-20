@@ -7,8 +7,6 @@
 #include <xmd/vm/vm.h>
 #include <xmd/forces/primitives/lj_variants.h>
 #include "free_pair.h"
-#include <taskflow/taskflow.hpp>
-#include <mutex>
 
 namespace xmd::qa {
     class process_contacts: public vm_aware {
@@ -24,13 +22,12 @@ namespace xmd::qa {
         real *V, *t;
         sync_data_array sync;
         free_pair_set *free_pairs;
-        std::mutex *mut;
 
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        void loop_iter(int idx) const;
+        void iter(int idx) const;
         void operator()() const;
-        tf::Task tf_impl(tf::Taskflow& taskflow) const;
+        void omp_async() const;
     };
 }

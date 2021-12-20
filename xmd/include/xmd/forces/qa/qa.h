@@ -4,7 +4,6 @@
 #include "process_candidates.h"
 #include "process_contacts.h"
 #include <xmd/vm/vm.h>
-#include <taskflow/taskflow.hpp>
 
 namespace xmd::qa {
     class eval_qa_forces: public vm_aware {
@@ -20,19 +19,14 @@ namespace xmd::qa {
         void operator()() const;
     };
 
-    class eval_qa_forces_tf: public vm_aware {
+    class update_qa: public vm_aware {
     public:
-        precompute_nh precompute_nh_t;
-        sift_candidates_tf sift_candidates_tf_t;
-        process_candidates process_candidates_t;
-        process_contacts process_contacts_t;
-
-        tf::Task precomp_nh_t, sift_cand_t, process_cand_t, process_cont_t;
-        tf::Taskflow module;
+        update_free_pairs update_free_pairs_;
+        eval_qa_forces *eval;
 
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        tf::Task tf_impl(tf::Taskflow& taskflow);
+        void operator()() const;
     };
 }

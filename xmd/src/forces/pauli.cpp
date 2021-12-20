@@ -2,6 +2,7 @@
 #include <xmd/utils/units.h>
 #include <xmd/params/param_file.h>
 #include <xmd/forces/primitives/shifted_lj.h>
+#include <iostream>
 
 namespace xmd {
 
@@ -11,16 +12,21 @@ namespace xmd {
         auto cutoff = r_excl;
         auto min_norm_inv = (real)1.0 / (cutoff + nl->orig_pad);
 
+//#pragma omp taskloop default(none) private(cutoff,min_norm_inv) nogroup
         for (int pair_idx = 0; pair_idx < nl->particle_pairs.size; ++pair_idx) {
             auto i1 = nl->particle_pairs.i1[pair_idx];
             auto i2 = nl->particle_pairs.i2[pair_idx];
             auto r1 = r[i1], r2 = r[i2];
-            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
-                int pauli_pair_idx = pairs->push_back();
+            if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
+                int pauli_pair_idx;
+//#pragma omp critical
+                pauli_pair_idx = pairs->push_back();
                 pairs->i1[pauli_pair_idx] = i1;
                 pairs->i2[pauli_pair_idx] = i2;
             }
         }
+
+        eval->pairs = pairs->to_span();
     }
 
     void update_pauli_pairs::init_from_vm(vm &vm_inst) {
@@ -32,11 +38,14 @@ namespace xmd {
         auto& max_cutoff = vm_inst.find<real>("max_cutoff");
         r_excl = vm_inst.find<real>("pauli_r_excl");
         max_cutoff = max(max_cutoff, r_excl);
+
+        eval = &vm_inst.find<eval_pauli_exclusion_forces>("eval_pauli");
     }
 
     void eval_pauli_exclusion_forces::operator()() const {
-        for (int idx = 0; idx < pairs.size; ++idx)
-            loop_iter(idx);
+        for (int idx = 0; idx < pairs.size; ++idx) {
+            iter(idx);
+        }
     }
 
     void eval_pauli_exclusion_forces::init_from_vm(vm &vm_inst) {
@@ -54,26 +63,29 @@ namespace xmd {
             "pauli_pairs").to_span();
     }
 
-    void eval_pauli_exclusion_forces::loop_iter(int idx) const {
+    void eval_pauli_exclusion_forces::iter(int idx) const {
         auto i1 = pairs.i1[idx], i2 = pairs.i2[idx];
+
         auto r1 = r[i1], r2 = r[i2];
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_rn = norm_inv(r12);
 
         if (1.0f < r12_rn * r_excl) {
             auto r12_u = r12 * r12_rn;
             auto [V_, dV_dr] = shifted_lj(depth, r_excl)(r12_rn);
 
+//#pragma omp atomic update
             *V += V_;
             F[i1] += r12_u * dV_dr;
             F[i2] -= r12_u * dV_dr;
         }
     }
 
-    tf::Task
-    eval_pauli_exclusion_forces::tf_impl(tf::Taskflow &taskflow) const {
-        return taskflow.for_each_index(0, std::ref(pairs.size), 1,
-            [this](auto idx) -> void { loop_iter(idx); });
+    void eval_pauli_exclusion_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < pairs.size; ++idx) {
+            iter(idx);
+        }
     }
 
     int pauli_pair_vector::push_back()  {

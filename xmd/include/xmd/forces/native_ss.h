@@ -6,7 +6,6 @@
 #include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/vm/vm.h>
-#include <taskflow/taskflow.hpp>
 
 namespace xmd {
     struct nat_ssbond_span {
@@ -25,22 +24,6 @@ namespace xmd {
         nat_ssbond_span to_span();
     };
 
-    class update_nat_ssbonds: public vm_aware {
-    public:
-        real cutoff;
-
-    public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        nat_ssbond_vector *all_ssobnds, *ssbonds;
-
-        void init_from_vm(vm& vm_inst) override;
-
-    public:
-        void operator()() const;
-    };
-
     class eval_nat_ssbond_forces: public vm_aware {
     public:
         real H1, nat_r;
@@ -54,8 +37,25 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        void loop_iter(int idx) const;
+        void iter(int idx) const;
         void operator()() const;
-        tf::Task tf_impl(tf::Taskflow& taskflow) const;
+        void omp_async() const;
+    };
+
+    class update_nat_ssbonds: public vm_aware {
+    public:
+        real cutoff;
+
+    public:
+        vec3r_array r;
+        box<vec3r> *box;
+        nl::nl_data *nl;
+        nat_ssbond_vector *all_ssobnds, *ssbonds;
+        eval_nat_ssbond_forces *eval;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
     };
 }

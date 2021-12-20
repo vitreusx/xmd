@@ -5,8 +5,9 @@
 namespace xmd {
 
     void eval_cnd_forces::operator()() const {
-        for (int idx = 0; idx < dihedrals.size; ++idx)
-            loop_iter(idx);
+        for (int idx = 0; idx < dihedrals.size; ++idx) {
+            iter(idx);
+        }
     }
 
     void eval_cnd_forces::init_from_vm(vm &vm_inst) {
@@ -19,7 +20,7 @@ namespace xmd {
         eval_native_dihedral_forces_base::init_from_vm(vm_inst);
     }
 
-    void eval_cnd_forces::loop_iter(int idx) const {
+    void eval_cnd_forces::iter(int idx) const {
         auto i1 = dihedrals.i1[idx], i2 = dihedrals.i2[idx],
             i3 = dihedrals.i3[idx], i4 = dihedrals.i4[idx];
         auto nat_phi = dihedrals.nat_phi[idx];
@@ -39,6 +40,7 @@ namespace xmd {
         auto sin_diff = sin(diff), cos_diff = cos(diff);
         auto sin_3diff = sin(3.0f*diff), cos_3diff = cos(3.0f*diff);
 
+//#pragma omp atomic update
         *V += CDA * (1.0f - cos_diff) + CDB * (1.0f - cos_3diff);
         auto dV_dphi = CDA * sin_diff + CDB * 3.0f * sin_3diff;
 
@@ -56,8 +58,10 @@ namespace xmd {
         F[i4] -= dV_dphi * dphi_dr4;
     }
 
-    tf::Task eval_cnd_forces::tf_impl(tf::Taskflow &taskflow) const {
-        return taskflow.for_each_index(0, dihedrals.size, 1,
-            [this](auto idx) -> void { loop_iter(idx); });
+    void eval_cnd_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < dihedrals.size; ++idx) {
+            iter(idx);
+        }
     }
 }

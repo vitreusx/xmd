@@ -8,9 +8,6 @@ namespace xmd {
 
     class model_loader: public vm_aware {
     public:
-        model* xmd_model;
-        explicit model_loader(model* xmd_model);
-
         void init_from_vm(vm& vm_inst) override;
     };
 }

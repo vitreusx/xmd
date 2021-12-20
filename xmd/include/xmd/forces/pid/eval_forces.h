@@ -5,7 +5,6 @@
 #include <xmd/forces/primitives/sink_lj.h>
 #include <xmd/vm/vm.h>
 #include <xmd/forces/primitives/lj_variants.h>
-#include <taskflow/taskflow.hpp>
 
 namespace xmd::pid {
     class eval_pid_forces: public vm_aware {
@@ -25,8 +24,8 @@ namespace xmd::pid {
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        void loop_iter(int idx) const;
-        void operator()() const;
-        tf::Task tf_impl(tf::Taskflow& taskflow) const;
+        void iter(int idx) const;
+        void operator()();
+        void omp_async() const;
     };
 }

@@ -6,8 +6,16 @@
 
 namespace xmd {
     void eval_tether_forces::operator()() const {
-        for (int idx = 0; idx < tethers.size; ++idx)
-            loop_iter(idx);
+        for (int idx = 0; idx < tethers.size; ++idx) {
+            iter(idx);
+        }
+    }
+
+    void eval_tether_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < tethers.size; ++idx) {
+            iter(idx);
+        }
     }
 
     void eval_tether_forces::init_from_vm(vm &vm_inst) {
@@ -43,19 +51,7 @@ namespace xmd {
             }).to_span();
     }
 
-    tether_pair_vector::tether_pair_vector(int n):
-        i1{n}, i2{n}, nat_dist{n}, size{n} {}
-
-    tether_pair_span tether_pair_vector::to_span() {
-        tether_pair_span span;
-        span.i1 = i1.to_array();
-        span.i2 = i2.to_array();
-        span.nat_dist = nat_dist.to_array();
-        span.size = size;
-        return span;
-    }
-
-    void eval_tether_forces::loop_iter(int idx) const {
+    void eval_tether_forces::iter(int idx) const {
         auto i1 = tethers.i1[idx], i2 = tethers.i2[idx];
         auto nat_dist = tethers.nat_dist[idx];
 
@@ -71,8 +67,15 @@ namespace xmd {
         F[i2] -= dV_dr * r12_u;
     }
 
-    tf::Task eval_tether_forces::tf_impl(tf::Taskflow &taskflow) const {
-        return taskflow.for_each_index(0, tethers.size, 1,
-            [this](auto idx) -> void { loop_iter(idx); });
+    tether_pair_vector::tether_pair_vector(int n):
+        i1{n}, i2{n}, nat_dist{n}, size{n} {}
+
+    tether_pair_span tether_pair_vector::to_span() {
+        tether_pair_span span;
+        span.i1 = i1.to_array();
+        span.i2 = i2.to_array();
+        span.nat_dist = nat_dist.to_array();
+        span.size = size;
+        return span;
     }
 }

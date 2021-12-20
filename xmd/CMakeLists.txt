@@ -28,21 +28,17 @@ target_include_directories(${TARGET_NAME}
 
 target_compile_options(${TARGET_NAME}
     PRIVATE
-    $<$<CONFIG:Debug>:$<$<COMPILE_LANGUAGE:CXX>:-O2>>
-    $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-Ofast;-march=native>>
-    $<$<COMPILE_LANGUAGE:CXX>:-g;-Wall;-Wextra;-Wpedantic>)
+    $<$<CONFIG:Debug>:$<$<COMPILE_LANGUAGE:CXX>:-g>>
+    $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-g;-O2;-march=native>>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(OpenMP REQUIRED)
 add_subdirectory(ext/cparse)
 
-set(TF_BUILD_TESTS off)
-set(TF_BUILD_EXAMPLES off)
-set(TF_BUILD_BENCHMARKS off)
-add_subdirectory(ext/taskflow)
-
 target_link_libraries(${TARGET_NAME}
-    PUBLIC Eigen3::Eigen yaml-cpp cparse Taskflow)
+    PUBLIC Eigen3::Eigen yaml-cpp cparse OpenMP::OpenMP_CXX)
 
 add_custom_command(
     TARGET ${TARGET_NAME}

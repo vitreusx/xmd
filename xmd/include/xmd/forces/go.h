@@ -7,7 +7,6 @@
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/nl/data.h>
 #include <xmd/vm/vm.h>
-#include <taskflow/taskflow.hpp>
 
 namespace xmd {
     struct go_contact_span {
@@ -47,19 +46,6 @@ namespace xmd {
         }
     };
 
-    class update_go_contacts: public vm_aware {
-    public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        go_contact_vector *all_contacts, *contacts;
-
-        void init_from_vm(vm& vm_inst) override;
-
-    public:
-        void operator()() const;
-    };
-
     class eval_go_forces: public vm_aware {
     public:
         real depth;
@@ -73,8 +59,22 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        void loop_iter(int idx) const;
+        void iter(int idx) const;
         void operator()() const;
-        tf::Task tf_impl(tf::Taskflow& taskflow) const;
+        void omp_async() const;
+    };
+
+    class update_go_contacts: public vm_aware {
+    public:
+        vec3r_array r;
+        box<vec3r> *box;
+        nl::nl_data *nl;
+        go_contact_vector *all_contacts, *contacts;
+        eval_go_forces *eval;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
     };
 }

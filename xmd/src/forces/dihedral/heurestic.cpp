@@ -22,8 +22,9 @@ namespace xmd {
         val{val} {};
 
     void eval_heurestic_dihedral_forces::operator()() const {
-        for (int idx = 0; idx < dihedrals.size; ++idx)
-            loop_iter(idx);
+        for (int idx = 0; idx < dihedrals.size; ++idx) {
+            iter(idx);
+        }
     }
 
     void eval_heurestic_dihedral_forces::init_from_vm(vm &vm_inst) {
@@ -98,13 +99,7 @@ namespace xmd {
             }).to_span();
     }
 
-    tf::Task
-    eval_heurestic_dihedral_forces::tf_impl(tf::Taskflow &taskflow) const {
-        return taskflow.for_each_index(0, dihedrals.size, 1,
-            [this](int idx) -> void { loop_iter(idx); });
-    }
-
-    void eval_heurestic_dihedral_forces::loop_iter(int idx) const {
+    void eval_heurestic_dihedral_forces::iter(int idx) const {
         auto i1 = dihedrals.i1[idx], i2 = dihedrals.i2[idx],
             i3 = dihedrals.i3[idx], i4 = dihedrals.i4[idx];
         auto type_val = (int8_t)dihedrals.type[idx];
@@ -124,6 +119,7 @@ namespace xmd {
         auto sin2_phi = sin_phi*sin_phi, cos2_phi = cos_phi*cos_phi,
             sin_phi_cos_phi = sin_phi*cos_phi;
 
+//#pragma omp atomic update
         *V += coeffs[0][type_val] + coeffs[1][type_val]*sin_phi +
               coeffs[2][type_val]*cos_phi + coeffs[3][type_val]*sin2_phi +
               coeffs[4][type_val]*cos2_phi + coeffs[5][type_val]*sin_phi_cos_phi;
@@ -144,6 +140,13 @@ namespace xmd {
         F[i3] -= dV_dphi * dphi_dr3;
         F[i4] -= dV_dphi * dphi_dr4;
 
+    }
+
+    void eval_heurestic_dihedral_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < dihedrals.size; ++idx) {
+            iter(idx);
+        }
     }
 
     heurestic_dihedral_span heurestic_dihedral_vector::to_span() {

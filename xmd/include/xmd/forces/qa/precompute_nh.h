@@ -2,7 +2,6 @@
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include <xmd/vm/vm.h>
-#include <taskflow/taskflow.hpp>
 
 namespace xmd::qa {
     struct nh_bundle_span {
@@ -28,8 +27,8 @@ namespace xmd::qa {
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        void loop_iter(int idx) const;
+        void iter(int idx) const;
         void operator()() const;
-        tf::Task tf_impl(tf::Taskflow& taskflow) const;
+        void omp_async() const;
     };
 }

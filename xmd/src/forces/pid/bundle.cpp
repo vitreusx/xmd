@@ -8,16 +8,24 @@ namespace xmd::pid {
 
         auto min_norm_inv = (real)1.0 / (cutoff + nl->orig_pad);
 
+//#pragma omp taskloop default(none) private(min_norm_inv) nogroup
         for (int pair_idx = 0; pair_idx < nl->particle_pairs.size; ++pair_idx) {
             auto idx1 = nl->particle_pairs.i1[pair_idx];
             auto idx2 = nl->particle_pairs.i2[pair_idx];
             auto r1 = r[idx1], r2 = r[idx2];
-            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
+
+            if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
                 auto prev1 = prev[idx1], next1 = next[idx1];
                 auto prev2 = prev[idx2], next2 = next[idx2];
+                if (prev1 < 0 || next1 < 0 || prev2 < 0 || next2 < 0)
+                    continue;
+
                 auto atype1 = atype[idx1], atype2 = atype[idx2];
 
-                int bundle_idx = bundles->push_back();
+                int bundle_idx;
+#pragma omp critical
+                bundle_idx = bundles->push_back();
+
                 bundles->i1p[bundle_idx] = prev1;
                 bundles->i1[bundle_idx] = idx1;
                 bundles->i1n[bundle_idx] = next1;

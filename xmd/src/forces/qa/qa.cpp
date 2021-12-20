@@ -2,13 +2,11 @@
 
 namespace xmd::qa {
     void eval_qa_forces::init_from_vm(vm &vm_inst) {
-        precompute_nh_t.init_from_vm(vm_inst);
+        vm_inst.find_or_emplace<free_pair_set>("qa_free_pairs");
+        vm_inst.find_or_emplace<candidate_list>("qa_candidates");
+        vm_inst.find_or_emplace<contact_set>("qa_contacts");
 
-        auto& free_pairs = vm_inst.find_or_emplace<free_pair_set>("qa_free_pairs");
-        auto& candidates = vm_inst.find_or_emplace<candidate_list>("qa_candidates");
-        auto& contacts = vm_inst.find_or_emplace<contact_set>("qa_contacts");
-
-        auto sync = vm_inst.find_or<sync_data_vector>("sync", [&]() -> auto& {
+        vm_inst.find_or<sync_data_vector>("sync", [&]() -> auto& {
             auto num_particles = vm_inst.find<int>("num_particles");
             auto& sync_vec_ = vm_inst.emplace<sync_data_vector>("sync",
                 num_particles);
@@ -26,42 +24,34 @@ namespace xmd::qa {
             }
 
             return sync_vec_;
-        }).to_array();
-        auto& t = vm_inst.find<real>("t");
-        auto& box = vm_inst.find<xmd::box<vec3r>>("box");
-        auto r = vm_inst.find<vec3r_vector>("r").to_array();
+        });
 
+        precompute_nh_t.init_from_vm(vm_inst);
         sift_candidates_t.init_from_vm(vm_inst);
-        sift_candidates_t.candidates = &candidates;
-        sift_candidates_t.atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
-        sift_candidates_t.box = &box;
-        sift_candidates_t.r = r;
-        sift_candidates_t.free_pairs = &free_pairs;
-        sift_candidates_t.sync = sync;
-        sift_candidates_t.n = precompute_nh_t.n;
-        sift_candidates_t.h = precompute_nh_t.h;
-
-        process_candidates_t.candidates = &candidates;
-        process_candidates_t.contacts = &contacts;
-        process_candidates_t.sync = sync;
-        process_candidates_t.free_pairs = &free_pairs;
-        process_candidates_t.t = &t;
-
+        process_candidates_t.init_from_vm(vm_inst);
         process_contacts_t.init_from_vm(vm_inst);
-        process_contacts_t.sync = sync;
-        process_contacts_t.contacts = &contacts;
-        process_contacts_t.box = &box;
-        process_contacts_t.V = &vm_inst.find<real>("V");
-        process_contacts_t.F = vm_inst.find<vec3r_vector>("F").to_array();
-        process_contacts_t.r = r;
-        process_contacts_t.free_pairs = &free_pairs;
     }
 
     void eval_qa_forces::operator()() const {
-        precompute_nh_t();
-        sift_candidates_t();
-        process_candidates_t();
-        process_contacts_t();
+//#pragma omp task default(none)
+        {
+            precompute_nh_t();
+//#pragma omp taskwait
+            sift_candidates_t();
+//#pragma omp taskwait
+            process_candidates_t();
+//#pragma omp taskwait
+            process_contacts_t();
+        }
+    }
+
+    void update_qa::init_from_vm(vm &vm_inst) {
+        update_free_pairs_.init_from_vm(vm_inst);
+        eval = &vm_inst.find<eval_qa_forces>("eval_qa");
+    }
+
+    void update_qa::operator()() const {
+        update_free_pairs_();
     }
 
     void eval_qa_forces_tf::init_from_vm(vm &vm_inst) {

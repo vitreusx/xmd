@@ -7,8 +7,6 @@
 #include "sync_data.h"
 #include "candidate.h"
 #include <xmd/vm/vm.h>
-#include <mutex>
-#include <taskflow/taskflow.hpp>
 
 namespace xmd::qa {
     class sift_candidates: public vm_aware {
@@ -22,7 +20,6 @@ namespace xmd::qa {
         box<vec3r> *box;
         array<amino_acid> atype;
         sync_data_array sync;
-        std::mutex *mut;
 
         free_pair_set *free_pairs;
         candidate_list *candidates;
@@ -30,18 +27,10 @@ namespace xmd::qa {
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        void loop_iter(int idx) const;
+        void iter(int idx) const;
         void operator()() const;
-    };
 
-    class sift_candidates_tf: public vm_aware {
-    public:
-        sift_candidates sift_candidates_;
-        tf::Task clear, loop;
-        tf::Taskflow module;
-        void init_from_vm(vm& vm_inst) override;
-
-    public:
-        tf::Task tf_impl(tf::Taskflow& taskflow);
+        void omp_prep() const;
+        void omp_async() const;
     };
 }

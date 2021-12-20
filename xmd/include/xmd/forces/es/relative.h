@@ -3,7 +3,6 @@
 #include <xmd/model/box.h>
 #include "es_pair.h"
 #include <xmd/vm/vm.h>
-#include <taskflow/taskflow.hpp>
 
 namespace xmd {
     class eval_relative_es_forces: public vm_aware  {
@@ -20,8 +19,18 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
-        void loop_iter(int idx) const;
+        void iter(int idx) const;
         void operator()() const;
-        tf::Task tf_impl(tf::Taskflow& taskflow) const;
+        void omp_async() const;
+    };
+
+    class update_relative_es: public update_es_base {
+    public:
+        eval_relative_es_forces *eval;
+
+        void init_from_vm(vm& vm_inst) override;
+
+    public:
+        void operator()() const;
     };
 }

@@ -23,8 +23,9 @@ namespace xmd {
         val{val} {};
 
     void eval_heurestic_angle_forces::operator()() const {
-        for (int idx = 0; idx < angles.size; ++idx)
-            loop_iter(idx);
+        for (int idx = 0; idx < angles.size; ++idx) {
+            iter(idx);
+        }
     }
 
     void eval_heurestic_angle_forces::init_from_vm(vm &vm_inst) {
@@ -101,7 +102,7 @@ namespace xmd {
             }).to_span();
     }
 
-    void eval_heurestic_angle_forces::loop_iter(int idx) const {
+    void eval_heurestic_angle_forces::iter(int idx) const {
         auto i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
         auto type_val = (int8_t)angles.type[idx];
 
@@ -125,15 +126,19 @@ namespace xmd {
             angle_V = coeff + theta * angle_V;
         }
 
+//#pragma omp atomic update
         *V += angle_V;
+
         F[i1] -= dV_dtheta * dtheta_dr1;
         F[i2] -= dV_dtheta * dtheta_dr2;
         F[i3] -= dV_dtheta * dtheta_dr3;
     }
 
-    tf::Task eval_heurestic_angle_forces::tf_impl(tf::Taskflow& taskflow) const {
-        return taskflow.for_each_index(0, angles.size, 1,
-            [this](auto idx) -> void { loop_iter(idx); });
+    void eval_heurestic_angle_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < angles.size; ++idx) {
+            iter(idx);
+        }
     }
 
     heurestic_angle_span heurestic_angle_vector::to_span()  {

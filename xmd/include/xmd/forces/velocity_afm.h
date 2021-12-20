@@ -16,7 +16,8 @@ namespace xmd {
         vec3r_vector afm_orig, afm_vel;
         int size;
 
-        explicit velocity_afm_bundle_vector(int n);
+        explicit velocity_afm_bundle_vector(int n = 0);
+        int push_back();
         velocity_afm_bundle_span to_span();
     };
 
@@ -32,6 +33,8 @@ namespace xmd {
         void init_from_vm(vm& vm_inst) override;
 
     public:
+        void iter(int idx) const;
         void operator()() const;
+        void omp_async() const;
     };
 }

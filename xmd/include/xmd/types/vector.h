@@ -5,31 +5,34 @@
 #include <iostream>
 
 namespace xmd {
+
+
     template<typename T>
     class vector {
     public:
+        static inline constexpr int ALIGNMENT = 512/8;
+
         vector(): data_{nullptr}, size_{0}, capacity_{0} {};
 
         explicit vector(int size, T const& init = T()) {
             size_ = capacity_ = size;
 
-            data_ = (T *)malloc(size * sizeof(T));
+            data_ = (T *)aligned_alloc(ALIGNMENT, size * sizeof(T));
             std::fill(data_, data_ + size_, init);
         }
 
         vector(vector const& other) {
-            size_ = other.size_;
-            capacity_ = other.capacity_;
-            data_ = (T *)malloc(size_ * sizeof(T));
-            std::copy(other.data_, other.data_ + size_, data_);
+            *this = other;
         }
 
         vector& operator=(vector const& other) {
-            this->~vector();
-            size_ = other.size_;
-            capacity_ = other.capacity_;
-            data_ = (T *)malloc(size_ * sizeof(T));
-            std::copy(other.data_, other.data_ + size_, data_);
+            if (&*this != &other) {
+                this->~vector();
+                size_ = other.size_;
+                capacity_ = other.capacity_;
+                data_ = (T *)aligned_alloc(ALIGNMENT, size_ * sizeof(T));
+                std::copy(other.data_, other.data_ + size_, data_);
+            }
             return *this;
         }
 
@@ -38,12 +41,14 @@ namespace xmd {
         }
 
         vector& operator=(vector&& other) {
-            size_ = other.size_;
-            capacity_ = other.capacity_;
-            data_ = other.data_;
+            if (&*this != &other) {
+                size_ = other.size_;
+                capacity_ = other.capacity_;
+                data_ = other.data_;
 
-            other.size_ = other.capacity_ = 0;
-            other.data_ = nullptr;
+                other.size_ = other.capacity_ = 0;
+                other.data_ = nullptr;
+            }
             return *this;
         }
 
@@ -67,7 +72,7 @@ namespace xmd {
         }
 
         void reserve(int new_capacity) {
-            T *new_data = (T *)malloc(new_capacity * sizeof(T));
+            T *new_data = (T *)aligned_alloc(ALIGNMENT, new_capacity * sizeof(T));
             std::move(data_, data_ + size_, new_data);
             if (data_) free(data_);
             data_ = new_data;

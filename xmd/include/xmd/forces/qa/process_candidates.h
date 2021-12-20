@@ -3,9 +3,10 @@
 #include "sync_data.h"
 #include "contact.h"
 #include "free_pair.h"
+#include <xmd/vm/vm.h>
 
 namespace xmd::qa {
-    class process_candidates {
+    class process_candidates: public vm_aware {
     public:
         candidate_list *candidates;
         sync_data_array sync;
@@ -13,7 +14,10 @@ namespace xmd::qa {
         contact_set *contacts;
         free_pair_set *free_pairs;
 
+        void init_from_vm(vm& vm_inst) override;
+
     public:
+        void iter(int idx) const;
         void operator()() const;
     };
 }

@@ -4,10 +4,12 @@
 #include <xmd/forces/primitives/lj_variants.h>
 
 namespace xmd::qa {
+
     void sift_candidates::operator()() const {
         candidates->clear();
-        for (int idx = 0; idx < free_pairs->size(); ++idx)
-            loop_iter(idx);
+        for (int idx = 0; idx < free_pairs->size(); ++idx) {
+            iter(idx);
+        }
     }
 
     void sift_candidates::init_from_vm(vm &vm_inst) {
@@ -37,17 +39,24 @@ namespace xmd::qa {
             ptype[(int)aa] = aa_data_[aa].polarization;
         }
 
-        mut = &vm_inst.find_or_emplace<std::mutex>("qa_sift_mutex");
+        candidates = &vm_inst.find<candidate_list>("qa_candidates");
+        atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
+        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        r = vm_inst.find<vec3r_vector>("r").to_array();
+        free_pairs = &vm_inst.find<free_pair_set>("qa_free_pairs");
+        sync = vm_inst.find<sync_data_vector>("sync").to_array();
+        n = vm_inst.find<vec3r_vector>("qa_n").to_array();
+        h = vm_inst.find<vec3r_vector>("qa_h").to_array();
     }
 
-    void sift_candidates::loop_iter(int idx) const {
+    void sift_candidates::iter(int idx) const {
         if (!free_pairs->has_item(idx))
             return;
 
         auto i1 = free_pairs->i1[idx], i2 = free_pairs->i2[idx];
 
         auto r1 = r[i1], r2 = r[i2];
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_rn = norm_inv(r12);
         auto r12_u = r12 * r12_rn;
 
@@ -99,31 +108,26 @@ namespace xmd::qa {
         if (!sync2_after_formation.is_valid())
             return;
 
-        {
-            std::lock_guard guard(*mut);
-            int slot_idx = candidates->add();
-            candidates->i1[slot_idx] = i1;
-            candidates->i2[slot_idx] = i2;
-            candidates->free_pair_idx[slot_idx] = idx;
-            candidates->type[slot_idx] = type;
-            candidates->sync_diff1[slot_idx] = sync_diff1;
-            candidates->sync_diff2[slot_idx] = sync_diff2;
+        int slot_idx;
+#pragma omp critical
+        slot_idx = candidates->add();
+
+        candidates->i1[slot_idx] = i1;
+        candidates->i2[slot_idx] = i2;
+        candidates->free_pair_idx[slot_idx] = idx;
+        candidates->type[slot_idx] = type;
+        candidates->sync_diff1[slot_idx] = sync_diff1;
+        candidates->sync_diff2[slot_idx] = sync_diff2;
+    }
+
+    void sift_candidates::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < free_pairs->size(); ++idx) {
+            iter(idx);
         }
     }
 
-    void sift_candidates_tf::init_from_vm(vm &vm_inst) {
-        clear = module.emplace([this]() -> void {
-            sift_candidates_.candidates->clear();
-        });
-
-        auto size_ref = std::ref(sift_candidates_.free_pairs->size());
-        loop = module.for_each_index(0, size_ref, 1,
-            [this](auto idx) -> void { sift_candidates_.loop_iter(idx); });
-
-        clear.precede(loop);
-    }
-
-    tf::Task sift_candidates_tf::tf_impl(tf::Taskflow &taskflow) {
-        return taskflow.composed_of(module);
+    void sift_candidates::omp_prep() const {
+        candidates->clear();
     }
 }

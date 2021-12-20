@@ -11,6 +11,8 @@ namespace xmd {
     pdb::pdb(std::istream &&is) {
         std::unordered_map<char, bool> ter_found;
 
+        cryst1 = decltype(cryst1)::Zero();
+
         auto find_or_add_chain = [&](char chain_id) -> auto {
             auto chain_iter = chains.find(chain_id);
             if (chain_iter == chains.end()) {

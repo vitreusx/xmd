@@ -9,12 +9,17 @@ namespace xmd::qa {
         auto cutoff = max_formation_min_dist;
         auto min_norm_inv = (real)1.0 / (cutoff + nl->orig_pad);
 
+//#pragma omp taskloop default(none) private(cutoff, min_norm_inv) nogroup
         for (int pair_idx = 0; pair_idx < nl->particle_pairs.size; ++pair_idx) {
             auto i1 = nl->particle_pairs.i1[pair_idx];
             auto i2 = nl->particle_pairs.i2[pair_idx];
             auto r1 = r[i1], r2 = r[i2];
-            if (norm_inv(box->ray(r1, r2)) > min_norm_inv) {
-                int free_pair_idx = pairs->add();
+
+            if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
+                int free_pair_idx;
+#pragma omp critical
+                free_pair_idx = pairs->add();
+
                 pairs->i1[free_pair_idx] = i1;
                 pairs->i2[free_pair_idx] = i2;
             }

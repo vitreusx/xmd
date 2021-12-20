@@ -8,9 +8,10 @@ namespace xmd::nl {
         }
         else {
             real max_r_disp = 0.0f;
+//#pragma omp taskloop default(none) reduction(max:max_r_disp)
             for (int idx = 0; idx < num_particles; ++idx) {
                 auto r_ = r[idx], orig_r_ = data->orig_r[idx];
-                auto dr = box->ray(r_, orig_r_);
+                auto dr = box->r_uv(r_, orig_r_);
                 max_r_disp = max(max_r_disp, norm(dr));
             }
 
@@ -27,7 +28,7 @@ namespace xmd::nl {
         data = &vm_inst.find<nl_data>("nl_data");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         invalid = &vm_inst.find_or_emplace<bool>("invalid", true);
-        first_time = &vm_inst.find_or_emplace<bool>("first_time", true);
+        first_time = &vm_inst.find_or_emplace<bool>("nl_first_time", true);
         num_particles = vm_inst.find<int>("num_particles");
     }
 }

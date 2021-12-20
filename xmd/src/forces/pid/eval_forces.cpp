@@ -4,9 +4,11 @@
 #include <xmd/files/csv.h>
 
 namespace xmd::pid {
-    void eval_pid_forces::operator()() const {
-        for (int idx = 0; idx < bundles.size; ++idx)
-            loop_iter(idx);
+
+    void eval_pid_forces::operator()() {
+        for (int idx = 0; idx < bundles.size; ++idx) {
+            iter(idx);
+        }
     }
 
     void eval_pid_forces::init_from_vm(vm &vm_inst) {
@@ -58,7 +60,7 @@ namespace xmd::pid {
         V = &vm_inst.find<real>("V");
     }
 
-    void eval_pid_forces::loop_iter(int idx) const {
+    void eval_pid_forces::iter(int idx) const {
         real psi1, psi2;
         vec3r dpsi1_dr1p, dpsi1_dr1, dpsi1_dr1n, dpsi1_dr2;
         vec3r dpsi2_dr2p, dpsi2_dr2, dpsi2_dr2n, dpsi2_dr1;
@@ -67,12 +69,12 @@ namespace xmd::pid {
         auto i2p = bundles.i2p[idx], i2 = bundles.i2[idx], i2n = bundles.i2n[idx];
         auto type = bundles.type[idx];
 
-        auto r1p = r[i1p], r1 = r[i1], r1n = r[i1n];
-        auto r2p = r[i2p], r2 = r[i2], r2n = r[i2n];
+        vec3r r1p = r[i1p], r1 = r[i1], r1n = r[i1n];
+        vec3r r2p = r[i2p], r2 = r[i2], r2n = r[i2n];
 
         {
             auto &r1_ = r1p, &r2_ = r1, &r3_ = r1n, &r4_ = r2;
-            auto r24 = box->ray(r2_, r4_);
+            auto r24 = box->r_uv(r2_, r4_);
             auto r12 = r2_ - r1_;
             auto r23 = r3_ - r2_;
             auto r13 = r3_ - r1_;
@@ -105,7 +107,7 @@ namespace xmd::pid {
 
         {
             auto &r1_ = r2p, &r2_ = r2, &r3_ = r2n, &r4_ = r1;
-            auto r24 = box->ray(r2_, r4_);
+            auto r24 = box->r_uv(r2_, r4_);
             auto r12 = r2_ - r1_;
             auto r23 = r3_ - r2_;
             auto r13 = r3_ - r1_;
@@ -136,7 +138,7 @@ namespace xmd::pid {
             if (dot(rij, rn) < 0.0f) psi2 = -psi2;
         }
 
-        auto r12 = box->ray(r1, r2);
+        auto r12 = box->r_uv(r1, r2);
         auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
 
         real A = 0.0f, B = 0.0f, C = 0.0f, V_ = 0.0f;
@@ -175,8 +177,10 @@ namespace xmd::pid {
             C += lam1 * lam2 * lj_dV_dr;
         }
 
-        auto r12_u = r12 * r12_rn;
+//#pragma omp atomic update
         *V += V_;
+
+        auto r12_u = r12 * r12_rn;
         F[i1p] -= A * dpsi1_dr1p;
         F[i1] -= A * dpsi1_dr1 + B * dpsi2_dr1 + C * r12_u;
         F[i1n] -= A * dpsi1_dr1n;
@@ -185,8 +189,10 @@ namespace xmd::pid {
         F[i2n] -= B * dpsi2_dr2n;
     }
 
-    tf::Task eval_pid_forces::tf_impl(tf::Taskflow &taskflow) const {
-        return taskflow.for_each_index(0, std::ref(bundles.size), 1,
-            [this](auto idx) -> void { loop_iter(idx); });
+    void eval_pid_forces::omp_async() const {
+#pragma omp for nowait schedule(dynamic, 512)
+        for (int idx = 0; idx < bundles.size; ++idx) {
+            iter(idx);
+        }
     }
 }
