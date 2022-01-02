@@ -1,0 +1,71 @@
+{% import "meta.j2" as meta with context %}
+
+#pragma once
+#include "meta.h"
+
+{% macro _gen_inst(sig) %}
+    NO_TEMPLATE()
+    class {{sig.name}}: 
+        public {{sig.name}}##_expr<{{sig.name}} NO_SPEC()> {
+    public:        
+        {{sig.name}}(
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}const_ref<{{T}}> {{x}}
+            {% endfor %}
+        ):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_{{"{"}}{{x}}{{"}"}}
+            {% endfor %}
+        {};
+
+        template<
+            {% set comma = joiner(",") %}
+            {% for idx in range(1, len(sig.fields)+1) %}
+                {{comma()}}typename _T{{idx}}
+            {% endfor %}>
+        {{sig.name}}(
+            {% set comma = joiner(",") %}
+            {% for idx in range(1, len(sig.fields)+1) %}
+                {{comma()}} _T{{idx}}&& arg{{idx}}
+            {% endfor %}
+        ):
+            {% set comma = joiner(",") %}
+            {% for (T, x), idx in zip(sig.fields, range(1, len(sig.fields)+1)) %}
+                {{comma()}} {{x}}##_{{"{"}}std::forward<_T{{idx}}>(arg{{idx}}){{"}"}}
+            {% endfor %}
+        {};
+
+        {{sig.name}}({{sig.name}} const& other):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_{{"{"}}other.{{x}}##_{{"}"}}
+            {% endfor %}
+        {};
+
+        template<typename E>
+        {{sig.name}}({{sig.name}}##_expr<E> const& e):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_{{"{"}}e.{{x}}(){{"}"}}
+            {% endfor %}
+        {};
+
+        {% for T, x in sig.fields %}
+            inline const_ref<{{T}}> {{x}}() const {
+                return {{x}}##_;
+            }
+            inline ref<{{T}}> {{x}}() {
+                return {{x}}##_;
+            }
+        {% endfor %}
+        
+    protected:
+        {% for T, x in sig.fields %}
+            {{T}} {{x}}##_;
+        {% endfor %}
+    };
+{% endmacro %}
+
+{{meta.macro_v("GEN_INST", _gen_inst)}}

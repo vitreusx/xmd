@@ -3,7 +3,7 @@
 namespace builtin_operations {
 
 // Assignment operator "="
-packToken Assign(const packToken& left, const packToken& right, evaluationData* data) {
+packToken Assign([[maybe_unused]] const packToken& left, const packToken& right, evaluationData* data) {
   packToken& key = data->left->key;
   packToken& origin = data->left->origin;
 
@@ -46,7 +46,7 @@ packToken Assign(const packToken& left, const packToken& right, evaluationData* 
   return right;
 }
 
-packToken Comma(const packToken& left, const packToken& right, evaluationData* data) {
+packToken Comma(const packToken& left, const packToken& right, [[maybe_unused]] evaluationData* data) {
   if (left->type == TUPLE) {
     left.asTuple().list().push_back(right);
     return left;
@@ -55,7 +55,7 @@ packToken Comma(const packToken& left, const packToken& right, evaluationData* d
   }
 }
 
-packToken Colon(const packToken& left, const packToken& right, evaluationData* data) {
+packToken Colon(const packToken& left, const packToken& right, [[maybe_unused]] evaluationData* data) {
   if (left->type == STUPLE) {
     left.asSTuple().list().push_back(right);
     return left;
@@ -128,7 +128,7 @@ packToken UnaryNumeralOperation(const packToken& left, const packToken& right, e
   }
 }
 
-packToken UnaryNotOperation(const packToken& left, const packToken& right, evaluationData* data) {
+packToken UnaryNotOperation([[maybe_unused]] const packToken& left, const packToken& right,[[maybe_unused]]  evaluationData* data) {
   return !right.asBool();
 }
 
@@ -178,7 +178,7 @@ packToken NumeralOperation(const packToken& left, const packToken& right, evalua
   }
 }
 
-packToken FormatOperation(const packToken& p_left, const packToken& p_right, evaluationData* data) {
+packToken FormatOperation(const packToken& p_left, const packToken& p_right, [[maybe_unused]] evaluationData* data) {
   std::string& s_left = p_left.asString();
   const char* left = s_left.c_str();
 

@@ -151,11 +151,11 @@ class OppMap_t {
 
 namespace cparse {
 
-class TokenMap;
-class TokenList;
-class Tuple;
-class STuple;
-class Function;
+struct TokenMap;
+    class TokenList;
+    class Tuple;
+    class STuple;
+    class Function;
 
 }
 
@@ -251,12 +251,12 @@ struct parserMap_t {
   rCharMap_t cmap;
 
   // Add reserved word:
-  void add(const std::string& word, const rWordParser_t* parser) {
+  void add(const std::string& word, rWordParser_t* parser) {
     wmap[word] = parser;
   }
 
   // Add reserved character:
-  void add(char c, const rWordParser_t* parser) {
+  void add(char c, rWordParser_t* parser) {
     cmap[c] = parser;
   }
 
@@ -356,7 +356,8 @@ class Operation {
 
 typedef std::map<tokType_t, TokenMap> typeMap_t;
 typedef std::vector<Operation> opList_t;
-struct opMap_t : public std::map<std::string, opList_t> {
+class opMap_t : public std::map<std::string, opList_t> {
+public:
   void add(const opSignature_t sig, Operation::opFunc_t func) {
     (*this)[sig.op].push_back(Operation(sig, func));
   }

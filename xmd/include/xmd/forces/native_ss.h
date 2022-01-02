@@ -31,7 +31,7 @@ namespace xmd {
     public:
         vec3r_array r, F;
         box<vec3r> *box;
-        nat_ssbond_span ssbonds;
+        nat_ssbond_vector *ssbonds;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;
@@ -51,7 +51,6 @@ namespace xmd {
         box<vec3r> *box;
         nl::nl_data *nl;
         nat_ssbond_vector *all_ssobnds, *ssbonds;
-        eval_nat_ssbond_forces *eval;
 
         void init_from_vm(vm& vm_inst) override;
 

@@ -116,5 +116,23 @@ namespace xmd {
             }
             return next;
         });
+
+        vm_inst.find_or<vector<int>>("chain_idx", [&]() -> auto& {
+            auto& chain_idx = vm_inst.emplace<vector<int>>("chain_idx",
+                num_particles, -1);
+            for (auto const& res: stored_model.residues) {
+                chain_idx[res_map[res.get()]] = res->parent->chain_idx;
+            }
+            return chain_idx;
+        });
+
+        vm_inst.find_or<vector<int>>("seq_idx", [&]() -> auto& {
+            auto& seq_idx = vm_inst.emplace<vector<int>>("seq_idx",
+                num_particles, -1);
+            for (auto const& res: stored_model.residues) {
+                seq_idx[res_map[res.get()]] = res->seq_idx;
+            }
+            return seq_idx;
+        });
     }
 }

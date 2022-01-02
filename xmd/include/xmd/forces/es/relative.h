@@ -13,7 +13,7 @@ namespace xmd {
     public:
         vec3r_array r, F;
         box<vec3r> *box;
-        es_pair_span es_pairs;
+        es_pair_vector *es_pairs;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;
@@ -26,8 +26,6 @@ namespace xmd {
 
     class update_relative_es: public update_es_base {
     public:
-        eval_relative_es_forces *eval;
-
         void init_from_vm(vm& vm_inst) override;
 
     public:

@@ -1,13 +1,12 @@
 #pragma once
+#include "data.h"
 #include <xmd/types/vector.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
-#include "data.h"
 #include <xmd/vm/vm.h>
-#include <xmd/model/native_contacts.h>
 
 namespace xmd::nl {
-    class divide_into_cells: public vm_aware {
+    class legacy_update: public vm_aware {
     public:
         real pad_factor;
 
@@ -18,16 +17,11 @@ namespace xmd::nl {
         int num_particles;
         real *max_cutoff, *t;
         bool *invalid;
-        native_contact_span nat_cont;
+        array<int> chain_idx, seq_idx;
 
         void init_from_vm(vm& vm_inst) override;
 
     public:
         void operator()() const;
-
-    private:
-        void prepare(spatial_data& sd) const;
-        void assign(spatial_data& sd, int item_idx, int cell_idx) const;
-        void derive_rest(spatial_data& sd) const;
     };
 }

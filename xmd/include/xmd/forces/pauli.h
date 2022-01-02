@@ -30,7 +30,7 @@ namespace xmd {
     public:
         vec3r_array r, F;
         box<vec3r> *box;
-        pauli_pair_span pairs;
+        pauli_pair_vector *pairs;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;
@@ -50,7 +50,6 @@ namespace xmd {
         box<vec3r> *box;
         nl::nl_data *nl;
         pauli_pair_vector *pairs;
-        eval_pauli_exclusion_forces *eval;
 
         void init_from_vm(vm& vm_inst) override;
 

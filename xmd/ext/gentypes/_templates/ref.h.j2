@@ -1,0 +1,85 @@
+{% import "meta.j2" as meta with context %}
+
+#pragma once
+#include "meta.h"
+
+template<typename T>
+struct ref_impl {
+    using type = T&;
+};
+
+template<typename T>
+using ref = typename ref_impl<T>::type;
+
+{% macro _gen_ref(sig) %}
+    NO_TEMPLATE()
+    class {{sig.name}}##_ref:
+        public {{sig.name}}##_expr<{{sig.name}}##_ref NO_SPEC()> {
+    public:
+        {{sig.name}}##_ref(
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}ref<{{T}}> {{x}}
+            {% endfor %}
+        ):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_{{"{"}}{{x}}{{"}"}}
+            {% endfor %}
+        {};
+        
+        {{sig.name}}##_ref({{sig.name}} NO_SPEC()& inst_):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_{{"{"}}inst_.{{x}}(){{"}"}}
+            {% endfor %}
+        {};
+
+        {{sig.name}}##_ref({{sig.name}}##_ref NO_SPEC() const& other):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_{{"{"}}other.{{x}}##_{{"}"}}
+            {% endfor %}
+        {};
+        
+        inline {{sig.name}}##_ref& operator=({{sig.name}}##_ref NO_SPEC() const& other) {
+            {% for T, x in sig.fields %}
+                {{x}}##_ = other.{{x}}##_;
+            {% endfor %}
+            return *this;
+        }
+
+        inline {{sig.name}}##_ref& operator=({{sig.name}}##_ref NO_SPEC()&& other) {
+            {% for T, x in sig.fields %}
+                {{x}}##_ = std::move(other.{{x}}##_);
+            {% endfor %}
+            return *this;
+        }
+
+        template<typename E>
+        {{sig.name}}##_ref& operator=({{sig.name}}##_expr<E> const& e) {
+            {% for T, x in sig.fields %}
+                {{x}}##_ = e.{{x}}();
+            {% endfor %}
+            return *this;
+        }
+        
+        {% for T, x in sig.fields %}
+            inline ref<{{T}}> {{x}}() const {
+                return {{x}}##_;
+            }
+        {% endfor %}
+
+    protected:
+        {% for T, x in sig.fields %}
+            ref<{{T}}> {{x}}##_;
+        {% endfor %}
+    };
+
+    NULL_SPEC()
+    struct ref_impl<{{sig.name}} NO_SPEC()> {
+        using type = {{sig.name}}##_ref NO_SPEC();
+    };
+{% endmacro %}
+
+{{meta.macro_v("GEN_REF", _gen_ref)}}

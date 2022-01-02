@@ -13,6 +13,7 @@
 #include <xmd/nl/divide_into_cells.h>
 #include <xmd/io/report_stats.h>
 #include <xmd/io/report_structure.h>
+#include <xmd/nl/legacy_update.h>
 #include <omp.h>
 
 #ifndef _GNU_SOURCE
@@ -73,6 +74,8 @@ int main() {
         "div_into_cells");
     auto &nl_verify_ = def_vm.find_or_emplace<nl::verify>("nl_verify");
     auto &invalid = def_vm.find<bool>("invalid");
+
+    auto &legacy_update_ = def_vm.find_or_emplace<nl::legacy_update>("legacy_update");
 
     auto &pauli_enabled = def_vm.find_or_emplace<bool>("pauli_enabled",
         params["Pauli exclusion"]["enabled"].as<bool>());
@@ -262,7 +265,8 @@ eval_qa_,eval_solid_,eval_lj_attr_,eval_vel_afm_,eval_force_afm_)
                 }
 
                 if (invalid) {
-                    divide_into_cells_();
+//                    divide_into_cells_();
+                    legacy_update_();
 
                     if (pauli_enabled)
                         update_pauli_();

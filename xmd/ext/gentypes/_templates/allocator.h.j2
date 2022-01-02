@@ -1,0 +1,47 @@
+{% import "meta.j2" as meta with context %}
+
+#pragma once
+#include "meta.h"
+#include <memory>
+
+template<typename T>
+struct allocator_impl {
+    using type = std::allocator<T>;
+};
+
+template<typename T>
+using allocator = typename allocator_impl<T>::type;
+
+{% macro _gen_allocator(sig) %}
+    NO_TEMPLATE()
+    class {{sig.name}}##_allocator {
+    public:
+        {{sig.name}}##_ptr NO_SPEC() allocate(size_t n) {
+            {{sig.name}}##_ptr NO_SPEC() res;
+            {% for T, x in sig.fields %}
+                res.{{x}}##_ptr = {{x}}##_alloc.allocate(n);
+            {% endfor %}
+            return res;
+        }
+
+        void deallocate({{sig.name}}##_ptr NO_SPEC() p, size_t n) {
+            if (p) {
+                {% for T, x in sig.fields %}
+                    {{x}}##_alloc.deallocate(p.{{x}}##_ptr, n);
+                {% endfor %}
+            }
+        }
+
+    protected:
+        {% for T, x in sig.fields %}
+            allocator<{{T}}> {{x}}##_alloc;
+        {% endfor %}
+    };
+
+    NULL_SPEC()
+    struct allocator_impl<{{sig.name}} NO_SPEC()> {
+        using type = {{sig.name}}##_allocator NO_SPEC();
+    };
+{% endmacro %}
+
+{{meta.macro_v("GEN_ALLOCATOR", _gen_allocator)}}

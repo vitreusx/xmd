@@ -18,7 +18,7 @@ namespace xmd::pid {
     public:
         vec3r_array r, F;
         box<vec3r> *box;
-        pid_bundle_span bundles;
+        pid_bundle_vector *bundles;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;

@@ -1,0 +1,96 @@
+{% import "meta.j2" as meta with context %}
+
+#pragma once
+#include "meta.h"
+#include <memory>
+
+template<typename T>
+void uninitialized_fill_n(T *data, size_t n, T const& init) {
+    std::uninitialized_fill_n(data, n, init);
+}
+
+template<typename T>
+void uninitialized_copy_n(T const *from, size_t n, T* to) {
+    std::uninitialized_copy_n(from, n, to);
+}
+
+template<typename T>
+void uninitialized_move_n(T *from, size_t n, T *to) {
+    std::uninitialized_move_n(from, n, to);
+}
+
+template<typename T>
+void destroy_n(T *data, size_t n) {
+    std::destroy_n(data, n);
+}
+
+template<typename T, typename... Args>
+void construct_at(T *p, Args&&... args) {
+    ::new (static_cast<void*>(p)) T(std::forward<Args>(args)...);
+}
+
+template<typename T>
+void destroy_at(T *p) {
+    std::destroy_at(p);
+}
+
+{% macro _gen_memory(sig) %}
+    TEMPLATE(typename,E)
+    inline void uninitialized_fill_n({{sig.name}}##_ptr NO_SPEC() const& p, size_t n, {{sig.name}}##_expr<E> const& e) {
+        {% for T, x in sig.fields %}
+            uninitialized_fill_n(p.{{x}}##_ptr, n, e.{{x}}());
+        {% endfor %}
+    }
+
+    NO_TEMPLATE()
+    inline void uninitialized_copy_n({{sig.name}}##_const_ptr NO_SPEC() const& from, size_t n, {{sig.name}}##_ptr NO_SPEC() const& to) {
+        {% for T, x in sig.fields %}
+            uninitialized_copy_n(from.{{x}}##_ptr, n, to.{{x}}##_ptr);
+        {% endfor %}
+    }
+
+    NO_TEMPLATE()
+    inline void uninitialized_move_n({{sig.name}}##_ptr NO_SPEC() const& from, size_t n, {{sig.name}}##_ptr NO_SPEC() const& to) {
+        {% for T, x in sig.fields %}
+            uninitialized_move_n(from.{{x}}##_ptr, n, to.{{x}}##_ptr);
+        {% endfor %}
+    }
+
+    NO_TEMPLATE()
+    inline void destroy_n({{sig.name}}##_ptr NO_SPEC() const& p, size_t n) {
+        {% for T, x in sig.fields %}
+            destroy_n(p.{{x}}##_ptr, n);
+        {% endfor %}
+    }
+
+    TEMPLATE(typename,E)
+    inline void _construct_at_expr({{sig.name}}##_ptr NO_SPEC() const& p, {{sig.name}}##_expr<E> const& e) {
+        {% for T, x in sig.fields %}
+            construct_at(p.{{x}}##_ptr, e.{{x}}());
+        {% endfor %}
+    }
+
+    NO_TEMPLATE()
+    inline void construct_at({{sig.name}}##_ptr NO_SPEC() const& p, {{sig.name}} NO_SPEC() const& inst) {
+        _construct_at_expr(p, inst);
+    }
+
+    TEMPLATE(typename,E)
+    inline void construct_at({{sig.name}}##_ptr NO_SPEC() const& p, {{sig.name}}##_expr<E> const& e) {
+        _construct_at_expr(p, e);
+    }
+
+    TEMPLATE(typename...,Args)
+    inline void construct_at({{sig.name}}##_ptr NO_SPEC() const& p, Args&&... args) {
+        _construct_at_expr(p, {{sig.name}} NO_SPEC() (std::forward<Args>(args)...));
+    }
+
+    NO_TEMPLATE()
+    inline void destroy_at({{sig.name}}##_ptr NO_SPEC() const& p) {
+        {% for T, x in sig.fields %}
+            destroy_at(p.{{x}}##_ptr);
+        {% endfor %}
+    }
+{% endmacro %}
+
+{{meta.macro_v("GEN_MEMORY", _gen_memory)}}

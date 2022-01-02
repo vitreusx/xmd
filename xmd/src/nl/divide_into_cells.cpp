@@ -187,6 +187,7 @@ namespace xmd::nl {
         for (int idx = 0; idx < num_particles; ++idx)
             data->orig_r[idx] = r[idx];
         data->orig_box = *box;
+        data->ref_t = *t;
         *invalid = false;
     }
 
@@ -196,6 +197,7 @@ namespace xmd::nl {
             params["neighbor list"]["pad factor"].as<quantity>());
         r = vm_inst.find<vec3r_vector>("r").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
+        t = &vm_inst.find<float>("t");
 
         num_particles = vm_inst.find<int>("num_particles");
         nat_cont = vm_inst.find<native_contact_vector>(

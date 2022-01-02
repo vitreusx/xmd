@@ -24,8 +24,6 @@ namespace xmd {
                 contacts->nat_dist[cont_idx] = nat_dist;
             }
         }
-
-        eval->contacts = contacts->to_span();
     }
 
     void update_go_contacts::init_from_vm(vm &vm_inst) {
@@ -70,12 +68,10 @@ namespace xmd {
 
         auto& max_cutoff = vm_inst.find<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
-
-        eval = &vm_inst.find<eval_go_forces>("eval_go");
     }
 
     void eval_go_forces::operator()() const {
-        for (int idx = 0; idx < contacts.size; ++idx) {
+        for (int idx = 0; idx < contacts->size; ++idx) {
             iter(idx);
         }
     }
@@ -86,16 +82,16 @@ namespace xmd {
             params["native contacts"]["lj depth"].as<quantity>());
 
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        contacts = vm_inst.find_or_emplace<go_contact_vector>(
-            "go_contacts").to_span();
+        contacts = &vm_inst.find_or_emplace<go_contact_vector>(
+            "go_contacts");
         r = vm_inst.find<vec3r_vector>("r").to_array();
         V = &vm_inst.find<real>("V");
         F = vm_inst.find<vec3r_vector>("F").to_array();
     }
 
     void eval_go_forces::iter(int idx) const {
-        auto i1 = contacts.i1[idx], i2 = contacts.i2[idx];
-        auto nat_dist = contacts.nat_dist[idx];
+        auto i1 = contacts->i1[idx], i2 = contacts->i2[idx];
+        auto nat_dist = contacts->nat_dist[idx];
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = box->r_uv(r1, r2);
@@ -112,7 +108,7 @@ namespace xmd {
 
     void eval_go_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < contacts.size; ++idx) {
+        for (int idx = 0; idx < contacts->size; ++idx) {
             iter(idx);
         }
     }

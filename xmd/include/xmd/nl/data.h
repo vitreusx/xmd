@@ -30,7 +30,7 @@ namespace xmd::nl {
         spatial_data particles, native_contacts;
         neighbor_cell_list neighbor_cells;
         nl_pair_vector particle_pairs;
-        real orig_pad;
+        real orig_pad, ref_t;
         box<vec3r> orig_box;
         vec3r_vector orig_r;
         int num_cells;

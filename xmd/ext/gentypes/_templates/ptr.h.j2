@@ -1,0 +1,142 @@
+{% import "meta.j2" as meta with context %}
+
+#pragma once
+#include "meta.h"
+
+template<typename T>
+struct ptr_impl {
+    using type = T*;
+};
+
+template<typename T>
+using ptr = typename ptr_impl<T>::type;
+
+template<typename T>
+T *ref_to_ptr(T &ref_) {
+    return &ref_;
+}
+
+{% macro _gen_ptr(sig) %}
+    NO_TEMPLATE()
+    class {{sig.name}}##_ptr {
+    public:
+        {{sig.name}}##_ptr() = default;
+        
+        {{sig.name}}##_ptr(
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}ptr<{{T}}> {{x}}
+            {% endfor %}
+        ):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_ptr{{"{"}}{{x}}{{"}"}}
+            {% endfor %}
+        {};
+
+        {{sig.name}}##_ptr(std::nullptr_t):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_ptr{{"{"}}nullptr{{"}"}}
+            {% endfor %}
+        {};
+        
+        {{sig.name}}##_ptr({{sig.name}} NO_SPEC()* ptr_):
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_ptr{{"{"}}&ptr_->{{x}}(){{"}"}}
+            {% endfor %}
+        {};
+        
+        inline {{sig.name}}##_ref NO_SPEC() operator*(int) {
+            return {{"{"}}
+                {% set comma = joiner(",") %}
+                {% for T, x in sig.fields %}
+                    {{comma()}}*{{x}}##_ptr
+                {% endfor %}
+            {{"}"}};
+        }
+        
+        inline {{sig.name}}##_const_ref NO_SPEC() operator*(int) const {
+            return {{"{"}}
+                {% set comma = joiner(",") %}
+                {% for T, x in sig.fields %}
+                    {{comma()}}*{{x}}##_ptr
+                {% endfor %}
+            {{"}"}};
+        };
+        
+        template<typename Idx>
+        {{sig.name}}##_ref NO_SPEC() operator[](Idx idx) const {
+            return {{"{"}}
+                {% set comma = joiner(",") %}
+                {% for T, x in sig.fields %}
+                    {{comma()}}{{x}}##_ptr[idx]
+                {% endfor %}
+            {{"}"}};
+        };
+        
+        inline operator bool() const {
+            {% set T1, x1 = sig.fields[0] %}
+            return {{x1}}##_ptr;
+        }
+
+        template<typename Offset>
+        inline {{sig.name}}##_ptr NO_SPEC() operator+(Offset off) const {
+            return {
+                {% set comma = joiner(",") %}
+                {% for T, x in sig.fields %}
+                    {{comma()}}{{x}}##_ptr + off
+                {% endfor %}
+            };
+        }
+
+        template<typename Offset>
+        inline {{sig.name}}##_ptr NO_SPEC()& operator+=(Offset off) {
+            {% for T, x in sig.fields %}
+                {{x}}##_ptr += off;
+            {% endfor %}
+            return *this;
+        }
+
+        template<typename Offset>
+        inline {{sig.name}}##_ptr NO_SPEC() operator-(Offset off) const {
+            return {
+                {% set comma = joiner(",") %}
+                {% for T, x in sig.fields %}
+                    {{comma()}}{{x}}##_ptr - off
+                {% endfor %}
+            };
+        }
+
+        template<typename Offset>
+        inline {{sig.name}}##_ptr NO_SPEC()& operator-=(Offset off) {
+            {% for T, x in sig.fields %}
+                {{x}}##_ptr -= off;
+            {% endfor %}
+            return *this;
+        }
+
+    public:
+        {% for T, x in sig.fields %}
+            ptr<{{T}}> {{x}}##_ptr;
+        {% endfor %}
+    };
+
+    NO_TEMPLATE()
+    {{sig.name}}##_ptr NO_SPEC() ref_to_ptr({{sig.name}}##_ref NO_SPEC() const& ref_) {
+        return {
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}ref_to_ptr(ref_.{{x}}())
+            {% endfor %}
+        };
+    }
+
+    NULL_SPEC()
+    struct ptr_impl<{{sig.name}} NO_SPEC()> {
+        using type = {{sig.name}}##_ptr NO_SPEC();
+    };
+{% endmacro %}
+
+{{meta.macro_v("GEN_PTR", _gen_ptr)}}

@@ -1,0 +1,27 @@
+#pragma once
+#include "expr.h"
+#include "inst.h"
+#include "ref.h"
+#include "const_ref.h"
+#include "ptr.h"
+#include "const_ptr.h"
+#include "const_span.h"
+#include "span.h"
+#include "memory.h"
+#include "allocator.h"
+#include "vector.h"
+#include "set.h"
+
+#define GENTYPE()\
+    GEN_EXPR()\
+    GEN_INST()\
+    GEN_REF()\
+    GEN_CONST_REF()\
+    GEN_PTR()\
+    GEN_CONST_PTR()\
+    GEN_CONST_SPAN()\
+    GEN_SPAN()\
+    GEN_MEMORY()\
+    GEN_ALLOCATOR()\
+    GEN_VECTOR()\
+    GEN_SET()

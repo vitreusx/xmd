@@ -1,0 +1,31 @@
+{% macro _macro_args(sig) -%}
+    {{sig.name}},
+    {%- set comma = joiner(",") -%}
+    {%- for T, x in sig.fields -%}
+        {{comma()}}{{T}},{{x}}
+    {%- endfor -%}
+{% endmacro %}
+
+{% macro macro_n(macro_name, func) %}
+    #define {{macro_name|upper}}() {{macro_name|upper}}_EXP(NAME())
+    
+    #define {{macro_name|upper}}_EXP(name) {{macro_name|upper}}_(name) 
+    
+    #define {{macro_name|upper}}_(name) \
+        {{func("name")|as_macro_body}}
+{% endmacro %}
+
+{% macro macro_v(macro_name, func) %}
+    #define {{macro_name|upper}}() {{macro_name|upper}}_EXP(NAME(), FIELDS())
+    
+    #define {{macro_name|upper}}_EXP(name, fields) {{macro_name|upper}}_(name, fields)
+
+    #define {{macro_name|upper}}_(...) \
+        VFUNC({{macro_name|upper}}_, __VA_ARGS__)
+    
+    {% for n in range(1, MAX_FIELDS+1) %}
+        {% set sig = macro_sig(n) %}
+        #define {{macro_name|upper}}_{{2*n+1}}({{_macro_args(sig)}}) \
+            {{func(sig)|as_macro_body}}
+    {% endfor %}
+{% endmacro %}

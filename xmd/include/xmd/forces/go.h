@@ -53,7 +53,7 @@ namespace xmd {
     public:
         vec3r_array r, F;
         box<vec3r> *box;
-        go_contact_span contacts;
+        go_contact_vector *contacts;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;
@@ -70,7 +70,6 @@ namespace xmd {
         box<vec3r> *box;
         nl::nl_data *nl;
         go_contact_vector *all_contacts, *contacts;
-        eval_go_forces *eval;
 
         void init_from_vm(vm& vm_inst) override;
 

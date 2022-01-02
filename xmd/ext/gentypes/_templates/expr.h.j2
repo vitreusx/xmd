@@ -1,0 +1,21 @@
+{% import "meta.j2" as meta with context %}
+
+#pragma once
+#include "meta.h"
+
+{% macro _gen_expr(sig) %}
+    template<typename Impl>
+    class {{sig.name}}##_expr {
+    public:
+        {% for T, x in sig.fields %}
+            auto {{x}}() const {
+                return static_cast<Impl const&>(*this).{{x}}();
+            }
+            auto {{x}}() {
+                return static_cast<Impl&>(*this).{{x}}();
+            }
+    {% endfor %}
+    };
+{% endmacro %}
+
+{{meta.macro_v("GEN_EXPR", _gen_expr)}}

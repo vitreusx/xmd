@@ -6,24 +6,24 @@ packToken trueToken = packToken(true);
 packToken falseToken = packToken(false);
 packToken noneToken = packToken::None();
 
-void True(const char* expr, const char** rest, rpnBuilder* data) {
+void True([[maybe_unused]] const char* expr, [[maybe_unused]] const char** rest, rpnBuilder* data) {
   data->handle_token(trueToken->clone());
 }
 
-void False(const char* expr, const char** rest, rpnBuilder* data) {
+void False([[maybe_unused]] const char* expr, [[maybe_unused]]  const char** rest, rpnBuilder* data) {
   data->handle_token(falseToken->clone());
 }
 
-void None(const char* expr, const char** rest, rpnBuilder* data) {
+void None([[maybe_unused]] const char* expr, [[maybe_unused]] const char** rest, rpnBuilder* data) {
   data->handle_token(noneToken->clone());
 }
 
-void LineComment(const char* expr, const char** rest, rpnBuilder* data) {
+void LineComment(const char* expr, const char** rest, [[maybe_unused]] rpnBuilder* data) {
   while (*expr && *expr != '\n') ++expr;
   *rest = expr;
 }
 
-void SlashStarComment(const char* expr, const char** rest, rpnBuilder* data) {
+void SlashStarComment(const char* expr, const char** rest, [[maybe_unused]] rpnBuilder* data) {
   while (*expr && !(expr[0] == '*' && expr[1] == '/')) ++expr;
   if (*expr == '\0') {
     throw syntax_error("Unexpected end of file after '/*' comment!");
@@ -33,7 +33,7 @@ void SlashStarComment(const char* expr, const char** rest, rpnBuilder* data) {
   *rest = expr;
 }
 
-void KeywordOperator(const char* expr, const char** rest, rpnBuilder* data) {
+void KeywordOperator([[maybe_unused]] const char* expr, [[maybe_unused]] const char** rest, rpnBuilder* data) {
   // Convert any STuple like `a : 10` to `'a': 10`:
   if (data->rpn.back()->type == VAR) {
     data->rpn.back()->type = STR;

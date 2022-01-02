@@ -25,8 +25,6 @@ namespace xmd {
                 pairs->i2[pauli_pair_idx] = i2;
             }
         }
-
-        eval->pairs = pairs->to_span();
     }
 
     void update_pauli_pairs::init_from_vm(vm &vm_inst) {
@@ -38,12 +36,10 @@ namespace xmd {
         auto& max_cutoff = vm_inst.find<real>("max_cutoff");
         r_excl = vm_inst.find<real>("pauli_r_excl");
         max_cutoff = max(max_cutoff, r_excl);
-
-        eval = &vm_inst.find<eval_pauli_exclusion_forces>("eval_pauli");
     }
 
     void eval_pauli_exclusion_forces::operator()() const {
-        for (int idx = 0; idx < pairs.size; ++idx) {
+        for (int idx = 0; idx < pairs->size; ++idx) {
             iter(idx);
         }
     }
@@ -59,12 +55,11 @@ namespace xmd {
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        pairs = vm_inst.find_or_emplace<pauli_pair_vector>(
-            "pauli_pairs").to_span();
+        pairs = &vm_inst.find_or_emplace<pauli_pair_vector>("pauli_pairs");
     }
 
     void eval_pauli_exclusion_forces::iter(int idx) const {
-        auto i1 = pairs.i1[idx], i2 = pairs.i2[idx];
+        auto i1 = pairs->i1[idx], i2 = pairs->i2[idx];
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = box->r_uv(r1, r2);
@@ -83,7 +78,7 @@ namespace xmd {
 
     void eval_pauli_exclusion_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < pairs.size; ++idx) {
+        for (int idx = 0; idx < pairs->size; ++idx) {
             iter(idx);
         }
     }

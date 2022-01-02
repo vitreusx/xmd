@@ -5,7 +5,7 @@
 namespace xmd {
 
     void eval_relative_es_forces::operator()() const {
-        for (int idx = 0; idx < es_pairs.size; ++idx) {
+        for (int idx = 0; idx < es_pairs->size; ++idx) {
             iter(idx);
         }
     }
@@ -26,12 +26,12 @@ namespace xmd {
         F = vm_inst.find<vec3r_vector>("F").to_array();
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        es_pairs = vm_inst.find_or_emplace<es_pair_vector>("es_pairs").to_span();
+        es_pairs = &vm_inst.find_or_emplace<es_pair_vector>("es_pairs");
     }
 
     void eval_relative_es_forces::iter(int idx) const {
-        auto i1 = es_pairs.i1[idx], i2 = es_pairs.i2[idx];
-        auto q1_q2 = es_pairs.q1_q2[idx];
+        auto i1 = es_pairs->i1[idx], i2 = es_pairs->i2[idx];
+        auto q1_q2 = es_pairs->q1_q2[idx];
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = box->r_uv(r1, r2);
@@ -52,14 +52,13 @@ namespace xmd {
 
     void eval_relative_es_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < es_pairs.size; ++idx) {
+        for (int idx = 0; idx < es_pairs->size; ++idx) {
             iter(idx);
         }
     }
 
     void update_relative_es::init_from_vm(vm &vm_inst) {
         update_es_base::init_from_vm(vm_inst);
-        eval = &vm_inst.find<eval_relative_es_forces>("eval_rel_es");
 
         auto& params = vm_inst.find<param_file>("params");
         auto const& rel_es_params = params["relative ES"];
@@ -73,6 +72,5 @@ namespace xmd {
 
     void update_relative_es::operator()() const {
         update_es_base::operator()();
-        eval->es_pairs = pairs->to_span();
     }
 }

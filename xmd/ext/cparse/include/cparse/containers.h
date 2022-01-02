@@ -26,7 +26,7 @@ class Container {
   }
 };
 
-class Iterator;
+struct Iterator;
 
 struct Iterable : public TokenBase {
   virtual ~Iterable() {}
@@ -49,7 +49,7 @@ struct Iterator : public Iterable {
   Iterator* getIterator() const;
 };
 
-class TokenMap;
+struct TokenMap;
 typedef std::map<std::string, packToken> TokenMap_t;
 
 struct MapData_t {
@@ -135,7 +135,8 @@ struct GlobalScope : public TokenMap {
 
 typedef std::vector<packToken> TokenList_t;
 
-struct TokenList : public Container<TokenList_t>, public Iterable {
+class TokenList : public Container<TokenList_t>, public Iterable {
+public:
   static packToken default_constructor(TokenMap scope);
 
  public:

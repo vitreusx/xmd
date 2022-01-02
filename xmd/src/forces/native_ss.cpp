@@ -20,8 +20,6 @@ namespace xmd {
                 ssbonds->i2[cont_idx] = idx2;
             }
         }
-
-        eval->ssbonds = ssbonds->to_span();
     }
 
     void update_nat_ssbonds::init_from_vm(vm &vm_inst) {
@@ -63,12 +61,10 @@ namespace xmd {
 
         auto& max_cutoff = vm_inst.find<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
-
-        eval = &vm_inst.find<eval_nat_ssbond_forces>("eval_ss");
     }
 
     void eval_nat_ssbond_forces::operator()() const {
-        for (int idx = 0; idx < ssbonds.size; ++idx) {
+        for (int idx = 0; idx < ssbonds->size; ++idx) {
             iter(idx);
         }
     }
@@ -81,13 +77,13 @@ namespace xmd {
             params["native ssbonds"]["equilibrium dist"].as<quantity>());
 
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        ssbonds = vm_inst.find_or_emplace<nat_ssbond_vector>("ssbonds").to_span();
+        ssbonds = &vm_inst.find_or_emplace<nat_ssbond_vector>("ssbonds");
         r = vm_inst.find<vec3r_vector>("r").to_array();
         V = &vm_inst.find<real>("V");
     }
 
     void eval_nat_ssbond_forces::iter(int idx) const {
-        auto cys_i1 = ssbonds.i1[idx], cys_i2 = ssbonds.i2[idx];
+        auto cys_i1 = ssbonds->i1[idx], cys_i2 = ssbonds->i2[idx];
         auto r1 = r[cys_i1], r2 = r[cys_i2];
         auto r12 = box->r_uv(r1, r2);
 
@@ -103,7 +99,7 @@ namespace xmd {
 
     void eval_nat_ssbond_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < ssbonds.size; ++idx) {
+        for (int idx = 0; idx < ssbonds->size; ++idx) {
             iter(idx);
         }
     }

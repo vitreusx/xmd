@@ -25,9 +25,8 @@ namespace xmd::qa {
         auto new_sync2 = sync[i2] - sync_diff2;
 
         if (new_sync1.is_valid() && new_sync2.is_valid()) {
-            int slot_idx;
-#pragma omp critical
-            slot_idx = contacts->add();
+            int slot_idx = contacts->add();
+
             contacts->i1[slot_idx] = i1;
             contacts->i2[slot_idx] = i2;
             contacts->type[slot_idx] = type;
@@ -38,6 +37,7 @@ namespace xmd::qa {
 
             sync[i1] -= sync_diff1;
             sync[i2] -= sync_diff2;
+            free_pairs->remove(candidates->free_pair_idx[idx]);
         }
     }
 }

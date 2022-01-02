@@ -6,7 +6,7 @@
 namespace xmd::pid {
 
     void eval_pid_forces::operator()() {
-        for (int idx = 0; idx < bundles.size; ++idx) {
+        for (int idx = 0; idx < bundles->size; ++idx) {
             iter(idx);
         }
     }
@@ -55,8 +55,8 @@ namespace xmd::pid {
         r = vm_inst.find<vec3r_vector>("r").to_array();
         F = vm_inst.find<vec3r_vector>("F").to_array();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        bundles = vm_inst.find_or_emplace<pid_bundle_vector>(
-            "pid_bundles").to_span();
+        bundles = &vm_inst.find_or_emplace<pid_bundle_vector>(
+            "pid_bundles");
         V = &vm_inst.find<real>("V");
     }
 
@@ -65,9 +65,9 @@ namespace xmd::pid {
         vec3r dpsi1_dr1p, dpsi1_dr1, dpsi1_dr1n, dpsi1_dr2;
         vec3r dpsi2_dr2p, dpsi2_dr2, dpsi2_dr2n, dpsi2_dr1;
 
-        auto i1p = bundles.i1p[idx], i1 = bundles.i1[idx], i1n = bundles.i1n[idx];
-        auto i2p = bundles.i2p[idx], i2 = bundles.i2[idx], i2n = bundles.i2n[idx];
-        auto type = bundles.type[idx];
+        auto i1p = bundles->i1p[idx], i1 = bundles->i1[idx], i1n = bundles->i1n[idx];
+        auto i2p = bundles->i2p[idx], i2 = bundles->i2[idx], i2n = bundles->i2n[idx];
+        auto type = bundles->type[idx];
 
         vec3r r1p = r[i1p], r1 = r[i1], r1n = r[i1n];
         vec3r r2p = r[i2p], r2 = r[i2], r2n = r[i2n];
@@ -191,7 +191,7 @@ namespace xmd::pid {
 
     void eval_pid_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < bundles.size; ++idx) {
+        for (int idx = 0; idx < bundles->size; ++idx) {
             iter(idx);
         }
     }
