@@ -1,6 +1,5 @@
 #pragma once
-#include <xmd/types/vector.h>
-#include <xmd/types/cyclic_buffer.h>
+
 #include "contact_type.h"
 #include "sync_data.h"
 
@@ -13,8 +12,8 @@ namespace xmd::qa {
 #define NAMESPACE(...) xmd,qa,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() contact
-#define FIELDS() int,i1,int,i2,contact_type,type,contact_status,status, \
-real,ref_time,sync_data,sync_diff1,sync_data,sync_diff2
+#define FIELDS() int,i1,int,i2,xmd::qa::contact_type,type,xmd::qa::contact_status,status, \
+xmd::real,ref_time,xmd::qa::sync_data,sync_diff1,xmd::qa::sync_data,sync_diff2
 
 GENTYPE()
 

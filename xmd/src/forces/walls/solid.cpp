@@ -16,8 +16,8 @@ namespace xmd {
         cutoff = vm_inst.find_or_emplace<real>("solid_wall_cutoff",
             params["solid walls"]["cutoff"].as<quantity>());
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
         num_particles = vm_inst.find<int>("num_particles");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
@@ -31,10 +31,10 @@ namespace xmd {
                 walls_.push_back(p);
             }
             return walls_;
-        }).to_span();
+        }).view();
 
-        wall_F = vm_inst.find_or_emplace<vec3r_vector>("solid_wall_F",
-            walls.size()).to_array();
+        wall_F = vm_inst.find_or_emplace<vector<vec3r>>("solid_wall_F",
+            walls.size()).data();
     }
 
     void eval_solid_wall_forces::omp_async() const {

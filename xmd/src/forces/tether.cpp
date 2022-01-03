@@ -6,14 +6,14 @@
 
 namespace xmd {
     void eval_tether_forces::operator()() const {
-        for (int idx = 0; idx < tethers.size; ++idx) {
+        for (int idx = 0; idx < tethers.size(); ++idx) {
             iter(idx);
         }
     }
 
     void eval_tether_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < tethers.size; ++idx) {
+        for (int idx = 0; idx < tethers.size(); ++idx) {
             iter(idx);
         }
     }
@@ -27,33 +27,32 @@ namespace xmd {
         def_length = vm_inst.find_or_emplace<real>("tether_def_length",
             params["tether forces"]["def_length"].as<quantity>());
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
 
-        tethers = vm_inst.find_or<tether_pair_vector>("tethers",
+        tethers = vm_inst.find_or<vector<tether_pair>>("tethers",
             [&]() -> auto& {
                 auto& xmd_model = vm_inst.find<model>("model");
                 using res_map_t = std::unordered_map<xmd::model::residue*, int>;
                 auto& res_map = vm_inst.find<res_map_t>("res_map");
 
-                auto& tethers_ = vm_inst.emplace<tether_pair_vector>(
-                    "tethers", xmd_model.tethers.size());
-                int tether_idx = 0;
+                auto& tethers_ = vm_inst.emplace<vector<tether_pair>>(
+                    "tethers");
                 for (auto const& tether: xmd_model.tethers) {
-                    tethers_.i1[tether_idx] = res_map[tether.res1];
-                    tethers_.i2[tether_idx] = res_map[tether.res2];
-                    tethers_.nat_dist[tether_idx] = tether.length.value_or(def_length);
-                    ++tether_idx;
+                    auto i1 = res_map[tether.res1], i2 = res_map[tether.res2];
+                    auto nat_dist = (real)tether.length.value_or(def_length);
+                    tethers_.emplace_back(i1, i2, nat_dist);
                 }
 
                 return tethers_;
-            }).to_span();
+            }).view();
     }
 
     void eval_tether_forces::iter(int idx) const {
-        auto i1 = tethers.i1[idx], i2 = tethers.i2[idx];
-        auto nat_dist = tethers.nat_dist[idx];
+        auto tether = tethers[idx];
+        auto i1 = tether.i1(), i2 = tether.i2();
+        auto nat_dist = tether.nat_dist();
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = r2 - r1;
@@ -65,17 +64,5 @@ namespace xmd {
         *V += V_;
         F[i1] += dV_dr * r12_u;
         F[i2] -= dV_dr * r12_u;
-    }
-
-    tether_pair_vector::tether_pair_vector(int n):
-        i1{n}, i2{n}, nat_dist{n}, size{n} {}
-
-    tether_pair_span tether_pair_vector::to_span() {
-        tether_pair_span span;
-        span.i1 = i1.to_array();
-        span.i2 = i2.to_array();
-        span.nat_dist = nat_dist.to_array();
-        span.size = size;
-        return span;
     }
 }

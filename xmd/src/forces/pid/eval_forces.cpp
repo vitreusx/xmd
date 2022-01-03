@@ -6,7 +6,7 @@
 namespace xmd::pid {
 
     void eval_pid_forces::operator()() {
-        for (int idx = 0; idx < bundles->size; ++idx) {
+        for (int idx = 0; idx < bundles->size(); ++idx) {
             iter(idx);
         }
     }
@@ -28,36 +28,38 @@ namespace xmd::pid {
                 lambda_ver = GAUSSIAN;
 
             auto const& bb_plus_params = pid_params["bb+"];
-            conf_.bb_plus_lam.version = lambda_ver;
-            conf_.bb_plus_lam.alpha = bb_plus_params["alpha"].as<quantity>();
-            conf_.bb_plus_lam.psi_0 = bb_plus_params["psi_0"].as<quantity>();
-            conf_.bb_plus_lj.r_min = bb_plus_params["r_min"].as<quantity>();
-            conf_.bb_plus_lj.depth = bb_plus_params["depth"].as<quantity>();
+            conf_.bb_plus_lam.version() = lambda_ver;
+            conf_.bb_plus_lam.alpha() = bb_plus_params["alpha"].as<quantity>();
+            conf_.bb_plus_lam.psi_0() = bb_plus_params["psi_0"].as<quantity>();
+            conf_.bb_plus_lj.r_min() = bb_plus_params["r_min"].as<quantity>();
+            conf_.bb_plus_lj.depth() = bb_plus_params["depth"].as<quantity>();
 
             auto const& bb_minus_params = pid_params["bb-"];
-            conf_.bb_minus_lam.version = lambda_ver;
-            conf_.bb_minus_lam.alpha = bb_minus_params["alpha"].as<quantity>();
-            conf_.bb_minus_lam.psi_0 = bb_minus_params["psi_0"].as<quantity>();
-            conf_.bb_minus_lj.r_min = bb_minus_params["r_min"].as<quantity>();
-            conf_.bb_minus_lj.depth = bb_minus_params["depth"].as<quantity>();
+            conf_.bb_minus_lam.version() = lambda_ver;
+            conf_.bb_minus_lam.alpha() = bb_minus_params["alpha"].as<quantity>();
+            conf_.bb_minus_lam.psi_0() = bb_minus_params["psi_0"].as<quantity>();
+            conf_.bb_minus_lj.r_min() = bb_minus_params["r_min"].as<quantity>();
+            conf_.bb_minus_lj.depth() = bb_minus_params["depth"].as<quantity>();
 
             auto& lj_variants_ = vm_inst.find_or_emplace<lj_variants>(
                 "lj_variants");
-            conf_.ss_ljs = lj_variants_.ss;
+            conf_.ss_ljs = lj_variants_.ss.data();
 
             auto const& ss_params = pid_params["ss"];
-            conf_.ss_lam.psi_0 = ss_params["psi_0"].as<quantity>();
-            conf_.ss_lam.alpha = ss_params["alpha"].as<quantity>();
+            conf_.ss_lam.psi_0() = ss_params["psi_0"].as<quantity>();
+            conf_.ss_lam.alpha() = ss_params["alpha"].as<quantity>();
 
             return conf_;
         });
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        bundles = &vm_inst.find_or_emplace<pid_bundle_vector>(
+        bundles = &vm_inst.find_or_emplace<vector<pid_bundle>>(
             "pid_bundles");
         V = &vm_inst.find<real>("V");
+        prev = vm_inst.find<vector<int>>("prev").data();
+        next = vm_inst.find<vector<int>>("next").data();
     }
 
     void eval_pid_forces::iter(int idx) const {
@@ -65,9 +67,10 @@ namespace xmd::pid {
         vec3r dpsi1_dr1p, dpsi1_dr1, dpsi1_dr1n, dpsi1_dr2;
         vec3r dpsi2_dr2p, dpsi2_dr2, dpsi2_dr2n, dpsi2_dr1;
 
-        auto i1p = bundles->i1p[idx], i1 = bundles->i1[idx], i1n = bundles->i1n[idx];
-        auto i2p = bundles->i2p[idx], i2 = bundles->i2[idx], i2n = bundles->i2n[idx];
-        auto type = bundles->type[idx];
+        auto bundle = bundles->at(idx);
+        auto i1 = bundle.i1(), i2 = bundle.i2();
+        auto type = bundle.type();
+        auto i1p = prev[i1], i1n = next[i1], i2p = prev[i2], i2n = next[i2];
 
         vec3r r1p = r[i1p], r1 = r[i1], r1n = r[i1n];
         vec3r r2p = r[i2p], r2 = r[i2], r2n = r[i2n];
@@ -165,7 +168,7 @@ namespace xmd::pid {
             C += lam1 * lam2 * lj_dV_dr;
         }
 
-        auto ss_sink_lj = conf.ss_ljs[type];
+        sink_lj ss_sink_lj = conf.ss_ljs[type];
         if (conf.ss_lam.supp(psi1) && conf.ss_lam.supp(psi2)) {
             auto [lam1, deriv1] = conf.ss_lam(psi1);
             auto [lam2, deriv2] = conf.ss_lam(psi2);
@@ -177,7 +180,6 @@ namespace xmd::pid {
             C += lam1 * lam2 * lj_dV_dr;
         }
 
-//#pragma omp atomic update
         *V += V_;
 
         auto r12_u = r12 * r12_rn;
@@ -191,7 +193,7 @@ namespace xmd::pid {
 
     void eval_pid_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < bundles->size; ++idx) {
+        for (int idx = 0; idx < bundles->size(); ++idx) {
             iter(idx);
         }
     }

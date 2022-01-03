@@ -3,10 +3,11 @@
 #include <unordered_map>
 #include <xmd/params/param_file.h>
 #include <xmd/utils/units.h>
+#include <xmd/utils/convert.h>
 
 namespace xmd {
     void eval_chiral_forces::operator()() const {
-        for (int idx = 0; idx < quads.size; ++idx) {
+        for (int idx = 0; idx < quads.size(); ++idx) {
             iter(idx);
         }
     }
@@ -16,35 +17,28 @@ namespace xmd {
         e_chi = vm_inst.find_or_emplace<real>("e_chi",
             params["chirality"]["e_chi"].as<quantity>());
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
 
-        quads = vm_inst.find_or<chiral_quad_vector>("chiral_quads",
+        quads = vm_inst.find_or<vector<chiral_quad>>("chiral_quads",
             [&]() -> auto& {
                 auto& xmd_model = vm_inst.find<xmd::model>("model");
                 using res_map_t = std::unordered_map<
                     xmd::model::residue*, int>;
                 auto& res_map = vm_inst.find<res_map_t>("res_map");
 
-                auto& quads_ = vm_inst.emplace<chiral_quad_vector>(
-                    "chiral_quads", xmd_model.dihedrals.size());
+                auto& quads_ = vm_inst.emplace<vector<chiral_quad>>(
+                    "chiral_quads");
 
-                auto quads_idx = 0;
                 for (auto const& dihedral: xmd_model.dihedrals) {
-                    quads_.i1[quads_idx] = res_map[dihedral.res1];
-                    quads_.i2[quads_idx] = res_map[dihedral.res2];
-                    quads_.i3[quads_idx] = res_map[dihedral.res3];
-                    quads_.i4[quads_idx] = res_map[dihedral.res4];
+                    auto i1 = res_map[dihedral.res1], i2 = res_map[dihedral.res2],
+                        i3 = res_map[dihedral.res3], i4 = res_map[dihedral.res4];
 
-                    auto const& cast_vec = [](Eigen::Vector3d const& v) -> vec3r {
-                        return { (real)v.x(), (real)v.y(), (real)v.z() };
-                    };
-
-                    auto nat_r1 = cast_vec(dihedral.res1->pos);
-                    auto nat_r2 = cast_vec(dihedral.res2->pos);
-                    auto nat_r3 = cast_vec(dihedral.res3->pos);
-                    auto nat_r4 = cast_vec(dihedral.res4->pos);
+                    vec3r nat_r1 = convert<real, double>(dihedral.res1->pos),
+                        nat_r2 = convert<real, double>(dihedral.res2->pos),
+                        nat_r3 = convert<real, double>(dihedral.res3->pos),
+                        nat_r4 = convert<real, double>(dihedral.res4->pos);
 
                     auto nat_r12 = nat_r2 - nat_r1, nat_r23 = nat_r3 - nat_r2,
                         nat_r34 = nat_r4 - nat_r3;
@@ -52,21 +46,19 @@ namespace xmd {
                     auto nat_factor = ipow<3>(norm_inv(nat_r23));
                     auto nat_chir = dot(nat_r12, cross(nat_r23, nat_r34)) * nat_factor;
 
-                    quads_.nat_factor[quads_idx] = nat_factor;
-                    quads_.nat_chir[quads_idx] = nat_chir;
-
-                    ++quads_idx;
+                    quads_.emplace_back(i1, i2, i3, i4, nat_factor, nat_chir);
                 }
 
                 return quads_;
-            }).to_span();
+            }).view();
     }
 
     void eval_chiral_forces::iter(int idx) const {
-        auto i1 = quads.i1[idx], i2 = quads.i2[idx], i3 = quads.i3[idx],
-            i4 = quads.i4[idx];
-        auto nat_chir = quads.nat_chir[idx];
-        auto nat_factor = quads.nat_factor[idx];
+        auto quad = quads[idx];
+
+        auto i1 = quad.i1(), i2 = quad.i2(), i3 = quad.i3(), i4 = quad.i4();
+        auto nat_chir = quad.nat_chir();
+        auto nat_factor = quad.nat_factor();
 
         auto r1 = r[i1], r2 = r[i2], r3 = r[i3], r4 = r[i4];
         auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
@@ -76,7 +68,6 @@ namespace xmd {
         auto chir = dot(r12, x23_34) * nat_factor;
         auto chir_diff = chir - nat_chir;
 
-//#pragma omp atomic update
         *V += 0.5f * e_chi * chir_diff * chir_diff;
 
         auto f = e_chi * chir_diff * nat_factor;
@@ -84,28 +75,12 @@ namespace xmd {
         F[i2] -= f * (x12_34 + x23_34);
         F[i3] += f * (x12_23 + x12_34);
         F[i4] -= f * x12_23;
-
     }
 
     void eval_chiral_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < quads.size; ++idx) {
+        for (int idx = 0; idx < quads.size(); ++idx) {
             iter(idx);
         }
     }
-
-    chiral_quad_vector::chiral_quad_vector(int n):
-        i1{n}, i2{n}, i3{n}, i4{n}, nat_chir{n}, nat_factor {n} {}
-
-    chiral_quad_span chiral_quad_vector::to_span() {
-        chiral_quad_span span;
-        span.i1 = i1.to_array();
-        span.i2 = i2.to_array();
-        span.i3 = i3.to_array();
-        span.i4 = i4.to_array();
-        span.nat_factor = nat_factor.to_array();
-        span.nat_chir = nat_chir.to_array();
-        span.size = size;
-        return span;
-    };
 }

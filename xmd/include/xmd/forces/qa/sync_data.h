@@ -11,9 +11,9 @@ int8_t,side_hydrophobic
 GEN_EXPR()
 
 namespace xmd::qa {
-    class sync_data: public sync_data_expr<sync_data> {
+    class sync_data : public sync_data_expr<sync_data> {
     public:
-        sync_data():
+        sync_data() :
             back_{0}, side_all_{0}, side_polar_{0}, side_hydrophobic_{0} {};
 
         INST_CTORS()
@@ -21,7 +21,7 @@ namespace xmd::qa {
         INST_ASSIGN_EXPR()
 
         template<typename E>
-        inline auto& operator+=(sync_data_expr<E> const& e) {
+        inline auto &operator+=(sync_data_expr<E> const &e) {
             back_ += e.back();
             side_all_ += e.side_all();
             side_polar_ += e.side_polar();
@@ -30,7 +30,7 @@ namespace xmd::qa {
         }
 
         template<typename E>
-        inline auto& operator-=(sync_data_expr<E> const& e) {
+        inline auto &operator-=(sync_data_expr<E> const &e) {
             back_ -= e.back();
             side_all_ -= e.side_all();
             side_polar_ -= e.side_polar();
@@ -49,15 +49,16 @@ namespace xmd::qa {
         INST_FIELDS()
     };
 
-    class sync_data_ref: public sync_data_expr<sync_data_ref> {
+    class sync_data_ref : public sync_data_expr<sync_data_ref> {
     public:
         REF_CTORS()
         REF_ASSIGN_COPY()
         REF_ASSIGN_MOVE()
         REF_ASSIGN_EXPR()
+        REF_SWAP()
 
         template<typename E>
-        inline auto& operator+=(sync_data_expr<E> const& e) {
+        inline auto &operator+=(sync_data_expr<E> const &e) {
             back_ += e.back();
             side_all_ += e.side_all();
             side_polar_ += e.side_polar();
@@ -66,7 +67,7 @@ namespace xmd::qa {
         }
 
         template<typename E>
-        inline auto& operator-=(sync_data_expr<E> const& e) {
+        inline auto &operator-=(sync_data_expr<E> const &e) {
             back_ -= e.back();
             side_all_ -= e.side_all();
             side_polar_ -= e.side_polar();
@@ -74,29 +75,36 @@ namespace xmd::qa {
             return *this;
         }
 
+        REF_LAZY_FIELDS()
+
     protected:
         REF_FIELDS()
     };
+}
 
+REF_IMPL_SPEC()
+
+namespace xmd::qa {
     template<typename E1, typename E2>
     class sync_sum_expr:
         public sync_data_expr<sync_sum_expr<E1, E2>> {
     public:
-        sync_sum_expr(E1 const& e1, E2 const& e2);
+        sync_sum_expr(E1 const& e1, E2 const& e2):
+            e1{e1}, e2{e2} {};
 
-        auto back() const {
+        int8_t back() const {
             return e1.back() + e2.back();
         }
 
-        auto side_all() const {
+        int8_t side_all() const {
             return e1.side_all() + e2.side_all();
         }
 
-        auto side_polar() const {
+        int8_t side_polar() const {
             return e1.side_polar() + e2.side_polar();
         }
 
-        auto side_hydrophobic() const {
+        int8_t side_hydrophobic() const {
             return e1.side_hydrophobic() + e2.side_hydrophobic();
         }
 
@@ -115,21 +123,22 @@ namespace xmd::qa {
     class sync_diff_expr:
         public sync_data_expr<sync_sum_expr<E1, E2>> {
     public:
-        sync_diff_expr(E1 const& e1, E2 const& e2);
+        sync_diff_expr(E1 const& e1, E2 const& e2):
+            e1{e1}, e2{e2} {};
 
-        auto back() const {
+        int8_t back() const {
             return e1.back() - e2.back();
         }
 
-        auto side_all() const {
+        int8_t side_all() const {
             return e1.side_all() - e2.side_all();
         }
 
-        auto side_polar() const {
+        int8_t side_polar() const {
             return e1.side_polar() - e2.side_polar();
         }
 
-        auto side_hydrophobic() const {
+        int8_t side_hydrophobic() const {
             return e1.side_hydrophobic() - e2.side_hydrophobic();
         }
 
@@ -148,8 +157,8 @@ namespace xmd::qa {
 GEN_CONST_REF()
 GEN_PTR()
 GEN_CONST_PTR()
-GEN_CONST_SPAN()
 GEN_SPAN()
+GEN_CONST_SPAN()
 GEN_MEMORY()
 GEN_ALLOCATOR()
 GEN_VECTOR()

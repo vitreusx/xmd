@@ -1,6 +1,5 @@
 #pragma once
-#include <xmd/types/vector.h>
-#include <xmd/types/cyclic_buffer.h>
+
 #include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>

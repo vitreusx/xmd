@@ -1,6 +1,6 @@
 #pragma once
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+
+
 #include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
@@ -10,7 +10,7 @@
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() es_pair
-#define FIELDS() int,i1,int,i2,real,q1_x_q2
+#define FIELDS() int,i1,int,i2,xmd::real,q1_x_q2
 
 GENTYPE()
 

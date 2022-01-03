@@ -5,7 +5,7 @@
 namespace xmd {
 
     void eval_snd_forces::operator()() const {
-        for (int idx = 0; idx < dihedrals.size; ++idx) {
+        for (int idx = 0; idx < dihedrals.size(); ++idx) {
             iter(idx);
         }
     }
@@ -19,8 +19,9 @@ namespace xmd {
     }
 
     void eval_snd_forces::iter(int idx) const {
-        int i1 = dihedrals.i1[idx], i2 = dihedrals.i2[idx],
-            i3 = dihedrals.i3[idx], i4 = dihedrals.i4[idx];
+        auto dihedral = dihedrals[idx];
+        int i1 = dihedral.i1(), i2 = dihedral.i2(),
+            i3 = dihedral.i3(), i4 = dihedral.i4();
         auto r1 = r[i1], r2 = r[i2], r3 = r[i3], r4 = r[i4];
         auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
         auto x12_23 = cross(r12, r23), x23_34 = cross(r23, r34);
@@ -32,10 +33,8 @@ namespace xmd {
         auto phi = acos(cos_phi);
         if (dot(x12_23, r34) < 0.0f) phi = -phi;
 
-        auto diff = phi - dihedrals.nat_phi[idx];
-//#pragma omp atomic update
+        auto diff = phi - dihedral.nat_phi();
         *V += 0.5f * CDH * diff * diff;
-        auto dV_dphi = CDH * diff;
 
         auto r23_n = norm(r23);
         auto dphi_dr1 = -x12_23_u * r23_n * x12_23_rn;
@@ -45,6 +44,7 @@ namespace xmd {
         auto dphi_dr2 = -dphi_dr1 + df;
         auto dphi_dr3 = -dphi_dr4 - df;
 
+        auto dV_dphi = CDH * diff;
         F[i1] -= dV_dphi * dphi_dr1;
         F[i2] -= dV_dphi * dphi_dr2;
         F[i3] -= dV_dphi * dphi_dr3;
@@ -54,7 +54,7 @@ namespace xmd {
 
     void eval_snd_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < dihedrals.size; ++idx) {
+        for (int idx = 0; idx < dihedrals.size(); ++idx) {
             iter(idx);
         }
     }

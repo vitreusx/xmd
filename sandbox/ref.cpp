@@ -10,7 +10,6 @@
 #include <xmd/io/export_pdb.h>
 #include <xmd/params/param_file.h>
 #include <xmd/nl/verify.h>
-#include <xmd/nl/divide_into_cells.h>
 #include <xmd/io/report_stats.h>
 #include <xmd/io/report_structure.h>
 #include <xmd/nl/legacy_update.h>
@@ -70,12 +69,9 @@ int main() {
         params["simple native dihedrals"]["enabled"].as<bool>());
     auto &nat_simp_dih_ = def_vm.find_or_emplace<eval_snd_forces>("eval_snd");
 
-    auto &divide_into_cells_ = def_vm.find_or_emplace<nl::divide_into_cells>(
-        "div_into_cells");
+    auto &legacy_update_ = def_vm.find_or_emplace<nl::legacy_update>("legacy_update");
     auto &nl_verify_ = def_vm.find_or_emplace<nl::verify>("nl_verify");
     auto &invalid = def_vm.find<bool>("invalid");
-
-    auto &legacy_update_ = def_vm.find_or_emplace<nl::legacy_update>("legacy_update");
 
     auto &pauli_enabled = def_vm.find_or_emplace<bool>("pauli_enabled",
         params["Pauli exclusion"]["enabled"].as<bool>());
@@ -159,7 +155,7 @@ int main() {
     nl_verify_();
 
     if (invalid) {
-        divide_into_cells_();
+        legacy_update_();
 
         if (pauli_enabled)
             update_pauli_();
@@ -265,7 +261,6 @@ eval_qa_,eval_solid_,eval_lj_attr_,eval_vel_afm_,eval_force_afm_)
                 }
 
                 if (invalid) {
-//                    divide_into_cells_();
                     legacy_update_();
 
                     if (pauli_enabled)

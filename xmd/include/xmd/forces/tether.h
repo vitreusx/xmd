@@ -6,7 +6,7 @@
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() tether_pair
-#define FIELDS() int,i1,int,i2,real,nat_dist
+#define FIELDS() int,i1,int,i2,xmd::real,nat_dist
 
 GENTYPE()
 

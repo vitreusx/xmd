@@ -1,6 +1,6 @@
 #pragma once
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+
+
 #include <xmd/types/amino_acid.h>
 #include <xmd/model/box.h>
 #include <xmd/types/vec3.h>

@@ -47,3 +47,7 @@ add_custom_command(
     POST_BUILD
     COMMAND /usr/bin/zsh ${PROJECT_SOURCE_DIR}/scripts/gen_asm.zsh
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+add_subdirectory(docs)

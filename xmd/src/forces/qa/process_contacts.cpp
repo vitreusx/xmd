@@ -24,25 +24,26 @@ namespace xmd::qa {
 
         factor = breaking_factor * (real)pow(2.0f, -1.0f/6.0f);
 
-        sync = vm_inst.find<sync_data_vector>("sync").to_array();
-        contacts = &vm_inst.find<contact_set>("qa_contacts");
+        sync = vm_inst.find<vector<sync_data>>("sync").data();
+        contacts = &vm_inst.find<set<contact>>("qa_contacts");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         V = &vm_inst.find<real>("V");
-        F = vm_inst.find<vec3r_vector>("F").to_array();
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        free_pairs = &vm_inst.find<free_pair_set>("qa_free_pairs");
+        F = vm_inst.find<vector<vec3r>>("F").data();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        free_pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
     }
 
     void process_contacts::iter(int idx) const {
-        if (!contacts->has_item(idx))
-            return;
+        auto node = contacts->at(idx);
+        if (node.vacant()) return;
+        auto contact = node.value();
 
-        auto i1 = contacts->i1[idx], i2 = contacts->i2[idx];
-        auto type = contacts->type[idx];
-        auto status = contacts->status[idx];
-        auto ref_time = contacts->ref_time[idx];
-        auto sync_diff1 = contacts->sync_diff1[idx];
-        auto sync_diff2 = contacts->sync_diff2[idx];
+        auto i1 = contact.i1(), i2 = contact.i2();
+        auto type = contact.type();
+        auto status = contact.status();
+        auto ref_time = contact.ref_time();
+        auto sync_diff1 = contact.sync_diff1();
+        auto sync_diff2 = contact.sync_diff2();
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = box->r_uv(r1, r2);
@@ -54,31 +55,27 @@ namespace xmd::qa {
             saturation = 1.0f - saturation;
 
         auto lj_force = ljs[(short)type];
-        auto r12_n = r12_rn * v3::norm_squared(r12);
+        auto r12_n = r12_rn * norm_squared(r12);
         auto [Vij, dVij_dr] = lj_force(r12_n, r12_rn);
-//#pragma omp atomic update
         *V += saturation * Vij;
         auto f = saturation * dVij_dr * r12_u;
         F[i1] += f;
         F[i2] -= f;
 
         if (status == FORMING_OR_FORMED && saturation == 1.0f) {
-            if (factor * lj_force.r_min * r12_rn < 1.0f) {
-                contacts->status[idx] = BREAKING;
-                contacts->ref_time[idx] = *t;
+            if (factor * lj_force.r_min() * r12_rn < 1.0f) {
+                contact.status() = BREAKING;
+                contact.ref_time() = *t;
             }
         }
         else if (status == BREAKING && saturation == 0.0f) {
 #pragma omp critical
-            contacts->remove(idx);
-            sync[i1] += sync_diff1;
-            sync[i2] += sync_diff2;
-
-            int free_idx;
-#pragma omp critical
-            free_idx = free_pairs->add();
-            free_pairs->i1[free_idx] = i1;
-            free_pairs->i2[free_idx] = i2;
+            {
+                contacts->remove(idx);
+                sync[i1] += sync_diff1;
+                sync[i2] += sync_diff2;
+                free_pairs->emplace(i1, i2);
+            }
         }
     }
 

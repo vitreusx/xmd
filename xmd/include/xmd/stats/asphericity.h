@@ -6,7 +6,7 @@ namespace xmd {
     class compute_asphericity: public vm_aware {
     public:
         real *asphericity;
-        vec3r_array r;
+        const_array<vec3r> r;
         array<real> mass;
         int num_particles;
 

@@ -46,7 +46,7 @@ T const *const_ref_to_ptr(T const& ref_) {
         inline {{sig.name}}##_const_ptr({{sig.name}} NO_SPEC() const *ptr_):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
-                {{comma()}}{{x}}##_ptr{{"{"}}&ptr_->{{x}}(){{"}"}}
+                {{comma()}}{{x}}##_ptr{{"{"}}const_ref_to_ptr(ptr_->{{x}}()){{"}"}}
             {% endfor %}
         {};
 
@@ -57,7 +57,7 @@ T const *const_ref_to_ptr(T const& ref_) {
             {% endfor %}
         {};
 
-        inline {{sig.name}}##_const_ref NO_SPEC() operator*(int) const {
+        inline {{sig.name}}##_const_ref NO_SPEC() operator*() const {
             return {{"{"}}
                 {% set comma = joiner(",") %}
                 {% for T, x in sig.fields %}

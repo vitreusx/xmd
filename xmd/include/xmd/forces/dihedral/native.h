@@ -7,7 +7,7 @@
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() nat_dih
-#define FIELDS() int,i1,int,i2,int,i3,int,i4,real,nat_phi
+#define FIELDS() int,i1,int,i2,int,i3,int,i4,xmd::real,nat_phi
 
 GENTYPE()
 

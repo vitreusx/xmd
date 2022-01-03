@@ -11,20 +11,11 @@
 
 #define INST_CTORS_3(name, T1, x1)                                             \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
-      typename _T1>                                                            \
+      typename _T1                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -53,29 +44,14 @@
 
 #define INST_CTORS_5(name, T1, x1, T2, x2)                                     \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T2> x2                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        ,                                                                      \
-        x2##_{x2}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
       typename _T1                                                             \
                                                                                \
       ,                                                                        \
-      typename _T2>                                                            \
+      typename _T2                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -116,29 +92,6 @@
 
 #define INST_CTORS_7(name, T1, x1, T2, x2, T3, x3)                             \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T2> x2                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T3> x3                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        ,                                                                      \
-        x2##_{x2}                                                              \
-                                                                               \
-        ,                                                                      \
-        x3##_{x3}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
       typename _T1                                                             \
@@ -147,7 +100,9 @@
       typename _T2                                                             \
                                                                                \
       ,                                                                        \
-      typename _T3>                                                            \
+      typename _T3                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -200,35 +155,6 @@
 
 #define INST_CTORS_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                     \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T2> x2                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T3> x3                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T4> x4                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        ,                                                                      \
-        x2##_{x2}                                                              \
-                                                                               \
-        ,                                                                      \
-        x3##_{x3}                                                              \
-                                                                               \
-        ,                                                                      \
-        x4##_{x4}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
       typename _T1                                                             \
@@ -240,7 +166,9 @@
       typename _T3                                                             \
                                                                                \
       ,                                                                        \
-      typename _T4>                                                            \
+      typename _T4                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -305,41 +233,6 @@
 
 #define INST_CTORS_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)            \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T2> x2                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T3> x3                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T4> x4                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T5> x5                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        ,                                                                      \
-        x2##_{x2}                                                              \
-                                                                               \
-        ,                                                                      \
-        x3##_{x3}                                                              \
-                                                                               \
-        ,                                                                      \
-        x4##_{x4}                                                              \
-                                                                               \
-        ,                                                                      \
-        x5##_{x5}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
       typename _T1                                                             \
@@ -354,7 +247,9 @@
       typename _T4                                                             \
                                                                                \
       ,                                                                        \
-      typename _T5>                                                            \
+      typename _T5                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -431,47 +326,6 @@
 
 #define INST_CTORS_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)    \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T2> x2                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T3> x3                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T4> x4                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T5> x5                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T6> x6                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        ,                                                                      \
-        x2##_{x2}                                                              \
-                                                                               \
-        ,                                                                      \
-        x3##_{x3}                                                              \
-                                                                               \
-        ,                                                                      \
-        x4##_{x4}                                                              \
-                                                                               \
-        ,                                                                      \
-        x5##_{x5}                                                              \
-                                                                               \
-        ,                                                                      \
-        x6##_{x6}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
       typename _T1                                                             \
@@ -489,7 +343,9 @@
       typename _T5                                                             \
                                                                                \
       ,                                                                        \
-      typename _T6>                                                            \
+      typename _T6                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -579,53 +435,6 @@
 #define INST_CTORS_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6,    \
                       T7, x7)                                                  \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T2> x2                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T3> x3                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T4> x4                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T5> x5                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T6> x6                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T7> x7                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        ,                                                                      \
-        x2##_{x2}                                                              \
-                                                                               \
-        ,                                                                      \
-        x3##_{x3}                                                              \
-                                                                               \
-        ,                                                                      \
-        x4##_{x4}                                                              \
-                                                                               \
-        ,                                                                      \
-        x5##_{x5}                                                              \
-                                                                               \
-        ,                                                                      \
-        x6##_{x6}                                                              \
-                                                                               \
-        ,                                                                      \
-        x7##_{x7}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
       typename _T1                                                             \
@@ -646,7 +455,9 @@
       typename _T6                                                             \
                                                                                \
       ,                                                                        \
-      typename _T7>                                                            \
+      typename _T7                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -748,59 +559,6 @@
 #define INST_CTORS_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6,    \
                       T7, x7, T8, x8)                                          \
                                                                                \
-  inline name(                                                                 \
-                                                                               \
-      const_ref<T1> x1                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T2> x2                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T3> x3                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T4> x4                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T5> x5                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T6> x6                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T7> x7                                                         \
-                                                                               \
-      ,                                                                        \
-      const_ref<T8> x8                                                         \
-                                                                               \
-      )                                                                        \
-      :                                                                        \
-                                                                               \
-        x1##_{x1}                                                              \
-                                                                               \
-        ,                                                                      \
-        x2##_{x2}                                                              \
-                                                                               \
-        ,                                                                      \
-        x3##_{x3}                                                              \
-                                                                               \
-        ,                                                                      \
-        x4##_{x4}                                                              \
-                                                                               \
-        ,                                                                      \
-        x5##_{x5}                                                              \
-                                                                               \
-        ,                                                                      \
-        x6##_{x6}                                                              \
-                                                                               \
-        ,                                                                      \
-        x7##_{x7}                                                              \
-                                                                               \
-        ,                                                                      \
-        x8##_{x8}                                                              \
-                                                                               \
-        {};                                                                    \
-                                                                               \
   template <                                                                   \
                                                                                \
       typename _T1                                                             \
@@ -824,7 +582,9 @@
       typename _T7                                                             \
                                                                                \
       ,                                                                        \
-      typename _T8>                                                            \
+      typename _T8                                                             \
+                                                                               \
+      >                                                                        \
   inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
@@ -943,7 +703,12 @@
 
 #define INST_ASSIGN_COPY_3(name, T1, x1)                                       \
                                                                                \
-  inline name &operator=(name NO_SPEC() const &other) { x1##_ = other.x1##_; }
+  inline name &operator=(name NO_SPEC() const &other) {                        \
+                                                                               \
+    x1##_ = other.x1##_;                                                       \
+                                                                               \
+    return *this;                                                              \
+  }
 
 #define INST_ASSIGN_COPY_5(name, T1, x1, T2, x2)                               \
                                                                                \
@@ -952,6 +717,8 @@
     x1##_ = other.x1##_;                                                       \
                                                                                \
     x2##_ = other.x2##_;                                                       \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_COPY_7(name, T1, x1, T2, x2, T3, x3)                       \
@@ -963,6 +730,8 @@
     x2##_ = other.x2##_;                                                       \
                                                                                \
     x3##_ = other.x3##_;                                                       \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_COPY_9(name, T1, x1, T2, x2, T3, x3, T4, x4)               \
@@ -976,6 +745,8 @@
     x3##_ = other.x3##_;                                                       \
                                                                                \
     x4##_ = other.x4##_;                                                       \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_COPY_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)      \
@@ -991,6 +762,8 @@
     x4##_ = other.x4##_;                                                       \
                                                                                \
     x5##_ = other.x5##_;                                                       \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_COPY_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
@@ -1009,6 +782,8 @@
     x5##_ = other.x5##_;                                                       \
                                                                                \
     x6##_ = other.x6##_;                                                       \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_COPY_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
@@ -1029,6 +804,8 @@
     x6##_ = other.x6##_;                                                       \
                                                                                \
     x7##_ = other.x7##_;                                                       \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_COPY_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
@@ -1051,6 +828,8 @@
     x7##_ = other.x7##_;                                                       \
                                                                                \
     x8##_ = other.x8##_;                                                       \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR() INST_ASSIGN_EXPR_EXP(NAME(), FIELDS())
@@ -1064,6 +843,8 @@
   template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR_5(name, T1, x1, T2, x2)                               \
@@ -1073,6 +854,8 @@
     x1##_ = e.x1();                                                            \
                                                                                \
     x2##_ = e.x2();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR_7(name, T1, x1, T2, x2, T3, x3)                       \
@@ -1084,6 +867,8 @@
     x2##_ = e.x2();                                                            \
                                                                                \
     x3##_ = e.x3();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR_9(name, T1, x1, T2, x2, T3, x3, T4, x4)               \
@@ -1097,6 +882,8 @@
     x3##_ = e.x3();                                                            \
                                                                                \
     x4##_ = e.x4();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)      \
@@ -1112,6 +899,8 @@
     x4##_ = e.x4();                                                            \
                                                                                \
     x5##_ = e.x5();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
@@ -1130,6 +919,8 @@
     x5##_ = e.x5();                                                            \
                                                                                \
     x6##_ = e.x6();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
@@ -1150,6 +941,8 @@
     x6##_ = e.x6();                                                            \
                                                                                \
     x7##_ = e.x7();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_ASSIGN_EXPR_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
@@ -1172,6 +965,8 @@
     x7##_ = e.x7();                                                            \
                                                                                \
     x8##_ = e.x8();                                                            \
+                                                                               \
+    return *this;                                                              \
   }
 
 #define INST_LAZY_FIELDS() INST_LAZY_FIELDS_EXP(NAME(), FIELDS())

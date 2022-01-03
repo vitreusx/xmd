@@ -9,29 +9,30 @@ namespace xmd {
         auto& params = vm_inst.find<param_file>("params");
         auto const& lj_params = params["lj force variants"];
 
-        bb.r_min = lj_params["bb"]["r_min"].as<quantity>();
-        bb.depth = lj_params["bb"]["depth"].as<quantity>();
+        bb.r_min() = lj_params["bb"]["r_min"].as<quantity>();
+        bb.depth() = lj_params["bb"]["depth"].as<quantity>();
 
-        bs.r_min = lj_params["bs"]["r_min"].as<quantity>();
-        bs.depth = lj_params["bs"]["depth"].as<quantity>();
+        bs.r_min() = lj_params["bs"]["r_min"].as<quantity>();
+        bs.depth() = lj_params["bs"]["depth"].as<quantity>();
 
         sb = bs;
 
         auto num_ss_lj_types = amino_acid::NUM_AA * amino_acid::NUM_AA;
-        ss = vm_inst.emplace<sink_lj_vector>("ss_ljs_vector",
-            num_ss_lj_types).to_array();
 
+        auto mut_ss =  vm_inst.emplace<vector<sink_lj>>("ss_ljs_vector",
+            num_ss_lj_types).view();
+        ss = mut_ss;
 
         if (auto def_r_max_p = lj_params["ss"]["default"]["r_max"]; def_r_max_p) {
             auto def_r_max = def_r_max_p.as<quantity>();
             for (int ss_idx = 0; ss_idx < num_ss_lj_types; ++ss_idx)
-                ss.r_max[ss_idx] = def_r_max;
+                mut_ss[ss_idx].r_max() = def_r_max;
         }
 
         if (auto def_depth_p = lj_params["ss"]["default"]["depth"]; def_depth_p) {
             auto def_depth = def_depth_p.as<quantity>();
             for (int ss_idx = 0; ss_idx < num_ss_lj_types; ++ss_idx)
-                ss.depth[ss_idx] = def_depth;
+                mut_ss[ss_idx].depth() = def_depth;
         }
 
         if (auto per_pair_ss = lj_params["ss"]["per pair"]; per_pair_ss) {
@@ -41,7 +42,7 @@ namespace xmd {
                     auto aa1 = amino_acid(rec["type"]);
                     for (auto const& aa2: amino_acid::all()) {
                         int ss_idx = amino_acid::NUM_AA*(int)aa1 + (int)aa2;
-                        ss.r_max[ss_idx] = quantity(rec[aa2.name()], angstrom);
+                        mut_ss[ss_idx].r_max() = quantity(rec[aa2.name()], angstrom);
                     }
                 }
             }
@@ -52,7 +53,7 @@ namespace xmd {
                     auto aa1 = amino_acid(rec["type"]);
                     for (auto const& aa2: amino_acid::all()) {
                         int ss_idx = amino_acid::NUM_AA*(int)aa1 + (int)aa2;
-                        ss.depth[ss_idx] = quantity(rec[aa2.name()], eps);
+                        mut_ss[ss_idx].depth() = quantity(rec[aa2.name()], eps);
                     }
                 }
             }
@@ -60,7 +61,7 @@ namespace xmd {
 
         bool sinking = lj_params["ss"]["use sinking variant"].as<bool>();
         for (int ss_idx = 0; ss_idx < num_ss_lj_types; ++ss_idx) {
-            ss.r_min[ss_idx] = sinking ? bb.r_min : ss.r_max[ss_idx];
+            mut_ss[ss_idx].r_min() = sinking ? bb.r_min() : mut_ss[ss_idx].r_max();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace xmd::pid {
 #define NAMESPACE(...) xmd,pid,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() lambda_func
-#define FIELDS() real,psi_0,real,alpha,lambda_version,version
+#define FIELDS() xmd::real,psi_0,xmd::real,alpha,xmd::pid::lambda_version,version
 
 GEN_EXPR()
 
@@ -75,8 +75,8 @@ GEN_REF()
 GEN_CONST_REF()
 GEN_PTR()
 GEN_CONST_PTR()
-GEN_CONST_SPAN()
 GEN_SPAN()
+GEN_CONST_SPAN()
 GEN_MEMORY()
 GEN_ALLOCATOR()
 GEN_VECTOR()

@@ -1,6 +1,6 @@
 #pragma once
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+
+
 #include <xmd/utils/geometry.h>
 #include <xmd/vm/vm.h>
 #include <xmd/model/box.h>
@@ -14,8 +14,8 @@ namespace xmd {
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() lj_attr_pair
-#define FIELDS() int,part_idx,int,wall_idx,lj_attr_pair_status,status,\
-vec3r,joint_r,real,ref_t
+#define FIELDS() int,part_idx,int,wall_idx,xmd::lj_attr_pair_status,status,\
+xmd::vec3r,joint_r,xmd::real,ref_t
 
 GENTYPE()
 
@@ -39,7 +39,7 @@ namespace xmd {
         span<plane> walls;
         real *V, *t;
         int num_particles;
-        const_span<lj_attr_pair> pairs;
+        span<lj_attr_pair> pairs;
 
         void init_from_vm(vm& vm_inst) override;
 

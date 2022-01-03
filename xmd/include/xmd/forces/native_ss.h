@@ -1,8 +1,8 @@
 #pragma once
 #include <xmd/forces/primitives/harmonic.h>
 #include <xmd/model/box.h>
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+
+
 #include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/vm/vm.h>
@@ -47,7 +47,7 @@ namespace xmd {
         array<vec3r> r;
         box<vec3r> const *box;
         nl::nl_data const *nl;
-        vector<nat_ss> const *all_ssobnds;
+        vector<nat_ss> const *all_ssbonds;
         vector<nat_ss> *ssbonds;
 
         void init_from_vm(vm& vm_inst) override;

@@ -8,45 +8,34 @@ namespace xmd::pid {
 
         auto min_norm_inv = (real)1.0 / (cutoff + nl->orig_pad);
 
-//#pragma omp taskloop default(none) private(min_norm_inv) nogroup
-        for (int pair_idx = 0; pair_idx < nl->particle_pairs.size; ++pair_idx) {
-            auto idx1 = nl->particle_pairs.i1[pair_idx];
-            auto idx2 = nl->particle_pairs.i2[pair_idx];
-            auto r1 = r[idx1], r2 = r[idx2];
+        for (int pair_idx = 0; pair_idx < nl->particle_pairs.size(); ++pair_idx) {
+            auto nl_pair = nl->particle_pairs[pair_idx];
+            auto i1 = nl_pair.i1(), i2 = nl_pair.i2();
+            auto r1 = r[i1], r2 = r[i2];
 
             if (norm_inv(box->r_uv(r1, r2)) > min_norm_inv) {
-                auto prev1 = prev[idx1], next1 = next[idx1];
-                auto prev2 = prev[idx2], next2 = next[idx2];
+                auto prev1 = prev[i1], next1 = next[i1];
+                auto prev2 = prev[i2], next2 = next[i2];
                 if (prev1 < 0 || next1 < 0 || prev2 < 0 || next2 < 0)
                     continue;
 
-                auto atype1 = atype[idx1], atype2 = atype[idx2];
-
-                int bundle_idx;
-#pragma omp critical
-                bundle_idx = bundles->push_back();
-
-                bundles->i1p[bundle_idx] = prev1;
-                bundles->i1[bundle_idx] = idx1;
-                bundles->i1n[bundle_idx] = next1;
-                bundles->i2p[bundle_idx] = prev2;
-                bundles->i2[bundle_idx] = idx2;
-                bundles->i2n[bundle_idx] = next2;
+                auto atype1 = atype[i1], atype2 = atype[i2];
                 int16_t type = (int16_t)atype1 *
                                (int16_t)amino_acid::NUM_AA + (int16_t)atype2;
-                bundles->type[bundle_idx] = type;
+
+                bundles->emplace_back(i1, i2, type);
             }
         }
     }
 
     void update_pid_bundles::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        prev = vm_inst.find<vector<int>>("prev").to_array();
-        next = vm_inst.find<vector<int>>("next").to_array();
-        atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        prev = vm_inst.find<vector<int>>("prev").data();
+        next = vm_inst.find<vector<int>>("next").data();
+        atype = vm_inst.find<vector<amino_acid>>("atype").data();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
-        bundles = &vm_inst.find<pid_bundle_vector>("pid_bundles");
+        bundles = &vm_inst.find<vector<pid_bundle>>("pid_bundles");
 
         cutoff = vm_inst.find_or<real>("pid_cutoff", [&]() -> auto& {
             auto& cutoff_ = vm_inst.emplace<real>("pid_cutoff", 0.0);
@@ -55,8 +44,8 @@ namespace xmd::pid {
             cutoff_ = max(cutoff_, variants.bb.cutoff());
             cutoff_ = max(cutoff_, variants.bs.cutoff());
             cutoff_ = max(cutoff_, variants.sb.cutoff());
-            for (int ss_idx = 0; ss_idx < variants.ss.size; ++ss_idx) {
-                auto ss = variants.ss[ss_idx];
+            for (int ss_idx = 0; ss_idx < variants.ss.size(); ++ss_idx) {
+                sink_lj ss = variants.ss[ss_idx];
                 cutoff_ = max(cutoff_, ss.cutoff());
             }
 
@@ -65,39 +54,5 @@ namespace xmd::pid {
 
         auto& max_cutoff = vm_inst.find<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
-    }
-
-    int pid_bundle_vector::push_back() {
-        i1p.push_back();
-        i1.push_back();
-        i1n.push_back();
-        i2p.push_back();
-        i2.push_back();
-        i2n.push_back();
-        type.push_back();
-        return size++;
-    }
-
-    void pid_bundle_vector::clear() {
-        i1p.clear();
-        i1.clear();
-        i1n.clear();
-        i2p.clear();
-        i2.clear();
-        i2n.clear();
-        type.clear();
-        size = 0;
-    }
-
-    pid_bundle_span pid_bundle_vector::to_span() {
-        pid_bundle_span s;
-        s.i1p = i1p.data();
-        s.i1 = i1.data();
-        s.i1n = i1n.data();
-        s.i2p = i2p.data();
-        s.i2 = i2.data();
-        s.i2n = i2n.data();
-        s.size = size;
-        return s;
     }
 }

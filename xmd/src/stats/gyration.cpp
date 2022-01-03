@@ -19,8 +19,8 @@ namespace xmd {
     }
 
     void compute_gyration_radius::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        mass = vm_inst.find<vector<real>>("mass").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        mass = vm_inst.find<vector<real>>("mass").data();
         num_particles = vm_inst.find<int>("num_particles");
         gyration_radius = &vm_inst.find_or_emplace<real>(
             "gyration_radius");

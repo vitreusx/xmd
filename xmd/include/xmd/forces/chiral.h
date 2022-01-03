@@ -6,7 +6,7 @@
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() chiral_quad
-#define FIELDS() int,i1,int,i2,int,i3,int,i4,real,nat_chir,real,nat_factor
+#define FIELDS() int,i1,int,i2,int,i3,int,i4,xmd::real,nat_chir,xmd::real,nat_factor
 
 GENTYPE()
 

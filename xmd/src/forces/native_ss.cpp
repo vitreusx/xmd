@@ -8,53 +8,41 @@ namespace xmd {
     void update_nat_ssbonds::operator()() const {
         ssbonds->clear();
 
-//#pragma omp taskloop default(none) nogroup
-        for (int idx = 0; idx < all_ssobnds->size; ++idx) {
-            auto idx1 = all_ssobnds->i1[idx], idx2 = all_ssobnds->i2[idx];
-            auto r1 = r[idx1], r2 = r[idx2];
+        for (int idx = 0; idx < all_ssbonds->size(); ++idx) {
+            auto ssbond = all_ssbonds->at(idx);
+            auto i1 = ssbond.i1(), i2 = ssbond.i2();
+            auto r1 = r[i1], r2 = r[i2];
             if (norm(box->r_uv(r1, r2)) < cutoff + nl->orig_pad) {
-                int cont_idx;
-#pragma omp critical
-                cont_idx = ssbonds->push_back();
-                ssbonds->i1[cont_idx] = idx1;
-                ssbonds->i2[cont_idx] = idx2;
+                ssbonds->emplace_back(i1, i2);
             }
         }
     }
 
     void update_nat_ssbonds::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vec3r_vector>("r").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
-        all_ssobnds = &vm_inst.find_or<nat_ssbond_vector>("all_ssbonds",
+        all_ssbonds = &vm_inst.find_or<vector<nat_ss>>("all_ssbonds",
             [&]() -> auto& {
                 auto& xmd_model = vm_inst.find<xmd::model>("model");
                 using res_map_t = std::unordered_map<
                     xmd::model::residue*, int>;
                 auto& res_map = vm_inst.find<res_map_t>("res_map");
 
-                int num_ssbonds = 0;
-                for (auto const& cont: xmd_model.contacts) {
-                    if (cont.type == model::NAT_SS)
-                        ++num_ssbonds;
-                }
+                auto& all_ssbonds_ = vm_inst.emplace<vector<nat_ss>>(
+                    "all_ssbonds");
 
-                auto& all_ssbonds_ = vm_inst.emplace<nat_ssbond_vector>(
-                    "all_ssbonds", num_ssbonds);
-
-                int cont_idx = 0;
                 for (auto const& cont: xmd_model.contacts) {
                     if (cont.type == model::NAT_SS) {
-                        all_ssbonds_.i1[cont_idx] = res_map[cont.res1];
-                        all_ssbonds_.i2[cont_idx] = res_map[cont.res2];
-                        ++cont_idx;
+                        auto i1 = res_map[cont.res1], i2 = res_map[cont.res2];
+                        all_ssbonds_.emplace_back(i1, i2);
                     }
                 }
 
                 return all_ssbonds_;
             });
 
-        ssbonds = &vm_inst.find<nat_ssbond_vector>("ssbonds");
+        ssbonds = &vm_inst.find<vector<nat_ss>>("ssbonds");
 
         auto& nat_r = vm_inst.find<real>("nat_ss_r");
         cutoff = harmonic::cutoff(nat_r);
@@ -64,7 +52,7 @@ namespace xmd {
     }
 
     void eval_nat_ssbond_forces::operator()() const {
-        for (int idx = 0; idx < ssbonds->size; ++idx) {
+        for (int idx = 0; idx < ssbonds->size(); ++idx) {
             iter(idx);
         }
     }
@@ -77,13 +65,14 @@ namespace xmd {
             params["native ssbonds"]["equilibrium dist"].as<quantity>());
 
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        ssbonds = &vm_inst.find_or_emplace<nat_ssbond_vector>("ssbonds");
-        r = vm_inst.find<vec3r_vector>("r").to_array();
+        ssbonds = &vm_inst.find_or_emplace<vector<nat_ss>>("ssbonds");
+        r = vm_inst.find<vector<vec3r>>("r").data();
         V = &vm_inst.find<real>("V");
     }
 
     void eval_nat_ssbond_forces::iter(int idx) const {
-        auto cys_i1 = ssbonds->i1[idx], cys_i2 = ssbonds->i2[idx];
+        auto ssbond = ssbonds->at(idx);
+        auto cys_i1 = ssbond.i1(), cys_i2 = ssbond.i2();
         auto r1 = r[cys_i1], r2 = r[cys_i2];
         auto r12 = box->r_uv(r1, r2);
 
@@ -99,31 +88,8 @@ namespace xmd {
 
     void eval_nat_ssbond_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < ssbonds->size; ++idx) {
+        for (int idx = 0; idx < ssbonds->size(); ++idx) {
             iter(idx);
         }
     }
-
-    int nat_ssbond_vector::push_back()  {
-        i1.push_back();
-        i2.push_back();
-        return size++;
-    }
-
-    void nat_ssbond_vector::clear() {
-        i1.clear();
-        i2.clear();
-        size = 0;
-    }
-
-    nat_ssbond_span nat_ssbond_vector::to_span() {
-        nat_ssbond_span span;
-        span.i1 = i1.data();
-        span.i2 = i2.data();
-        span.size = size;
-        return span;
-    }
-
-    nat_ssbond_vector::nat_ssbond_vector(int n):
-        i1{n}, i2{n}, size{n} {};
 }

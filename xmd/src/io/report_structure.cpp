@@ -20,13 +20,13 @@ namespace xmd {
 
         xmd_model = &vm_inst.find<xmd::model>("model");
         res_map = &vm_inst.find<res_map_t>("res_map");
-        r = vm_inst.find<vec3r_vector>("r").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
 
         if (vm_inst.has("sync"))
-            sync = vm_inst.find<qa::sync_data_vector>("sync").to_array();
+            sync = vm_inst.find<vector<qa::sync_data>>("sync").data();
 
         if (vm_inst.has("qa_contacts"))
-            qa_cont = &vm_inst.find<qa::contact_set>("qa_contacts");
+            qa_cont = &vm_inst.find<set<qa::contact>>("qa_contacts");
 
         t = &vm_inst.find<real>("t");
         last_t = &vm_inst.find_or_emplace<real>("rep_struct_last_t",
@@ -69,12 +69,10 @@ namespace xmd {
 
                 if (sync) {
                     auto sync_ = sync.value()[idx];
-                    record["back"] = std::to_string(sync_.back);
-                    record["side-all"] = std::to_string(sync_.side_all);
-                    record["side-polar"] = std::to_string(
-                        sync_.side_polar);
-                    record["side-hydrophobic"] = std::to_string(
-                        sync_.side_hydrophobic);
+                    record["back"] = std::to_string(sync_.back());
+                    record["side-all"] = std::to_string(sync_.side_all());
+                    record["side-polar"] = std::to_string(sync_.side_polar());
+                    record["side-hydrophobic"] = std::to_string(sync_.side_hydrophobic());
                 }
             }
 
@@ -123,13 +121,17 @@ namespace xmd {
 
                 auto& qa_cont_ = *qa_cont.value();
                 for (int idx = 0; idx < qa_cont_.extent(); ++idx) {
+                    auto node = qa_cont_.at(idx);
+                    if (node.vacant()) continue;
+                    auto cont = node.value();
+
                     auto& record = qa_cont_csv.add_record();
                     record["idx"] = std::to_string(idx);
-                    record["i1"] = std::to_string(qa_cont_.i1[idx]);
-                    record["i2"] = std::to_string(qa_cont_.i2[idx]);
+                    record["i1"] = std::to_string(cont.i1());
+                    record["i2"] = std::to_string(cont.i2());
 
                     std::string type;
-                    switch ((short)qa_cont_.type[idx]) {
+                    switch ((short)cont.type()) {
                     case (short)qa::contact_type::BACK_BACK():
                         type = "BACK_BACK";
                         break;
@@ -145,10 +147,10 @@ namespace xmd {
                     }
                     record["type"] = type;
 
-                    record["t0"] = std::to_string(qa_cont_.ref_time[idx]);
+                    record["t0"] = std::to_string(cont.ref_time());
 
                     std::string status;
-                    switch (qa_cont_.status[idx]) {
+                    switch (cont.status()) {
                     case qa::FORMING_OR_FORMED:
                         status = "FORMING_OR_FORMED";
                         break;

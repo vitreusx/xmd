@@ -4,25 +4,12 @@
 #include <xmd/vm/vm.h>
 
 namespace xmd::qa {
-    struct nh_bundle_span {
-        array<int> iprev, icur, inext;
-        int size;
-    };
-
-    struct nh_bundle_vector {
-        vector<int> iprev, icur, inext;
-        int size;
-
-        explicit nh_bundle_vector(int n = 0);
-
-        nh_bundle_span to_span();
-    };
-
     class precompute_nh: public vm_aware {
     public:
         const_array<vec3r> r;
         array<vec3r> n, h;
         box<vec3r> const *box;
+        const_array<int> prev, next;
         int num_particles;
 
         void init_from_vm(vm& vm_inst) override;

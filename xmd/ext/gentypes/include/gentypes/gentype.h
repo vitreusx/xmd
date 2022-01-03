@@ -20,8 +20,8 @@
   GEN_CONST_REF()                                                              \
   GEN_PTR()                                                                    \
   GEN_CONST_PTR()                                                              \
-  GEN_CONST_SPAN()                                                             \
   GEN_SPAN()                                                                   \
+  GEN_CONST_SPAN()                                                             \
   GEN_MEMORY()                                                                 \
   GEN_ALLOCATOR()                                                              \
   GEN_VECTOR()                                                                 \

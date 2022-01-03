@@ -12,9 +12,9 @@ namespace xmd {
         real period;
 
     public:
-        vec3tr_array true_r;
-        xmd::model *ref_model;
-        res_map_t *res_map;
+        const_array<vec3tr> true_r;
+        xmd::model const *ref_model;
+        res_map_t const *res_map;
         int *serial;
         real *last_t, *t;
 

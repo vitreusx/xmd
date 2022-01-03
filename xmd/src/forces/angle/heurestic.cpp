@@ -6,7 +6,6 @@
 #include <sstream>
 
 namespace xmd {
-
     heur_ang_type::heur_ang_type(const amino_acid &a1,
         const amino_acid &a2) {
         auto code1 = (aa_code)a1, code2 = (aa_code)a2;
@@ -15,7 +14,7 @@ namespace xmd {
         val = (int8_t)3 * type1 + type2;
     }
 
-    constexpr heur_ang_type::operator int8_t() {
+    constexpr heur_ang_type::operator int8_t() const {
         return val;
     }
 
@@ -23,7 +22,7 @@ namespace xmd {
         val{val} {};
 
     void eval_heurestic_angle_forces::operator()() const {
-        for (int idx = 0; idx < angles.size; ++idx) {
+        for (int idx = 0; idx < angles.size(); ++idx) {
             iter(idx);
         }
     }
@@ -63,48 +62,38 @@ namespace xmd {
             }
         }
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
 
-        angles = vm_inst.find_or<heurestic_angle_vector>("heurestic_angles",
+        angles = vm_inst.find_or<vector<heur_ang>>("heurestic_angles",
             [&]() -> auto& {
                 auto& xmd_model = vm_inst.find<model>("model");
-                int num_heur_ang = 0;
-                for (auto const& angle: xmd_model.angles) {
-                    if (!angle.theta.has_value())
-                        num_heur_ang += 1;
-                }
-
-                auto& angles_vec = vm_inst.emplace<heurestic_angle_vector>(
-                    "heurestic_angles", num_heur_ang);
-
-                int ang_idx = 0;
                 using res_map_t = std::unordered_map<xmd::model::residue*, int>;
                 auto& res_map = vm_inst.find<res_map_t>("res_map");
-                auto atypes = vm_inst.find<vector<amino_acid>>("atype").to_array();
+                auto atypes = vm_inst.find<vector<amino_acid>>("atype").data();
+
+                auto& angles_ = vm_inst.emplace<vector<heur_ang>>(
+                    "heurestic_angles");
+
                 for (auto const& angle: xmd_model.angles) {
                     if (!angle.theta.has_value()) {
                         auto i1 = res_map[angle.res1], i2 = res_map[angle.res2],
                             i3 = res_map[angle.res3];
-
-                        angles_vec.i1[ang_idx] = i1;
-                        angles_vec.i2[ang_idx] = i2;
-                        angles_vec.i3[ang_idx] = i3;
                         auto type = heur_ang_type(atypes[i1], atypes[i2]);
-                        angles_vec.type[ang_idx] = type;
 
-                        ++ang_idx;
+                        angles_.emplace_back(i1, i2, i3, type);
                     }
                 }
 
-                return angles_vec;
-            }).to_span();
+                return angles_;
+            }).view();
     }
 
     void eval_heurestic_angle_forces::iter(int idx) const {
-        auto i1 = angles.i1[idx], i2 = angles.i2[idx], i3 = angles.i3[idx];
-        auto type_val = (int8_t)angles.type[idx];
+        auto angle = angles[idx];
+        auto i1 = angle.i1(), i2 = angle.i2(), i3 = angle.i3();
+        auto type_val = (int8_t)angle.type();
 
         auto r1 = r[i1], r2 = r[i2], r3 = r[i3];
         auto r12 = r2 - r1, r23 = r3 - r2;
@@ -126,7 +115,6 @@ namespace xmd {
             angle_V = coeff + theta * angle_V;
         }
 
-//#pragma omp atomic update
         *V += angle_V;
 
         F[i1] -= dV_dtheta * dtheta_dr1;
@@ -136,21 +124,8 @@ namespace xmd {
 
     void eval_heurestic_angle_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < angles.size; ++idx) {
+        for (int idx = 0; idx < angles.size(); ++idx) {
             iter(idx);
         }
     }
-
-    heurestic_angle_span heurestic_angle_vector::to_span()  {
-        heurestic_angle_span span;
-        span.i1 = i1.to_array();
-        span.i2 = i2.to_array();
-        span.i3 = i3.to_array();
-        span.type = type.to_array();
-        span.size = i1.size();
-        return span;
-    }
-
-    heurestic_angle_vector::heurestic_angle_vector(int n):
-        i1{n}, i2{n}, i3{n}, type{n}, size{n} {};
 }

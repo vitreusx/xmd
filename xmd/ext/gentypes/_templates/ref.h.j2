@@ -75,6 +75,18 @@ using ref = typename ref_impl<T>::type;
 
 {{meta.macro_v_alt2("REF_ASSIGN_EXPR", _ref_assign_expr)}}
 
+{% macro _ref_swap(sig) %}
+    friend void swap({{sig.name}}##_ref const& a, {{sig.name}}##_ref const& b) {
+        using std::swap;
+
+        {% for T, x in sig.fields %}
+            swap(a.{{x}}##_, b.{{x}}##_);
+        {% endfor %}
+    }
+{% endmacro %}
+
+{{meta.macro_v_alt2("REF_SWAP", _ref_swap)}}
+
 {% macro _ref_lazy_fields(sig) %}
         {% for T, x in sig.fields %}
             inline ref<{{T}}> {{x}}() const {
@@ -93,6 +105,15 @@ using ref = typename ref_impl<T>::type;
 
 {{meta.macro_v_alt2("REF_FIELDS", _ref_fields)}}
 
+{% macro _ref_impl_spec(name) %}
+    NULL_SPEC()
+    struct ref_impl<NS_PREFIX() {{name}} NO_SPEC()> {
+        using type = NS_PREFIX() {{name}}##_ref NO_SPEC();
+    };
+{% endmacro %}
+
+{{meta.macro_n("REF_IMPL_SPEC", _ref_impl_spec)}}
+
 {% macro _gen_ref(sig) %}
     ENTER_NS()
     NO_TEMPLATE()
@@ -100,13 +121,10 @@ using ref = typename ref_impl<T>::type;
         public {{sig.name}}##_expr<{{sig.name}}##_ref NO_SPEC()> {
     public:
         REF_CTORS()
-
         REF_ASSIGN_COPY()
-
         REF_ASSIGN_MOVE()
-
         REF_ASSIGN_EXPR()
-
+        REF_SWAP()
         REF_LAZY_FIELDS()
 
     protected:
@@ -114,10 +132,7 @@ using ref = typename ref_impl<T>::type;
     };
     LEAVE_NS()
 
-    NULL_SPEC()
-    struct ref_impl<NS_PREFIX() {{sig.name}} NO_SPEC()> {
-        using type = NS_PREFIX() {{sig.name}}##_ref NO_SPEC();
-    };
+    REF_IMPL_SPEC()    
 {% endmacro %}
 
 {{meta.macro_v("GEN_REF", _gen_ref)}}

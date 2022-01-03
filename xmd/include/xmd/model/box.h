@@ -7,7 +7,7 @@ namespace xmd {
     public:
         VectorT cell, cell_inv;
 
-        box(): cell{0.0, 0.0, 0.0}, cell_inv{0.0, 0.0, 0.0} {};
+        box(): cell{VectorT::Zero()}, cell_inv{VectorT::Zero()} {};
 
         void set_cell(VectorT const& cell) {
             this->cell = cell;
@@ -28,7 +28,7 @@ namespace xmd {
         }
 
         template<typename E>
-        auto wrap(E const& v) {
+        auto wrap(E const& v) const {
             VectorT in_box_ = v;
             in_box_.x() -= cell.x() * xmd::nearbyint(v.x() * cell_inv.x());
             in_box_.y() -= cell.y() * xmd::nearbyint(v.y() * cell_inv.y());
@@ -37,7 +37,7 @@ namespace xmd {
         }
 
         template<typename E>
-        auto r_uv(E const& u, E const& v) {
+        auto r_uv(E const& u, E const& v) const {
             VectorT diff = v - u;
             return wrap(diff);
         }

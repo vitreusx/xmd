@@ -5,7 +5,7 @@
 namespace xmd {
 
     void eval_const_es_forces::operator()() const {
-        for (int idx = 0; idx < es_pairs->size; ++idx) {
+        for (int idx = 0; idx < es_pairs->size(); ++idx) {
             iter(idx);
         }
     }
@@ -22,26 +22,26 @@ namespace xmd {
             const_es_params["screening distance"].as<quantity>());
         screen_dist_inv = (real)1.0 / screening_dist;
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        es_pairs = &vm_inst.find_or_emplace<es_pair_vector>("es_pairs");
+        es_pairs = &vm_inst.find_or_emplace<vector<es_pair>>("es_pairs");
     }
 
     void eval_const_es_forces::iter(int idx) const {
-        auto i1 = es_pairs->i1[idx], i2 = es_pairs->i2[idx];
-        auto q1_q2 = es_pairs->q1_q2[idx];
+        auto es = es_pairs->at(idx);
+        auto i1 = es.i1(), i2 = es.i2();
+        auto q1_x_q2 = es.q1_x_q2();
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = box->r_uv(r1, r2);
         auto r12_n = norm(r12), r12_rn = 1.0f / r12_n;
         auto r12_u = r12 * r12_rn;
 
-        auto Vij = V_factor * q1_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
+        auto Vij = V_factor * q1_x_q2 * exp(-r12_n * screen_dist_inv) * r12_rn * r12_rn;
         auto dVij_dr = -Vij*(screen_dist_inv+r12_rn);
 
-//#pragma omp atomic update
         *V += Vij;
 
         auto f = r12_u * dVij_dr;
@@ -52,7 +52,7 @@ namespace xmd {
 
     void eval_const_es_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < es_pairs->size; ++idx) {
+        for (int idx = 0; idx < es_pairs->size(); ++idx) {
             iter(idx);
         }
     }

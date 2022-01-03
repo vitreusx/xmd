@@ -2,13 +2,13 @@
 
 namespace xmd::qa {
     void eval_qa_forces::init_from_vm(vm &vm_inst) {
-        vm_inst.find_or_emplace<free_pair_set>("qa_free_pairs");
-        vm_inst.find_or_emplace<candidate_list>("qa_candidates");
-        vm_inst.find_or_emplace<contact_set>("qa_contacts");
+        vm_inst.find_or_emplace<set<free_pair>>("qa_free_pairs");
+        vm_inst.find_or_emplace<set<candidate>>("qa_candidates");
+        vm_inst.find_or_emplace<set<contact>>("qa_contacts");
 
-        vm_inst.find_or<sync_data_vector>("sync", [&]() -> auto& {
+        vm_inst.find_or<vector<sync_data>>("sync", [&]() -> auto& {
             auto num_particles = vm_inst.find<int>("num_particles");
-            auto& sync_vec_ = vm_inst.emplace<sync_data_vector>("sync",
+            auto& sync_vec_ = vm_inst.emplace<vector<sync_data>>("sync",
                 num_particles);
 
             auto& aa_data_ = vm_inst.find<amino_acid_data>(
@@ -17,10 +17,8 @@ namespace xmd::qa {
 
             for (int idx = 0; idx < num_particles; ++idx) {
                 auto const& lim = aa_data_[atype[idx]].limits;
-                sync_vec_.back[idx] = lim.back;
-                sync_vec_.side_all[idx] = lim.side_all;
-                sync_vec_.side_polar[idx] = lim.side_polar;
-                sync_vec_.side_hydrophobic[idx] = lim.side_hydrophobic;
+                sync_vec_.emplace_back((int8_t)lim.back, (int8_t)lim.side_all,
+                    (int8_t)lim.side_polar, (int8_t)lim.side_hydrophobic);
             }
 
             return sync_vec_;

@@ -986,6 +986,134 @@ template <typename T> using ref = typename ref_impl<T>::type;
     return *this;                                                              \
   }
 
+#define REF_SWAP() REF_SWAP_EXP(NAME(), FIELDS())
+
+#define REF_SWAP_EXP(name, fields) REF_SWAP_(name, fields)
+
+#define REF_SWAP_(...) VFUNC_ALT2(REF_SWAP_, __VA_ARGS__)
+
+#define REF_SWAP_3(name, T1, x1)                                               \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+  }
+
+#define REF_SWAP_5(name, T1, x1, T2, x2)                                       \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+                                                                               \
+    swap(a.x2##_, b.x2##_);                                                    \
+  }
+
+#define REF_SWAP_7(name, T1, x1, T2, x2, T3, x3)                               \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+                                                                               \
+    swap(a.x2##_, b.x2##_);                                                    \
+                                                                               \
+    swap(a.x3##_, b.x3##_);                                                    \
+  }
+
+#define REF_SWAP_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                       \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+                                                                               \
+    swap(a.x2##_, b.x2##_);                                                    \
+                                                                               \
+    swap(a.x3##_, b.x3##_);                                                    \
+                                                                               \
+    swap(a.x4##_, b.x4##_);                                                    \
+  }
+
+#define REF_SWAP_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)              \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+                                                                               \
+    swap(a.x2##_, b.x2##_);                                                    \
+                                                                               \
+    swap(a.x3##_, b.x3##_);                                                    \
+                                                                               \
+    swap(a.x4##_, b.x4##_);                                                    \
+                                                                               \
+    swap(a.x5##_, b.x5##_);                                                    \
+  }
+
+#define REF_SWAP_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)      \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+                                                                               \
+    swap(a.x2##_, b.x2##_);                                                    \
+                                                                               \
+    swap(a.x3##_, b.x3##_);                                                    \
+                                                                               \
+    swap(a.x4##_, b.x4##_);                                                    \
+                                                                               \
+    swap(a.x5##_, b.x5##_);                                                    \
+                                                                               \
+    swap(a.x6##_, b.x6##_);                                                    \
+  }
+
+#define REF_SWAP_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
+                    x7)                                                        \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+                                                                               \
+    swap(a.x2##_, b.x2##_);                                                    \
+                                                                               \
+    swap(a.x3##_, b.x3##_);                                                    \
+                                                                               \
+    swap(a.x4##_, b.x4##_);                                                    \
+                                                                               \
+    swap(a.x5##_, b.x5##_);                                                    \
+                                                                               \
+    swap(a.x6##_, b.x6##_);                                                    \
+                                                                               \
+    swap(a.x7##_, b.x7##_);                                                    \
+  }
+
+#define REF_SWAP_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
+                    x7, T8, x8)                                                \
+                                                                               \
+  friend void swap(name##_ref const &a, name##_ref const &b) {                 \
+    using std::swap;                                                           \
+                                                                               \
+    swap(a.x1##_, b.x1##_);                                                    \
+                                                                               \
+    swap(a.x2##_, b.x2##_);                                                    \
+                                                                               \
+    swap(a.x3##_, b.x3##_);                                                    \
+                                                                               \
+    swap(a.x4##_, b.x4##_);                                                    \
+                                                                               \
+    swap(a.x5##_, b.x5##_);                                                    \
+                                                                               \
+    swap(a.x6##_, b.x6##_);                                                    \
+                                                                               \
+    swap(a.x7##_, b.x7##_);                                                    \
+                                                                               \
+    swap(a.x8##_, b.x8##_);                                                    \
+  }
+
 #define REF_LAZY_FIELDS() REF_LAZY_FIELDS_EXP(NAME(), FIELDS())
 
 #define REF_LAZY_FIELDS_EXP(name, fields) REF_LAZY_FIELDS_(name, fields)
@@ -1177,6 +1305,17 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
   ref<T8> x8##_;
 
+#define REF_IMPL_SPEC() REF_IMPL_SPEC_EXP(NAME())
+
+#define REF_IMPL_SPEC_EXP(name) REF_IMPL_SPEC_(name)
+
+#define REF_IMPL_SPEC_(name)                                                   \
+                                                                               \
+  NULL_SPEC()                                                                  \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
+  };
+
 #define GEN_REF() GEN_REF_EXP(NAME(), FIELDS())
 
 #define GEN_REF_EXP(name, fields) GEN_REF_(name, fields)
@@ -1190,13 +1329,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1204,10 +1340,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()
 
 #define GEN_REF_5(name, T1, x1, T2, x2)                                        \
                                                                                \
@@ -1216,13 +1349,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1230,10 +1360,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()
 
 #define GEN_REF_7(name, T1, x1, T2, x2, T3, x3)                                \
                                                                                \
@@ -1242,13 +1369,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1256,10 +1380,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()
 
 #define GEN_REF_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                        \
                                                                                \
@@ -1268,13 +1389,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1282,10 +1400,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()
 
 #define GEN_REF_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)               \
                                                                                \
@@ -1294,13 +1409,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1308,10 +1420,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()
 
 #define GEN_REF_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)       \
                                                                                \
@@ -1320,13 +1429,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1334,10 +1440,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()
 
 #define GEN_REF_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
                    x7)                                                         \
@@ -1347,13 +1450,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1361,10 +1461,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()
 
 #define GEN_REF_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
                    x7, T8, x8)                                                 \
@@ -1374,13 +1471,10 @@ template <typename T> using ref = typename ref_impl<T>::type;
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
     REF_CTORS()                                                                \
-                                                                               \
     REF_ASSIGN_COPY()                                                          \
-                                                                               \
     REF_ASSIGN_MOVE()                                                          \
-                                                                               \
     REF_ASSIGN_EXPR()                                                          \
-                                                                               \
+    REF_SWAP()                                                                 \
     REF_LAZY_FIELDS()                                                          \
                                                                                \
   protected:                                                                   \
@@ -1388,7 +1482,4 @@ template <typename T> using ref = typename ref_impl<T>::type;
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \
-  NULL_SPEC()                                                                  \
-  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
-    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
-  };
+  REF_IMPL_SPEC()

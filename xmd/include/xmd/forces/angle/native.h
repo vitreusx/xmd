@@ -1,13 +1,12 @@
 #pragma once
 #include <xmd/types/vec3.h>
-#include <xmd/types/array.h>
 #include <xmd/types/amino_acid.h>
 #include <xmd/vm/vm.h>
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define NAME() nat_ang
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
-#define FIELDS() int,i1,int,i2,int,i3,real,nat_theta
+#define FIELDS() int,i1,int,i2,int,i3,xmd::real,nat_theta
 
 GENTYPE()
 

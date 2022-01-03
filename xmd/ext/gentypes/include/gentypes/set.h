@@ -26,8 +26,8 @@ GEN_REF()
 GEN_CONST_REF()
 GEN_PTR()
 GEN_CONST_PTR()
-GEN_CONST_SPAN()
 GEN_SPAN()
+GEN_CONST_SPAN()
 GEN_MEMORY()
 GEN_ALLOCATOR()
 GEN_VECTOR()
@@ -62,7 +62,7 @@ public:
   }
 
   inline void remove(Idx idx) {
-    destroy_at(&nodes[idx].value());
+    destroy_at<T>::impl(&nodes[idx].value());
     nodes[idx].vacant() = true;
   }
 
@@ -70,7 +70,11 @@ public:
 
   inline ref<set_node<T>> operator[](Idx idx) { return nodes[idx]; }
 
+  inline ref<set_node<T>> at(Idx idx) { return nodes[idx]; }
+
   inline const_ref<set_node<T>> operator[](Idx idx) const { return nodes[idx]; }
+
+  inline const_ref<set_node<T>> at(Idx idx) const { return nodes[idx]; }
 
 protected:
   vector<set_node<T>, NodeAlloc, Idx> nodes;
@@ -122,7 +126,7 @@ using set = typename set_impl<T, NodeAlloc, Idx>::type;
     }                                                                          \
                                                                                \
     inline void remove(Idx idx) {                                              \
-      destroy_at(ref_to_ptr(nodes[idx].value()));                              \
+      destroy_at<name NO_SPEC()>::impl(ref_to_ptr(nodes[idx].value()));        \
       nodes[idx].vacant() = true;                                              \
     }                                                                          \
                                                                                \
@@ -130,7 +134,13 @@ using set = typename set_impl<T, NodeAlloc, Idx>::type;
       return nodes[idx];                                                       \
     }                                                                          \
                                                                                \
+    inline ref<set_node<name NO_SPEC()>> at(Idx idx) { return nodes[idx]; }    \
+                                                                               \
     inline const_ref<set_node<name NO_SPEC()>> operator[](Idx idx) const {     \
+      return nodes[idx];                                                       \
+    }                                                                          \
+                                                                               \
+    inline const_ref<set_node<name NO_SPEC()>> at(Idx idx) const {             \
       return nodes[idx];                                                       \
     }                                                                          \
                                                                                \

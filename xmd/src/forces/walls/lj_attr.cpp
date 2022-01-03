@@ -4,19 +4,6 @@
 #include <xmd/forces/primitives/lj.h>
 
 namespace xmd {
-    lj_attr_pairs_vector::lj_attr_pairs_vector(int n):
-        part_idx{n}, wall_idx{n}, status{n}, joint_r{n}, ref_t{n}, size{n} {};
-
-    lj_attr_pairs_span lj_attr_pairs_vector::to_span() {
-        lj_attr_pairs_span s;
-        s.part_idx = part_idx.to_array();
-        s.wall_idx = wall_idx.to_array();
-        s.joint_r = joint_r.to_array();
-        s.ref_t = ref_t.to_array();
-        s.size = size;
-        return s;
-    }
-
     void eval_lj_attr_wall_forces::init_from_vm(vm& vm_inst) {
         auto& params = vm_inst.find<param_file>("params");
         wall_min_dist = vm_inst.find_or_emplace<real>("lj_attr_wall_min_dist",
@@ -28,30 +15,25 @@ namespace xmd {
             params["LJ attractive walls"]["cycle time"].as<quantity>());
         cycle_time_inv = 1.0 / cycle_time;
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         num_particles = vm_inst.find<int>("num_particles");
         t = &vm_inst.find<real>("r");
 
-        pairs = vm_inst.find_or<lj_attr_pairs_vector>("lj_attr_pairs", [&]() -> auto& {
-            auto num_pairs = num_particles * walls.size();
-            auto& pairs_ = vm_inst.emplace<lj_attr_pairs_vector>("lj_attr_pairs",
-                num_pairs);
+        pairs = vm_inst.find_or<vector<lj_attr_pair>>("lj_attr_pairs", [&]() -> auto& {
+            auto& pairs_ = vm_inst.emplace<vector<lj_attr_pair>>("lj_attr_pairs");
 
-            auto pair_idx = 0;
             for (int wall_idx = 0; wall_idx < walls.size(); ++wall_idx) {
                 for (int part_idx = 0; part_idx < num_particles; ++part_idx) {
-                    pairs_.part_idx[pair_idx] = part_idx;
-                    pairs_.wall_idx[pair_idx] = wall_idx;
-                    pairs_.status[pair_idx] = FREE;
-                    ++pair_idx;
+                    pairs_.emplace_back(part_idx, wall_idx, FREE,
+                        vec3r::Zero(),0.0f);
                 }
             }
 
             return pairs_;
-        }).to_span();
+        }).view();
 
         walls = vm_inst.find_or<vector<plane>>("lj_attr_walls", [&]() -> auto& {
             auto& walls_ = vm_inst.emplace<vector<plane>>("lj_attr_walls");
@@ -62,28 +44,30 @@ namespace xmd {
                 walls_.push_back(p);
             }
             return walls_;
-        }).to_span();
+        }).view();
 
-        wall_F = vm_inst.find_or_emplace<vec3r_vector>("lj_attr_wall_F",
-            walls.size()).to_array();
+        wall_F = vm_inst.find_or_emplace<vector<vec3r>>("lj_attr_wall_F",
+            walls.size()).data();
     }
 
     void eval_lj_attr_wall_forces::loop(int idx) const {
-        auto part_idx = pairs.part_idx[idx], wall_idx = pairs.wall_idx[idx];
-        auto status = pairs.status[idx];
+        auto pair = pairs[idx];
+
+        auto part_idx = pair.part_idx(), wall_idx = pair.wall_idx();
+        auto status = pair.status();
         auto r_ = box->wrap(r[part_idx]);
         auto wall = walls[wall_idx];
 
         if (status == FREE) {
             if (abs(signed_dist(r_, wall)) < wall_min_dist) {
-                pairs.status[idx] = FORMING_OR_FORMED;
-                pairs.joint_r[idx] = project(r_, wall);
-                pairs.ref_t[idx] = *t;
+                pair.status() = FORMING_OR_FORMED;
+                pair.joint_r() = project(r_, wall);
+                pair.ref_t() = *t;
             }
         }
         else {
-            auto joint_r = pairs.joint_r[idx];
-            auto ref_t = pairs.ref_t[idx];
+            auto joint_r = pair.joint_r();
+            auto ref_t = pair.ref_t();
             auto saturation = min(*t - ref_t, cycle_time) * cycle_time_inv;
             if (status == BREAKING)
                 saturation = (real)1.0 - saturation;
@@ -100,25 +84,25 @@ namespace xmd {
 
             if (status == FORMING_OR_FORMED && saturation == 1.0f) {
                 if (factor * wall_min_dist * r12_rn < 1.0f) {
-                    pairs.status[idx] = BREAKING;
-                    pairs.ref_t[idx] = *t;
+                    pair.status() = BREAKING;
+                    pair.ref_t() = *t;
                 }
             }
             else if (status == BREAKING && saturation == 0.0f) {
-                pairs.status[idx] = FREE;
+                pair.status() = FREE;
             }
         }
     }
 
     void eval_lj_attr_wall_forces::operator()() const {
-        for (int idx = 0; idx < pairs.size; ++idx) {
+        for (int idx = 0; idx < pairs.size(); ++idx) {
             loop(idx);
         }
     }
 
     void eval_lj_attr_wall_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < pairs.size; ++idx) {
+        for (int idx = 0; idx < pairs.size(); ++idx) {
             loop(idx);
         }
     }

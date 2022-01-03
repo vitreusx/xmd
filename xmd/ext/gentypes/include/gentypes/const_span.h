@@ -2,17 +2,23 @@
 
 #pragma once
 #include "meta.h"
+#include "span.h"
 
 template <typename T, typename Idx> class const_span_def {
 public:
   inline explicit const_span_def(T const *data_ = nullptr, Idx size_ = 0)
       : data_{data_}, size_{size_} {};
 
+  inline const_span_def(span_def<T, Idx> const &span)
+      : const_span_def{span.data(), span.size()} {};
+
   inline T const *data() const { return data_; }
 
   inline Idx size() const { return size_; }
 
   inline T const &operator[](Idx idx) const { return data_[idx]; }
+
+  inline T const &at(Idx idx) const { return data_[idx]; }
 
 protected:
   T const *data_;
@@ -41,6 +47,9 @@ using const_span = typename const_span_impl<T, Idx>::type;
                                       Idx size_ = 0)                           \
         : data_{data_}, size_{size_} {};                                       \
                                                                                \
+    inline name##_const_span(name##_span SPEC(typename, Idx) const &span_)     \
+        : name##_const_span{span_.data(), span_.size()} {};                    \
+                                                                               \
     inline name##_const_ptr NO_SPEC() data() const { return data_; }           \
                                                                                \
     inline Idx size() const { return size_; }                                  \
@@ -48,6 +57,8 @@ using const_span = typename const_span_impl<T, Idx>::type;
     inline name##_const_ref NO_SPEC() operator[](Idx idx) const {              \
       return data_[idx];                                                       \
     }                                                                          \
+                                                                               \
+    inline name##_const_ref NO_SPEC() at(Idx idx) const { return data_[idx]; } \
                                                                                \
   protected:                                                                   \
     name##_const_ptr NO_SPEC() data_;                                          \

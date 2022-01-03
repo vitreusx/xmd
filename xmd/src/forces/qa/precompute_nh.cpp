@@ -4,67 +4,38 @@
 
 namespace xmd::qa {
     void precompute_nh::operator()() const {
-        for (int idx = 0; idx < bundles.size; ++idx) {
+        for (int idx = 0; idx < num_particles; ++idx) {
             iter(idx);
         }
     }
 
     void precompute_nh::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        auto num_particles = vm_inst.find<int>("num_particles");
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        num_particles = vm_inst.find<int>("num_particles");
 
-        n = vm_inst.find_or_emplace<vec3r_vector>("qa_n",
-            num_particles).to_array();
+        n = vm_inst.find_or_emplace<vector<vec3r>>("qa_n",
+            num_particles).data();
+        h = vm_inst.find_or_emplace<vector<vec3r>>("qa_h",
+            num_particles).data();
 
-        h = vm_inst.find_or_emplace<vec3r_vector>("qa_h",
-            num_particles).to_array();
-
-        bundles = vm_inst.find_or<nh_bundle_vector>("nh_bundles", [&]() -> auto& {
-            auto& xmd_model = vm_inst.find<xmd::model>("model");
-            using res_map_t = std::unordered_map<xmd::model::residue*, int>;
-            auto& res_map = vm_inst.find<res_map_t>("res_map");
-
-            auto& bundles_ = vm_inst.emplace<nh_bundle_vector>("nh_bundles",
-                xmd_model.angles.size());
-            int bundle_idx = 0;
-            for (auto const& angle: xmd_model.angles) {
-                bundles_.iprev[bundle_idx] = res_map[angle.res1];
-                bundles_.icur[bundle_idx] = res_map[angle.res2];
-                bundles_.inext[bundle_idx] = res_map[angle.res3];
-                ++bundle_idx;
-            }
-
-            return bundles_;
-        }).to_span();
+        prev = vm_inst.find<vector<int>>("prev").data();
+        next = vm_inst.find<vector<int>>("next").data();
     }
 
     void precompute_nh::iter(int idx) const {
-        auto iprev = bundles.iprev[idx], icur = bundles.icur[idx],
-            inext = bundles.inext[idx];
+        auto iprev = prev[idx], icur = idx, inext = next[idx];
+        if (iprev < 0 || inext < 0) return;
 
         auto rprev = r[iprev], rcur = r[icur], rnext = r[inext];
         auto v1 = rcur - rprev, v2 = rnext - rcur;
         n[icur] = unit(v2 - v1);
         h[icur] = unit(cross(v2, v1));
-
     }
 
     void precompute_nh::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < bundles.size; ++idx) {
+        for (int idx = 0; idx < num_particles; ++idx) {
             iter(idx);
         }
     }
-
-    nh_bundle_span nh_bundle_vector::to_span() {
-        nh_bundle_span span;
-        span.iprev = iprev.to_array();
-        span.icur = icur.to_array();
-        span.inext = inext.to_array();
-        span.size = size;
-        return span;
-    }
-
-    nh_bundle_vector::nh_bundle_vector(int n):
-        iprev(n), icur(n), inext(n), size(n) {};
 }

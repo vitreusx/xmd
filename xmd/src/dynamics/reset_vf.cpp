@@ -9,7 +9,7 @@ namespace xmd {
     }
 
     void reset_vf::init_from_vm(vm &vm_inst) {
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
         num_particles = vm_inst.find<int>("num_particles");
     }

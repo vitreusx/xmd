@@ -1,5 +1,4 @@
 #pragma once
-#include <xmd/types/array.h>
 #include <xmd/types/vec3.h>
 #include <xmd/types/amino_acid.h>
 #include <xmd/vm/vm.h>
@@ -10,7 +9,7 @@ namespace xmd {
         heur_ang_type() = default;
         heur_ang_type(amino_acid const& a1, amino_acid const& a2) ;
 
-        explicit constexpr operator int8_t();
+        explicit constexpr operator int8_t() const;
 
     private:
         explicit constexpr heur_ang_type(int8_t val);
@@ -21,8 +20,8 @@ namespace xmd {
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
-#define NAME() heur_angle
-#define FIELDS() int,i1,int,i2,int,i3,heur_ang_type,type
+#define NAME() heur_ang
+#define FIELDS() int,i1,int,i2,int,i3,xmd::heur_ang_type,type
 
 GENTYPE()
 
@@ -40,7 +39,7 @@ namespace xmd {
     public:
         const_array<vec3r> r;
         array<vec3r> F;
-        const_span<heur_angle> angles;
+        const_span<heur_ang> angles;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;

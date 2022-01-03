@@ -5,7 +5,7 @@
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() force_afm_tip
-#define FIELDS() int,res_idx,vec3r,pull_force
+#define FIELDS() int,res_idx,xmd::vec3r,pull_force
 
 GENTYPE()
 

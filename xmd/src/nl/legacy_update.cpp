@@ -7,17 +7,17 @@ namespace xmd::nl {
         auto& params = vm_inst.find<param_file>("params");
         pad_factor = vm_inst.find_or_emplace<real>("pad_factor",
             params["neighbor list"]["pad factor"].as<quantity>());
-        r = vm_inst.find<vec3r_vector>("r").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         t = &vm_inst.find<float>("t");
-        chain_idx = vm_inst.find<vector<int>>("chain_idx").to_array();
-        seq_idx = vm_inst.find<vector<int>>("seq_idx").to_array();
+        chain_idx = vm_inst.find<vector<int>>("chain_idx").data();
+        seq_idx = vm_inst.find<vector<int>>("seq_idx").data();
 
         num_particles = vm_inst.find<int>("num_particles");
 
         data = &vm_inst.find_or<nl_data>("nl_data", [&]() -> auto& {
             auto& data_ = vm_inst.emplace<nl_data>("nl_data");
-            data_.orig_r = vec3r_vector(num_particles);
+            data_.orig_r = vector<vec3r>(num_particles);
             return data_;
         });
         max_cutoff = &vm_inst.find_or_emplace<real>("max_cutoff");
@@ -41,12 +41,8 @@ namespace xmd::nl {
                 if (chain1 == chain2 && diff < 3)
                     continue;
 
-                if (norm(box->r_uv(r1, r2)) < req_r) {
-                    int pair_idx = data->particle_pairs.push_back();
-                    data->particle_pairs.i1[pair_idx] = i1;
-                    data->particle_pairs.i2[pair_idx] = i2;
-                    data->particle_pairs.is_native[pair_idx] = false;
-                }
+                if (norm(box->r_uv(r1, r2)) < req_r)
+                    data->particle_pairs.emplace_back(i1, i2, false);
             }
         }
 

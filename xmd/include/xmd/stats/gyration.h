@@ -6,7 +6,7 @@ namespace xmd {
     class compute_gyration_radius: public vm_aware {
     public:
         real* gyration_radius;
-        vec3r_array r;
+        const_array<vec3r> r;
         array<real> mass;
         int num_particles;
 

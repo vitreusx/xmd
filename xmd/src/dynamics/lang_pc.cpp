@@ -50,13 +50,13 @@ namespace xmd {
         dt = vm_inst.find_or_add<true_real>("dt",
             params["integrator"]["dt"].as<quantity>());
 
-        r = vm_inst.find<vec3r_vector>("r").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
         num_particles = vm_inst.find<int>("num_particles");
-        mass = vm_inst.find<vector<real>>("mass").to_array();
+        mass = vm_inst.find<vector<real>>("mass").data();
         gen = &vm_inst.find<rand_gen>("gen");
 
-        F = vm_inst.find_or_emplace<vec3r_vector>("F",
-            num_particles).to_array();
+        F = vm_inst.find_or_emplace<vector<vec3r>>("F",
+            num_particles).data();
         t = &vm_inst.find_or_emplace<real>("t", (real)0.0);
         mass_inv = vm_inst.find_or<vector<real>>("mass_inv", [&]() -> auto& {
             auto& mass_inv_ = vm_inst.emplace<vector<real>>("mass_inv",
@@ -64,24 +64,24 @@ namespace xmd {
             for (int idx = 0; idx < num_particles; ++idx)
                 mass_inv_[idx] = (real)1.0 / mass[idx];
             return mass_inv_;
-        }).to_array();
-        y0 = vm_inst.find_or<vec3tr_vector>("true_r", [&]() -> auto& {
-            auto& y0_ = vm_inst.emplace<vec3tr_vector>("true_r",
+        }).data();
+        y0 = vm_inst.find_or<vector<vec3tr>>("true_r", [&]() -> auto& {
+            auto& y0_ = vm_inst.emplace<vector<vec3tr>>("true_r",
                 num_particles);
             for (int idx = 0; idx < num_particles; ++idx)
                 y0_[idx] = r[idx];
             return y0_;
-        }).to_array();
-        y1 = vm_inst.find_or_emplace<vec3tr_vector>("y1",
-            num_particles).to_array();
-        y2 = vm_inst.find_or_emplace<vec3tr_vector>("y2",
-            num_particles).to_array();
-        y3 = vm_inst.find_or_emplace<vec3tr_vector>("y3",
-            num_particles).to_array();
-        y4 = vm_inst.find_or_emplace<vec3tr_vector>("y4",
-            num_particles).to_array();
-        y5 = vm_inst.find_or_emplace<vec3tr_vector>("y5",
-            num_particles).to_array();
+        }).data();
+        y1 = vm_inst.find_or_emplace<vector<vec3tr>>("y1",
+            num_particles).data();
+        y2 = vm_inst.find_or_emplace<vector<vec3tr>>("y2",
+            num_particles).data();
+        y3 = vm_inst.find_or_emplace<vector<vec3tr>>("y3",
+            num_particles).data();
+        y4 = vm_inst.find_or_emplace<vector<vec3tr>>("y4",
+            num_particles).data();
+        y5 = vm_inst.find_or_emplace<vector<vec3tr>>("y5",
+            num_particles).data();
         true_t = &vm_inst.find_or_emplace<true_real>("true_t", *t);
 
         mass_rsqrt = vm_inst.find_or<vector<real>>("mass_rsqrt",
@@ -89,13 +89,13 @@ namespace xmd {
                 auto& mass_rsqrt_ = vm_inst.emplace<vector<real>>("mass_rsqrt",
                     num_particles);
                 for (int idx = 0; idx < num_particles; ++idx) {
-                    mass_rsqrt_[idx] = 1.0 / sqrt(mass[idx]);
+                    mass_rsqrt_[idx] = (real)1.0 / sqrt(mass[idx]);
                 }
 
                 return mass_rsqrt_;
-            }).to_array();
+            }).data();
 
-        v = vm_inst.find_or_emplace<vec3r_vector>("v",
-            num_particles).to_array();
+        v = vm_inst.find_or_emplace<vector<vec3r>>("v",
+            num_particles).data();
     }
 }

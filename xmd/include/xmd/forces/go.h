@@ -1,24 +1,11 @@
 #pragma once
 #include <xmd/types/vec3.h>
-#include <xmd/types/vector.h>
-#include <xmd/types/array.h>
+#include <xmd/model/native_contact.h>
 #include <xmd/model/box.h>
 #include <xmd/utils/math.h>
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/nl/data.h>
 #include <xmd/vm/vm.h>
-
-#define NAMESPACE(...) xmd,__VA_ARGS__
-#define TEMPLATE_PARAMS(...) __VA_ARGS__
-#define NAME() nat_cont
-#define FIELDS() int,i1,int,i2,real,nat_dist
-
-GENTYPE()
-
-#undef FIELDS
-#undef NAME
-#undef TEMPLATE_PARAMS
-#undef NAMESPACE
 
 namespace xmd {
     class eval_go_forces: public vm_aware {

@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/amino_acid.h>
 #include <xmd/types/vec3.h>
-#include <xmd/types/array.h>
+
 #include <xmd/vm/vm.h>
 
 namespace xmd {
@@ -11,7 +11,7 @@ namespace xmd {
 
         heur_dih_type(amino_acid const &a2, amino_acid const &a3);
 
-        explicit constexpr operator int8_t();
+        explicit constexpr operator int8_t() const;
 
     private:
         explicit constexpr heur_dih_type(int8_t val);
@@ -23,7 +23,7 @@ namespace xmd {
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() heur_dih
-#define FIELDS() int,i1,int,i2,int,i3,int,i4,heur_dih_type,type
+#define FIELDS() int,i1,int,i2,int,i3,int,i4,xmd::heur_dih_type,type
 
 GENTYPE()
 

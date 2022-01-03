@@ -7,7 +7,7 @@ namespace xmd::qa {
 
     void sift_candidates::operator()() const {
         candidates->clear();
-        for (int idx = 0; idx < free_pairs->size(); ++idx) {
+        for (int idx = 0; idx < free_pairs->extent(); ++idx) {
             iter(idx);
         }
     }
@@ -22,14 +22,14 @@ namespace xmd::qa {
 
         auto& ljs = vm_inst.find<lj_variants>("lj_variants");
 
-        req_min_dist[(short)contact_type::BACK_BACK()] = ljs.bb.r_min;
-        req_min_dist[(short)contact_type::BACK_SIDE()] = ljs.bs.r_min;
-        req_min_dist[(short)contact_type::SIDE_BACK()] = ljs.sb.r_min;
+        req_min_dist[(short)contact_type::BACK_BACK()] = ljs.bb.r_min();
+        req_min_dist[(short)contact_type::BACK_SIDE()] = ljs.bs.r_min();
+        req_min_dist[(short)contact_type::SIDE_BACK()] = ljs.sb.r_min();
         for (auto const& aa1: amino_acid::all()) {
             for (auto const& aa2: amino_acid::all()) {
                 int ss_idx = (int)aa1 * amino_acid::NUM_AA + (int)aa2;
                 req_min_dist[(short)contact_type::SIDE_SIDE(aa1, aa2)] =
-                    ljs.ss.r_max[ss_idx];
+                    ljs.ss[ss_idx].r_max();
             }
         }
 
@@ -39,21 +39,22 @@ namespace xmd::qa {
             ptype[(int)aa] = aa_data_[aa].polarization;
         }
 
-        candidates = &vm_inst.find<candidate_list>("qa_candidates");
-        atype = vm_inst.find<vector<amino_acid>>("atype").to_array();
+        candidates = &vm_inst.find<set<candidate>>("qa_candidates");
+        atype = vm_inst.find<vector<amino_acid>>("atype").data();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        r = vm_inst.find<vec3r_vector>("r").to_array();
-        free_pairs = &vm_inst.find<free_pair_set>("qa_free_pairs");
-        sync = vm_inst.find<sync_data_vector>("sync").to_array();
-        n = vm_inst.find<vec3r_vector>("qa_n").to_array();
-        h = vm_inst.find<vec3r_vector>("qa_h").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
+        free_pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
+        sync = vm_inst.find<vector<sync_data>>("sync").data();
+        n = vm_inst.find<vector<vec3r>>("qa_n").data();
+        h = vm_inst.find<vector<vec3r>>("qa_h").data();
     }
 
     void sift_candidates::iter(int idx) const {
-        if (!free_pairs->has_item(idx))
-            return;
+        auto node = free_pairs->at(idx);
+        if (node.vacant()) return;
+        auto pair = node.value();
 
-        auto i1 = free_pairs->i1[idx], i2 = free_pairs->i2[idx];
+        auto i1 = pair.i1(), i2 = pair.i2();
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = box->r_uv(r1, r2);
@@ -88,41 +89,33 @@ namespace xmd::qa {
 
         auto ptype2 = ptype[atype2];
         sync_data sync_diff1;
-        sync_diff1.back += back1;
-        sync_diff1.side_all += side1;
-        sync_diff1.side_polar += side1 && (ptype2 == POLAR);
-        sync_diff1.side_hydrophobic += side1 && (ptype2 == HYDROPHOBIC);
+        sync_diff1.back() += back1;
+        sync_diff1.side_all() += side1;
+        sync_diff1.side_polar() += side1 && (ptype2 == POLAR);
+        sync_diff1.side_hydrophobic() += side1 && (ptype2 == HYDROPHOBIC);
 
-        auto sync1_after_formation = sync[i1] - sync_diff1;
+        sync_data sync1_after_formation = sync[i1] - sync_diff1;
         if (!sync1_after_formation.is_valid())
             return;
 
         auto ptype1 = ptype[atype1];
         sync_data sync_diff2;
-        sync_diff2.back += back2;
-        sync_diff2.side_all += side2;
-        sync_diff2.side_polar += side2 && (ptype1 == POLAR);
-        sync_diff2.side_hydrophobic += side2 && (ptype1 == HYDROPHOBIC);
+        sync_diff2.back() += back2;
+        sync_diff2.side_all() += side2;
+        sync_diff2.side_polar() += side2 && (ptype1 == POLAR);
+        sync_diff2.side_hydrophobic() += side2 && (ptype1 == HYDROPHOBIC);
 
-        auto sync2_after_formation = sync[i2] - sync_diff2;
+        sync_data sync2_after_formation = sync[i2] - sync_diff2;
         if (!sync2_after_formation.is_valid())
             return;
 
-        int slot_idx;
 #pragma omp critical
-        slot_idx = candidates->add();
-
-        candidates->i1[slot_idx] = i1;
-        candidates->i2[slot_idx] = i2;
-        candidates->free_pair_idx[slot_idx] = idx;
-        candidates->type[slot_idx] = type;
-        candidates->sync_diff1[slot_idx] = sync_diff1;
-        candidates->sync_diff2[slot_idx] = sync_diff2;
+        candidates->emplace(i1, i2, idx, type, sync_diff1, sync_diff2);
     }
 
     void sift_candidates::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < free_pairs->size(); ++idx) {
+        for (int idx = 0; idx < free_pairs->extent(); ++idx) {
             iter(idx);
         }
     }

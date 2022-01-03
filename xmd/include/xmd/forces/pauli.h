@@ -46,7 +46,7 @@ namespace xmd {
         const_array<vec3r> r;
         box<vec3r> const *box;
         nl::nl_data const *nl;
-        vector<pauli_pair> const *pairs;
+        vector<pauli_pair> *pairs;
 
         void init_from_vm(vm& vm_inst) override;
 

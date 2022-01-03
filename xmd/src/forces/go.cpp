@@ -8,62 +8,51 @@ namespace xmd {
     void update_go_contacts::operator()() const {
         contacts->clear();
 
-//#pragma omp taskloop default(none) nogroup
-        for (int idx = 0; idx < all_contacts->size; ++idx) {
-            auto idx1 = all_contacts->i1[idx], idx2 = all_contacts->i2[idx];
-            auto nat_dist = all_contacts->nat_dist[idx];
+        for (int idx = 0; idx < all_contacts->size(); ++idx) {
+            auto nat_cont = all_contacts->at(idx);
+            auto idx1 = nat_cont.i1(), idx2 = nat_cont.i2();
+            auto nat_dist = nat_cont.nat_dist();
+
             auto cutoff = lj::cutoff(nat_dist);
 
             auto r1 = r[idx1], r2 = r[idx2];
             if (norm(box->r_uv(r1, r2)) < cutoff + nl->orig_pad) {
-                int cont_idx;
-#pragma omp critical
-                cont_idx = contacts->push_back();
-                contacts->i1[cont_idx] = idx1;
-                contacts->i2[cont_idx] = idx2;
-                contacts->nat_dist[cont_idx] = nat_dist;
+                contacts->push_back(nat_cont);
             }
         }
     }
 
     void update_go_contacts::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vec3r_vector>("r").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
         box = &vm_inst.find<xmd::box<vec3r>>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
-        all_contacts = &vm_inst.find_or<go_contact_vector>("go_all_contacts",
+        all_contacts = &vm_inst.find_or<vector<nat_cont>>("go_all_contacts",
             [&]() -> auto& {
                 auto& xmd_model = vm_inst.find<xmd::model>("model");
                 using res_map_t = std::unordered_map<
                     xmd::model::residue*, int>;
                 auto& res_map = vm_inst.find<res_map_t>("res_map");
 
-                int num_go_cont = 0;
-                for (auto const& cont: xmd_model.contacts) {
-                    if (cont.type != model::NAT_SS)
-                        ++num_go_cont;
-                }
+                auto& all_contacts_ = vm_inst.emplace<vector<nat_cont>>(
+                    "go_all_contacts");
 
-                auto& all_contacts_ = vm_inst.emplace<go_contact_vector>(
-                    "go_all_contacts", num_go_cont);
-
-                int cont_idx = 0;
                 for (auto const& cont: xmd_model.contacts) {
                     if (cont.type != model::NAT_SS) {
-                        all_contacts_.i1[cont_idx] = res_map[cont.res1];
-                        all_contacts_.i2[cont_idx] = res_map[cont.res2];
-                        all_contacts_.nat_dist[cont_idx] = (real)cont.length;
-                        ++cont_idx;
+                        auto i1 = res_map[cont.res1], i2 = res_map[cont.res2];
+                        auto nat_dist = (real)cont.length;
+                        all_contacts_.emplace_back(i1, i2, nat_dist);
                     }
                 }
 
                 return all_contacts_;
             });
 
-        contacts = &vm_inst.find<go_contact_vector>("go_contacts");
+        contacts = &vm_inst.find<vector<nat_cont>>("go_contacts");
 
         real cutoff = 0.0;
-        for (int cont_idx = 0; cont_idx < all_contacts->size; ++cont_idx) {
-            cutoff = max(cutoff, lj::cutoff(all_contacts->nat_dist[cont_idx]));
+        for (int cont_idx = 0; cont_idx < all_contacts->size(); ++cont_idx) {
+            auto cont_dist = all_contacts->at(cont_idx).nat_dist();
+            cutoff = max(cutoff, lj::cutoff(cont_dist));
         }
 
         auto& max_cutoff = vm_inst.find<real>("max_cutoff");
@@ -71,7 +60,7 @@ namespace xmd {
     }
 
     void eval_go_forces::operator()() const {
-        for (int idx = 0; idx < contacts->size; ++idx) {
+        for (int idx = 0; idx < contacts->size(); ++idx) {
             iter(idx);
         }
     }
@@ -82,16 +71,17 @@ namespace xmd {
             params["native contacts"]["lj depth"].as<quantity>());
 
         box = &vm_inst.find<xmd::box<vec3r>>("box");
-        contacts = &vm_inst.find_or_emplace<go_contact_vector>(
+        contacts = &vm_inst.find_or_emplace<vector<nat_cont>>(
             "go_contacts");
-        r = vm_inst.find<vec3r_vector>("r").to_array();
+        r = vm_inst.find<vector<vec3r>>("r").data();
         V = &vm_inst.find<real>("V");
-        F = vm_inst.find<vec3r_vector>("F").to_array();
+        F = vm_inst.find<vector<vec3r>>("F").data();
     }
 
     void eval_go_forces::iter(int idx) const {
-        auto i1 = contacts->i1[idx], i2 = contacts->i2[idx];
-        auto nat_dist = contacts->nat_dist[idx];
+        auto nat_cont = contacts->at(idx);
+        auto i1 = nat_cont.i1(), i2 = nat_cont.i2();
+        auto nat_dist = nat_cont.nat_dist();
 
         auto r1 = r[i1], r2 = r[i2];
         auto r12 = box->r_uv(r1, r2);
@@ -100,7 +90,6 @@ namespace xmd {
         auto r12_u = r12 * r12_rn;
         auto [V_, dV_dr] = lj(depth, nat_dist)(r12_rn);
 
-//#pragma omp atomic update
         *V += V_;
         F[i1] += r12_u * dV_dr;
         F[i2] -= r12_u * dV_dr;
@@ -108,11 +97,8 @@ namespace xmd {
 
     void eval_go_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < contacts->size; ++idx) {
+        for (int idx = 0; idx < contacts->size(); ++idx) {
             iter(idx);
         }
     }
-
-    go_contact_vector::go_contact_vector(int n):
-        i1{n}, i2{n}, nat_dist{n}, size{n} {};
 }

@@ -2,6 +2,7 @@
 #include <gentypes/gentype.h>
 #include <xmd/utils/math.h>
 #include <xmd/types/scalar.h>
+#include <yaml-cpp/yaml.h>
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define NAME() vec3
@@ -12,7 +13,7 @@ GEN_EXPR()
 
 namespace xmd {
     template<typename U>
-    class zero_expr: public vec3_expr<zero_expr<U>> {
+    class zero_expr : public vec3_expr<zero_expr<U>> {
     public:
         U x() const {
             return 0;
@@ -28,13 +29,10 @@ namespace xmd {
     };
 
     template<typename U>
-    class vec3: public vec3_expr<vec3<U>> {
+    class vec3 : public vec3_expr<vec3<U>> {
     public:
-        vec3():
+        vec3() :
             x_{0}, y_{0}, z_{0} {};
-
-        vec3(U x, U y, U z):
-            x_{x}, y_{y}, z_{z} {};
 
         INST_CTORS()
         INST_ASSIGN_COPY()
@@ -45,7 +43,7 @@ namespace xmd {
         }
 
         template<typename E>
-        auto& operator+=(vec3_expr<E> const& e) {
+        auto &operator+=(vec3_expr<E> const &e) {
             x_ += e.x();
             y_ += e.y();
             z_ += e.z();
@@ -53,7 +51,7 @@ namespace xmd {
         }
 
         template<typename E>
-        auto& operator-=(vec3_expr<E> const& e) {
+        auto &operator-=(vec3_expr<E> const &e) {
             x_ -= e.x();
             y_ -= e.y();
             z_ -= e.z();
@@ -61,7 +59,7 @@ namespace xmd {
         }
 
         template<typename S>
-        auto& operator*=(S const& s) {
+        auto &operator*=(S const &s) {
             x_ *= s;
             y_ *= s;
             z_ *= s;
@@ -69,7 +67,7 @@ namespace xmd {
         }
 
         template<typename S>
-        auto& operator/=(S const& s) {
+        auto &operator/=(S const &s) {
             x_ /= s;
             y_ /= s;
             z_ /= s;
@@ -83,50 +81,66 @@ namespace xmd {
     };
 
     template<typename U>
-    class vec3_ref: public vec3_expr<vec3_ref<U>> {
+    class vec3_ref : public vec3_expr<vec3_ref<U>> {
     public:
         REF_CTORS()
         REF_ASSIGN_COPY()
         REF_ASSIGN_MOVE()
         REF_ASSIGN_EXPR()
+        REF_SWAP()
         REF_LAZY_FIELDS()
 
         template<typename E>
-        auto& operator+=(vec3_expr<E> const& e) {
-            x() += e.x();
-            y() += e.y();
-            z() += e.z();
+        auto &operator+=(vec3_expr<E> const &e) {
+            x_ += e.x();
+            y_ += e.y();
+            z_ += e.z();
             return *this;
         }
 
         template<typename E>
-        auto& operator-=(vec3_expr<E> const& e) {
-            x() -= e.x();
-            y() -= e.y();
-            z() -= e.z();
+        auto &atomic_add(vec3_expr<E> const &e) {
+#pragma omp atomic update
+            x_ += e.x();
+#pragma omp atomic update
+            y_ += e.y();
+#pragma omp atomic update
+            z_ += e.z();
+            return *this;
+        }
+
+        template<typename E>
+        auto &operator-=(vec3_expr<E> const &e) {
+            x_ -= e.x();
+            y_ -= e.y();
+            z_ -= e.z();
             return *this;
         }
 
         template<typename S>
-        auto& operator*=(S const& s) {
-            x() *= s;
-            y() *= s;
-            z() *= s;
+        auto &operator*=(S const &s) {
+            x_ *= s;
+            y_ *= s;
+            z_ *= s;
             return *this;
         }
 
         template<typename S>
-        auto& operator/=(S const& s) {
-            x() /= s;
-            y() /= s;
-            z() /= s;
+        auto &operator/=(S const &s) {
+            x_ /= s;
+            y_ /= s;
+            z_ /= s;
             return *this;
         }
 
     protected:
         REF_FIELDS()
     };
+}
 
+REF_IMPL_SPEC()
+
+namespace xmd {
     template<typename E>
     auto norm(vec3_expr<E> const& e) {
         return xmd::sqrt(norm_squared(e));
@@ -359,8 +373,8 @@ namespace xmd {
 GEN_CONST_REF()
 GEN_PTR()
 GEN_CONST_PTR()
-GEN_CONST_SPAN()
 GEN_SPAN()
+GEN_CONST_SPAN()
 GEN_MEMORY()
 GEN_ALLOCATOR()
 GEN_VECTOR()
@@ -371,6 +385,15 @@ namespace xmd {
     using vec3tr = vec3<true_real>;
 }
 
+#undef FIELDS
 #undef NAME
 #undef TEMPLATE_PARAMS
-#undef FIELDS
+#undef NAMESPACE
+
+namespace YAML {
+    template<>
+    struct convert<xmd::vec3r> {
+        static Node encode(xmd::vec3r const& v);
+        static bool decode(Node const& node, xmd::vec3r& v);
+    };
+}

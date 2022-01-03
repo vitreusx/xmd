@@ -1,25 +1,28 @@
 
 
 #pragma once
+#include "const_iterator.h"
+#include "iterator.h"
+#include "memory.h"
 #include "meta.h"
 #include <type_traits>
 
 template <typename T, typename Alloc, typename Idx> class vector_def {
 public:
   inline explicit vector_def(Alloc const &alloc = Alloc())
-      : data_{nullptr}, alloc_{alloc}, size_{0}, capacity_{0} {};
+      : data_{nullptr}, size_{0}, capacity_{0}, alloc_{alloc} {};
 
   inline vector_def(Idx n, T const &init = T(), Alloc const &alloc = Alloc()) {
     alloc_ = alloc;
     size_ = capacity_ = n;
 
     data_ = alloc_.allocate(size_);
-    uninitialized_fill_n(data_, n, init);
+    uninitialized_fill_n<T>::impl(data_, n, init);
   }
 
   inline ~vector_def() {
     if (data_) {
-      destroy_n(data_, size_);
+      destroy_n<T>::impl(data_, size_);
       alloc_.deallocate(data_, capacity_);
     }
     data_ = nullptr;
@@ -33,7 +36,7 @@ public:
     capacity_ = other.capacity_;
 
     data_ = alloc_.allocate(capacity_);
-    uninitialized_copy_n(other.data_, size_, data_);
+    uninitialized_copy_n<T>::impl(other.data_, size_, data_);
   }
 
   inline vector_def &operator=(vector_def const &other) {
@@ -44,7 +47,7 @@ public:
     capacity_ = other.capacity_;
 
     data_ = alloc_.allocate(capacity_);
-    uninitialized_copy_n(other.data_, size_, data_);
+    uninitialized_copy_n<T>::impl(other.data_, size_, data_);
 
     return *this;
   }
@@ -79,13 +82,19 @@ public:
 
   inline T *data() const { return data_; }
 
-  inline span<T, Idx> view() { return {data_, size_}; }
+  inline span<T, Idx> view() { return span<T, Idx>(data_, size_); }
 
-  inline const_span<T, Idx> view() const { return {data_, size_}; }
+  inline const_span<T, Idx> view() const {
+    return const_span<T, Idx>(data_, size_);
+  }
 
   inline T &operator[](Idx idx) { return data_[idx]; }
 
+  inline T &at(Idx idx) { return data_[idx]; }
+
   inline T const &operator[](Idx idx) const { return data_[idx]; }
+
+  inline T const &at(Idx idx) const { return data_[idx]; }
 
   inline void push_back(T const &value) { emplace_back(T(value)); }
 
@@ -95,14 +104,15 @@ public:
       reserve(new_capacity);
     }
 
-    uninitialized_fill_n(data_ + size_, 1, T(std::forward<Args>(args)...));
+    uninitialized_fill_n<T>::impl(data_ + size_, 1,
+                                  T(std::forward<Args>(args)...));
     return data_[size_++];
   }
 
   inline void reserve(Idx new_capacity) {
     if (capacity_ < new_capacity) {
       T *new_data = alloc_.allocate(new_capacity);
-      uninitialized_move_n(data_, size_, new_data);
+      uninitialized_move_n<T>::impl(data_, size_, new_data);
       alloc_.deallocate(data_, capacity_);
       data_ = new_data;
       capacity_ = new_capacity;
@@ -111,15 +121,30 @@ public:
 
   inline void resize(Idx new_size, T const &fill = T()) {
     if (new_size < size_) {
-      destroy_n(data_ + new_size, size_ - new_size);
+      destroy_n<T>::impl(data_ + new_size, size_ - new_size);
     } else if (size_ < new_size) {
       reserve(new_size);
-      uninitialized_fill_n(data_ + size_, new_size - size_, fill);
+      uninitialized_fill_n<T>::impl(data_ + size_, new_size - size_, fill);
     }
     size_ = new_size;
   }
 
-  inline void clear() { resize(0); }
+  inline void clear() {
+    destroy_n<T>::impl(data_, size_);
+    size_ = 0;
+  }
+
+  inline iterator<T, Idx> begin() { return iterator<T, Idx>(data_, 0); }
+
+  inline const_iterator<T, Idx> begin() const {
+    return const_iterator<T, Idx>(data_, 0);
+  }
+
+  inline iterator<T, Idx> end() { return iterator<T, Idx>(data_, size_); }
+
+  inline const_iterator<T, Idx> end() const {
+    return const_iterator<T, Idx>(data_, size_);
+  }
 
 protected:
   T *data_;
@@ -145,7 +170,7 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
   class name##_vector {                                                        \
   public:                                                                      \
     inline explicit name##_vector(Alloc const &alloc = Alloc())                \
-        : data_{nullptr}, alloc_{alloc}, size_{0}, capacity_{0} {};            \
+        : data_{nullptr}, size_{0}, capacity_{0}, alloc_{alloc} {};            \
                                                                                \
     template <typename _U = name NO_SPEC()>                                    \
     inline name##_vector(                                                      \
@@ -155,7 +180,7 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
       size_ = capacity_ = n;                                                   \
                                                                                \
       data_ = alloc_.allocate(size_);                                          \
-      uninitialized_fill_n(data_, n, init);                                    \
+      uninitialized_fill_n<name NO_SPEC()>::impl(data_, n, init);              \
     }                                                                          \
                                                                                \
     template <typename E>                                                      \
@@ -165,12 +190,12 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
       size_ = capacity_ = n;                                                   \
                                                                                \
       data_ = alloc_.allocate(size_);                                          \
-      uninitialized_fill_n(data_, n, e);                                       \
+      uninitialized_fill_n<name NO_SPEC()>::impl(data_, n, e);                 \
     }                                                                          \
                                                                                \
     inline ~name##_vector() {                                                  \
       if (data_) {                                                             \
-        destroy_n(data_, size_);                                               \
+        destroy_n<name NO_SPEC()>::impl(data_, size_);                         \
         alloc_.deallocate(data_, capacity_);                                   \
       }                                                                        \
       data_ = nullptr;                                                         \
@@ -184,7 +209,7 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
       capacity_ = other.capacity_;                                             \
                                                                                \
       data_ = alloc_.allocate(capacity_);                                      \
-      uninitialized_copy_n(other.data_, size_, data_);                         \
+      uninitialized_copy_n<name NO_SPEC()>::impl(other.data_, size_, data_);   \
     }                                                                          \
                                                                                \
     inline name##_vector &operator=(name##_vector const &other) {              \
@@ -195,7 +220,7 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
       capacity_ = other.capacity_;                                             \
                                                                                \
       data_ = alloc_.allocate(capacity_);                                      \
-      uninitialized_copy_n(other.data_, size_, data_);                         \
+      uninitialized_copy_n<name NO_SPEC()>::impl(other.data_, size_, data_);   \
                                                                                \
       return *this;                                                            \
     }                                                                          \
@@ -232,17 +257,23 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
                                                                                \
     inline name##_const_ptr NO_SPEC() data() const { return data_; }           \
                                                                                \
-    inline name##_span SPEC(typename, Idx) view() { return {data_, size_}; }   \
+    inline name##_span SPEC(typename, Idx) view() {                            \
+      return name##_span SPEC(typename, Idx)(data_, size_);                    \
+    }                                                                          \
                                                                                \
     inline name##_const_span SPEC(typename, Idx) view() const {                \
-      return {data_, size_};                                                   \
+      return name##_span SPEC(typename, Idx)(data_, size_);                    \
     }                                                                          \
                                                                                \
     inline name##_ref NO_SPEC() operator[](Idx idx) { return data_[idx]; }     \
                                                                                \
+    inline name##_ref NO_SPEC() at(Idx idx) { return data_[idx]; }             \
+                                                                               \
     inline name##_const_ref NO_SPEC() operator[](Idx idx) const {              \
       return data_[idx];                                                       \
     }                                                                          \
+                                                                               \
+    inline name##_const_ref NO_SPEC() at(Idx idx) const { return data_[idx]; } \
                                                                                \
     template <typename E> inline void push_back(name##_expr<E> const &e) {     \
       if (size_ >= capacity_) {                                                \
@@ -250,7 +281,7 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
         reserve(new_capacity);                                                 \
       }                                                                        \
                                                                                \
-      construct_at(data_ + size_, e);                                          \
+      construct_at<name NO_SPEC()>::impl(data_ + size_, e);                    \
     }                                                                          \
                                                                                \
     template <typename... Args>                                                \
@@ -260,14 +291,15 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
         reserve(new_capacity);                                                 \
       }                                                                        \
                                                                                \
-      construct_at(data_ + size_, std::forward<Args>(args)...);                \
+      construct_at<name NO_SPEC()>::impl(data_ + size_,                        \
+                                         std::forward<Args>(args)...);         \
       return data_[size_++];                                                   \
     }                                                                          \
                                                                                \
     inline void reserve(Idx new_capacity) {                                    \
       if (capacity_ < new_capacity) {                                          \
         name##_ptr NO_SPEC() new_data = alloc_.allocate(new_capacity);         \
-        uninitialized_move_n(data_, size_, new_data);                          \
+        uninitialized_move_n<name NO_SPEC()>::impl(data_, size_, new_data);    \
         alloc_.deallocate(data_, capacity_);                                   \
         data_ = new_data;                                                      \
         capacity_ = new_capacity;                                              \
@@ -279,10 +311,11 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
     resize(Idx new_size, _U const &fill = _U(),                                \
            std::enable_if_t<std::is_default_constructible_v<_U>, _U *> = 0) {  \
       if (new_size < size_) {                                                  \
-        destroy_n(data_ + new_size, size_ - new_size);                         \
+        destroy_n<name NO_SPEC()>::impl(data_ + new_size, size_ - new_size);   \
       } else if (size_ < new_size) {                                           \
         reserve(new_size);                                                     \
-        uninitialized_fill_n(data_ + size_, new_size - size_, fill);           \
+        uninitialized_fill_n<name NO_SPEC()>::impl(data_ + size_,              \
+                                                   new_size - size_, fill);    \
       }                                                                        \
       size_ = new_size;                                                        \
     }                                                                          \
@@ -290,15 +323,37 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
     template <typename E>                                                      \
     inline void resize(Idx new_size, name##_expr<E> const &e) {                \
       if (new_size < size_) {                                                  \
-        destroy_n(data_ + new_size, size_ - new_size);                         \
+        destroy_n<name NO_SPEC()>::impl(data_ + new_size, size_ - new_size);   \
       } else if (size_ < new_size) {                                           \
         reserve(new_size);                                                     \
-        uninitialized_fill_n(data_ + size_, new_size - size_, e);              \
+        uninitialized_fill_n<name NO_SPEC()>::impl(data_ + size_,              \
+                                                   new_size - size_, e);       \
       }                                                                        \
       size_ = new_size;                                                        \
     }                                                                          \
                                                                                \
-    inline void clear() { resize(0); }                                         \
+    inline void clear() {                                                      \
+      destroy_n<name NO_SPEC()>::impl(data_, size_);                           \
+      size_ = 0;                                                               \
+    }                                                                          \
+                                                                               \
+    inline iterator<name NO_SPEC(), Idx> begin() {                             \
+      return iterator<name NO_SPEC(), Idx>(data_, 0);                          \
+    }                                                                          \
+                                                                               \
+    inline const_iterator<name NO_SPEC(), Idx> begin() const {                 \
+      return const_iterator<name NO_SPEC(), Idx>(data_, 0);                    \
+    }                                                                          \
+                                                                               \
+    inline iterator<name NO_SPEC(), Idx> end() {                               \
+      return iterator<name NO_SPEC(), Idx>(data_, size_);                      \
+    }                                                                          \
+                                                                               \
+    inline const_iterator<name NO_SPEC(), Idx> end() const {                   \
+      return const_iterator<name NO_SPEC(), Idx>(data_, size_);                \
+    }                                                                          \
+                                                                               \
+    inline bool empty() const { return size_ == 0; }                           \
                                                                                \
   protected:                                                                   \
     name##_ptr NO_SPEC() data_;                                                \

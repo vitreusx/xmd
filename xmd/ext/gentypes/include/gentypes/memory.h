@@ -4,31 +4,37 @@
 #include "meta.h"
 #include <memory>
 
-template <typename T>
-inline void uninitialized_fill_n(T *data, size_t n, T const &init) {
-  std::uninitialized_fill_n(data, n, init);
-}
+template <typename T> struct uninitialized_fill_n {
+  static inline void impl(T *data, size_t n, T const &init) {
+    std::uninitialized_fill_n(data, n, init);
+  }
+};
 
-template <typename T>
-inline void uninitialized_copy_n(T const *from, size_t n, T *to) {
-  std::uninitialized_copy_n(from, n, to);
-}
+template <typename T> struct uninitialized_copy_n {
+  static inline void impl(T const *from, size_t n, T *to) {
+    std::uninitialized_copy_n(from, n, to);
+  }
+};
 
-template <typename T>
-inline void uninitialized_move_n(T *from, size_t n, T *to) {
-  std::uninitialized_move_n(from, n, to);
-}
+template <typename T> struct uninitialized_move_n {
+  static inline void impl(T const *from, size_t n, T *to) {
+    std::uninitialized_move_n(from, n, to);
+  }
+};
 
-template <typename T> inline void destroy_n(T *data, size_t n) {
-  std::destroy_n(data, n);
-}
+template <typename T> struct destroy_n {
+  static inline void impl(T *data, size_t n) { std::destroy_n(data, n); }
+};
 
-template <typename T, typename... Args>
-inline void construct_at(T *p, Args &&...args) {
-  ::new (static_cast<void *>(p)) T(std::forward<Args>(args)...);
-}
+template <typename T> struct construct_at {
+  template <typename... Args> static inline void impl(T *p, Args &&...args) {
+    ::new (static_cast<void *>(p)) T(std::forward<Args>(args)...);
+  }
+};
 
-template <typename T> inline void destroy_at(T *p) { std::destroy_at(p); }
+template <typename T> struct destroy_at {
+  static inline void impl(T *p) { std::destroy_at(p); }
+};
 
 #define GEN_MEMORY() GEN_MEMORY_EXP(NAME(), FIELDS())
 
@@ -38,850 +44,954 @@ template <typename T> inline void destroy_at(T *p) { std::destroy_at(p); }
 
 #define GEN_MEMORY_3(name, T1, x1)                                             \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
-  }                                                                            \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
-  }                                                                            \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
-  }
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
+    }                                                                          \
+  };
 
 #define GEN_MEMORY_5(name, T1, x1, T2, x2)                                     \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
                                                                                \
-    uninitialized_fill_n(p.x2##_ptr, n, e.x2());                               \
-  }                                                                            \
+      uninitialized_fill_n<T2>::impl(p.x2##_ptr, n, e.x2());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x2##_ptr, n, to.x2##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x2##_ptr, n, to.x2##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x2##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T2>::impl(p.x2##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
                                                                                \
-    construct_at(p.x2##_ptr, e.x2());                                          \
-  }                                                                            \
+      construct_at<T2>::impl(p.x2##_ptr, e.x2());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
                                                                                \
-    destroy_at(p.x2##_ptr);                                                    \
-  }
+      destroy_at<T2>::impl(p.x2##_ptr);                                        \
+    }                                                                          \
+  };
 
 #define GEN_MEMORY_7(name, T1, x1, T2, x2, T3, x3)                             \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
                                                                                \
-    uninitialized_fill_n(p.x2##_ptr, n, e.x2());                               \
+      uninitialized_fill_n<T2>::impl(p.x2##_ptr, n, e.x2());                   \
                                                                                \
-    uninitialized_fill_n(p.x3##_ptr, n, e.x3());                               \
-  }                                                                            \
+      uninitialized_fill_n<T3>::impl(p.x3##_ptr, n, e.x3());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_copy_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x3##_ptr, n, to.x3##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_move_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x3##_ptr, n, to.x3##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x2##_ptr, n);                                                  \
+      destroy_n<T2>::impl(p.x2##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x3##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T3>::impl(p.x3##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
                                                                                \
-    construct_at(p.x2##_ptr, e.x2());                                          \
+      construct_at<T2>::impl(p.x2##_ptr, e.x2());                              \
                                                                                \
-    construct_at(p.x3##_ptr, e.x3());                                          \
-  }                                                                            \
+      construct_at<T3>::impl(p.x3##_ptr, e.x3());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
                                                                                \
-    destroy_at(p.x2##_ptr);                                                    \
+      destroy_at<T2>::impl(p.x2##_ptr);                                        \
                                                                                \
-    destroy_at(p.x3##_ptr);                                                    \
-  }
+      destroy_at<T3>::impl(p.x3##_ptr);                                        \
+    }                                                                          \
+  };
 
 #define GEN_MEMORY_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                     \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
                                                                                \
-    uninitialized_fill_n(p.x2##_ptr, n, e.x2());                               \
+      uninitialized_fill_n<T2>::impl(p.x2##_ptr, n, e.x2());                   \
                                                                                \
-    uninitialized_fill_n(p.x3##_ptr, n, e.x3());                               \
+      uninitialized_fill_n<T3>::impl(p.x3##_ptr, n, e.x3());                   \
                                                                                \
-    uninitialized_fill_n(p.x4##_ptr, n, e.x4());                               \
-  }                                                                            \
+      uninitialized_fill_n<T4>::impl(p.x4##_ptr, n, e.x4());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_copy_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_copy_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x4##_ptr, n, to.x4##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_move_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_move_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x4##_ptr, n, to.x4##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x2##_ptr, n);                                                  \
+      destroy_n<T2>::impl(p.x2##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x3##_ptr, n);                                                  \
+      destroy_n<T3>::impl(p.x3##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x4##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T4>::impl(p.x4##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
                                                                                \
-    construct_at(p.x2##_ptr, e.x2());                                          \
+      construct_at<T2>::impl(p.x2##_ptr, e.x2());                              \
                                                                                \
-    construct_at(p.x3##_ptr, e.x3());                                          \
+      construct_at<T3>::impl(p.x3##_ptr, e.x3());                              \
                                                                                \
-    construct_at(p.x4##_ptr, e.x4());                                          \
-  }                                                                            \
+      construct_at<T4>::impl(p.x4##_ptr, e.x4());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
                                                                                \
-    destroy_at(p.x2##_ptr);                                                    \
+      destroy_at<T2>::impl(p.x2##_ptr);                                        \
                                                                                \
-    destroy_at(p.x3##_ptr);                                                    \
+      destroy_at<T3>::impl(p.x3##_ptr);                                        \
                                                                                \
-    destroy_at(p.x4##_ptr);                                                    \
-  }
+      destroy_at<T4>::impl(p.x4##_ptr);                                        \
+    }                                                                          \
+  };
 
 #define GEN_MEMORY_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)            \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
                                                                                \
-    uninitialized_fill_n(p.x2##_ptr, n, e.x2());                               \
+      uninitialized_fill_n<T2>::impl(p.x2##_ptr, n, e.x2());                   \
                                                                                \
-    uninitialized_fill_n(p.x3##_ptr, n, e.x3());                               \
+      uninitialized_fill_n<T3>::impl(p.x3##_ptr, n, e.x3());                   \
                                                                                \
-    uninitialized_fill_n(p.x4##_ptr, n, e.x4());                               \
+      uninitialized_fill_n<T4>::impl(p.x4##_ptr, n, e.x4());                   \
                                                                                \
-    uninitialized_fill_n(p.x5##_ptr, n, e.x5());                               \
-  }                                                                            \
+      uninitialized_fill_n<T5>::impl(p.x5##_ptr, n, e.x5());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_copy_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_copy_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_copy_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x5##_ptr, n, to.x5##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_move_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_move_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_move_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x5##_ptr, n, to.x5##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x2##_ptr, n);                                                  \
+      destroy_n<T2>::impl(p.x2##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x3##_ptr, n);                                                  \
+      destroy_n<T3>::impl(p.x3##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x4##_ptr, n);                                                  \
+      destroy_n<T4>::impl(p.x4##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x5##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T5>::impl(p.x5##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
                                                                                \
-    construct_at(p.x2##_ptr, e.x2());                                          \
+      construct_at<T2>::impl(p.x2##_ptr, e.x2());                              \
                                                                                \
-    construct_at(p.x3##_ptr, e.x3());                                          \
+      construct_at<T3>::impl(p.x3##_ptr, e.x3());                              \
                                                                                \
-    construct_at(p.x4##_ptr, e.x4());                                          \
+      construct_at<T4>::impl(p.x4##_ptr, e.x4());                              \
                                                                                \
-    construct_at(p.x5##_ptr, e.x5());                                          \
-  }                                                                            \
+      construct_at<T5>::impl(p.x5##_ptr, e.x5());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
                                                                                \
-    destroy_at(p.x2##_ptr);                                                    \
+      destroy_at<T2>::impl(p.x2##_ptr);                                        \
                                                                                \
-    destroy_at(p.x3##_ptr);                                                    \
+      destroy_at<T3>::impl(p.x3##_ptr);                                        \
                                                                                \
-    destroy_at(p.x4##_ptr);                                                    \
+      destroy_at<T4>::impl(p.x4##_ptr);                                        \
                                                                                \
-    destroy_at(p.x5##_ptr);                                                    \
-  }
+      destroy_at<T5>::impl(p.x5##_ptr);                                        \
+    }                                                                          \
+  };
 
 #define GEN_MEMORY_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)    \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
                                                                                \
-    uninitialized_fill_n(p.x2##_ptr, n, e.x2());                               \
+      uninitialized_fill_n<T2>::impl(p.x2##_ptr, n, e.x2());                   \
                                                                                \
-    uninitialized_fill_n(p.x3##_ptr, n, e.x3());                               \
+      uninitialized_fill_n<T3>::impl(p.x3##_ptr, n, e.x3());                   \
                                                                                \
-    uninitialized_fill_n(p.x4##_ptr, n, e.x4());                               \
+      uninitialized_fill_n<T4>::impl(p.x4##_ptr, n, e.x4());                   \
                                                                                \
-    uninitialized_fill_n(p.x5##_ptr, n, e.x5());                               \
+      uninitialized_fill_n<T5>::impl(p.x5##_ptr, n, e.x5());                   \
                                                                                \
-    uninitialized_fill_n(p.x6##_ptr, n, e.x6());                               \
-  }                                                                            \
+      uninitialized_fill_n<T6>::impl(p.x6##_ptr, n, e.x6());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_copy_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_copy_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_copy_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x5##_ptr, n, to.x5##_ptr);                       \
+      uninitialized_copy_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x6##_ptr, n, to.x6##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T6>::impl(from.x6##_ptr, n, to.x6##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_move_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_move_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_move_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x5##_ptr, n, to.x5##_ptr);                       \
+      uninitialized_move_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x6##_ptr, n, to.x6##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T6>::impl(from.x6##_ptr, n, to.x6##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x2##_ptr, n);                                                  \
+      destroy_n<T2>::impl(p.x2##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x3##_ptr, n);                                                  \
+      destroy_n<T3>::impl(p.x3##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x4##_ptr, n);                                                  \
+      destroy_n<T4>::impl(p.x4##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x5##_ptr, n);                                                  \
+      destroy_n<T5>::impl(p.x5##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x6##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T6>::impl(p.x6##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
                                                                                \
-    construct_at(p.x2##_ptr, e.x2());                                          \
+      construct_at<T2>::impl(p.x2##_ptr, e.x2());                              \
                                                                                \
-    construct_at(p.x3##_ptr, e.x3());                                          \
+      construct_at<T3>::impl(p.x3##_ptr, e.x3());                              \
                                                                                \
-    construct_at(p.x4##_ptr, e.x4());                                          \
+      construct_at<T4>::impl(p.x4##_ptr, e.x4());                              \
                                                                                \
-    construct_at(p.x5##_ptr, e.x5());                                          \
+      construct_at<T5>::impl(p.x5##_ptr, e.x5());                              \
                                                                                \
-    construct_at(p.x6##_ptr, e.x6());                                          \
-  }                                                                            \
+      construct_at<T6>::impl(p.x6##_ptr, e.x6());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
                                                                                \
-    destroy_at(p.x2##_ptr);                                                    \
+      destroy_at<T2>::impl(p.x2##_ptr);                                        \
                                                                                \
-    destroy_at(p.x3##_ptr);                                                    \
+      destroy_at<T3>::impl(p.x3##_ptr);                                        \
                                                                                \
-    destroy_at(p.x4##_ptr);                                                    \
+      destroy_at<T4>::impl(p.x4##_ptr);                                        \
                                                                                \
-    destroy_at(p.x5##_ptr);                                                    \
+      destroy_at<T5>::impl(p.x5##_ptr);                                        \
                                                                                \
-    destroy_at(p.x6##_ptr);                                                    \
-  }
+      destroy_at<T6>::impl(p.x6##_ptr);                                        \
+    }                                                                          \
+  };
 
 #define GEN_MEMORY_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6,    \
                       T7, x7)                                                  \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
                                                                                \
-    uninitialized_fill_n(p.x2##_ptr, n, e.x2());                               \
+      uninitialized_fill_n<T2>::impl(p.x2##_ptr, n, e.x2());                   \
                                                                                \
-    uninitialized_fill_n(p.x3##_ptr, n, e.x3());                               \
+      uninitialized_fill_n<T3>::impl(p.x3##_ptr, n, e.x3());                   \
                                                                                \
-    uninitialized_fill_n(p.x4##_ptr, n, e.x4());                               \
+      uninitialized_fill_n<T4>::impl(p.x4##_ptr, n, e.x4());                   \
                                                                                \
-    uninitialized_fill_n(p.x5##_ptr, n, e.x5());                               \
+      uninitialized_fill_n<T5>::impl(p.x5##_ptr, n, e.x5());                   \
                                                                                \
-    uninitialized_fill_n(p.x6##_ptr, n, e.x6());                               \
+      uninitialized_fill_n<T6>::impl(p.x6##_ptr, n, e.x6());                   \
                                                                                \
-    uninitialized_fill_n(p.x7##_ptr, n, e.x7());                               \
-  }                                                                            \
+      uninitialized_fill_n<T7>::impl(p.x7##_ptr, n, e.x7());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_copy_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_copy_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_copy_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x5##_ptr, n, to.x5##_ptr);                       \
+      uninitialized_copy_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x6##_ptr, n, to.x6##_ptr);                       \
+      uninitialized_copy_n<T6>::impl(from.x6##_ptr, n, to.x6##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x7##_ptr, n, to.x7##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T7>::impl(from.x7##_ptr, n, to.x7##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_move_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_move_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_move_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x5##_ptr, n, to.x5##_ptr);                       \
+      uninitialized_move_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x6##_ptr, n, to.x6##_ptr);                       \
+      uninitialized_move_n<T6>::impl(from.x6##_ptr, n, to.x6##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x7##_ptr, n, to.x7##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T7>::impl(from.x7##_ptr, n, to.x7##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x2##_ptr, n);                                                  \
+      destroy_n<T2>::impl(p.x2##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x3##_ptr, n);                                                  \
+      destroy_n<T3>::impl(p.x3##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x4##_ptr, n);                                                  \
+      destroy_n<T4>::impl(p.x4##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x5##_ptr, n);                                                  \
+      destroy_n<T5>::impl(p.x5##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x6##_ptr, n);                                                  \
+      destroy_n<T6>::impl(p.x6##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x7##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T7>::impl(p.x7##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
                                                                                \
-    construct_at(p.x2##_ptr, e.x2());                                          \
+      construct_at<T2>::impl(p.x2##_ptr, e.x2());                              \
                                                                                \
-    construct_at(p.x3##_ptr, e.x3());                                          \
+      construct_at<T3>::impl(p.x3##_ptr, e.x3());                              \
                                                                                \
-    construct_at(p.x4##_ptr, e.x4());                                          \
+      construct_at<T4>::impl(p.x4##_ptr, e.x4());                              \
                                                                                \
-    construct_at(p.x5##_ptr, e.x5());                                          \
+      construct_at<T5>::impl(p.x5##_ptr, e.x5());                              \
                                                                                \
-    construct_at(p.x6##_ptr, e.x6());                                          \
+      construct_at<T6>::impl(p.x6##_ptr, e.x6());                              \
                                                                                \
-    construct_at(p.x7##_ptr, e.x7());                                          \
-  }                                                                            \
+      construct_at<T7>::impl(p.x7##_ptr, e.x7());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
                                                                                \
-    destroy_at(p.x2##_ptr);                                                    \
+      destroy_at<T2>::impl(p.x2##_ptr);                                        \
                                                                                \
-    destroy_at(p.x3##_ptr);                                                    \
+      destroy_at<T3>::impl(p.x3##_ptr);                                        \
                                                                                \
-    destroy_at(p.x4##_ptr);                                                    \
+      destroy_at<T4>::impl(p.x4##_ptr);                                        \
                                                                                \
-    destroy_at(p.x5##_ptr);                                                    \
+      destroy_at<T5>::impl(p.x5##_ptr);                                        \
                                                                                \
-    destroy_at(p.x6##_ptr);                                                    \
+      destroy_at<T6>::impl(p.x6##_ptr);                                        \
                                                                                \
-    destroy_at(p.x7##_ptr);                                                    \
-  }
+      destroy_at<T7>::impl(p.x7##_ptr);                                        \
+    }                                                                          \
+  };
 
 #define GEN_MEMORY_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6,    \
                       T7, x7, T8, x8)                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
-                                   size_t n,                                   \
-                                   NS_PREFIX() name##_expr<E> const &e) {      \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_fill_n<NS_PREFIX() name NO_SPEC()> {                    \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n, NS_PREFIX() name##_expr<E> const &e) {   \
                                                                                \
-    uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
+      uninitialized_fill_n<T1>::impl(p.x1##_ptr, n, e.x1());                   \
                                                                                \
-    uninitialized_fill_n(p.x2##_ptr, n, e.x2());                               \
+      uninitialized_fill_n<T2>::impl(p.x2##_ptr, n, e.x2());                   \
                                                                                \
-    uninitialized_fill_n(p.x3##_ptr, n, e.x3());                               \
+      uninitialized_fill_n<T3>::impl(p.x3##_ptr, n, e.x3());                   \
                                                                                \
-    uninitialized_fill_n(p.x4##_ptr, n, e.x4());                               \
+      uninitialized_fill_n<T4>::impl(p.x4##_ptr, n, e.x4());                   \
                                                                                \
-    uninitialized_fill_n(p.x5##_ptr, n, e.x5());                               \
+      uninitialized_fill_n<T5>::impl(p.x5##_ptr, n, e.x5());                   \
                                                                                \
-    uninitialized_fill_n(p.x6##_ptr, n, e.x6());                               \
+      uninitialized_fill_n<T6>::impl(p.x6##_ptr, n, e.x6());                   \
                                                                                \
-    uninitialized_fill_n(p.x7##_ptr, n, e.x7());                               \
+      uninitialized_fill_n<T7>::impl(p.x7##_ptr, n, e.x7());                   \
                                                                                \
-    uninitialized_fill_n(p.x8##_ptr, n, e.x8());                               \
-  }                                                                            \
+      uninitialized_fill_n<T8>::impl(p.x8##_ptr, n, e.x8());                   \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(                                            \
-      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_copy_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_const_ptr NO_SPEC()             \
+                                const &from,                                   \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_copy_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_copy_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_copy_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_copy_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x5##_ptr, n, to.x5##_ptr);                       \
+      uninitialized_copy_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x6##_ptr, n, to.x6##_ptr);                       \
+      uninitialized_copy_n<T6>::impl(from.x6##_ptr, n, to.x6##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x7##_ptr, n, to.x7##_ptr);                       \
+      uninitialized_copy_n<T7>::impl(from.x7##_ptr, n, to.x7##_ptr);           \
                                                                                \
-    uninitialized_copy_n(from.x8##_ptr, n, to.x8##_ptr);                       \
-  }                                                                            \
+      uninitialized_copy_n<T8>::impl(from.x8##_ptr, n, to.x8##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(                                            \
-      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
-      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
+  NULL_SPEC()                                                                  \
+  struct uninitialized_move_n<NS_PREFIX() name NO_SPEC()> {                    \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &from,      \
+                            size_t n,                                          \
+                            NS_PREFIX() name##_ptr NO_SPEC() const &to) {      \
                                                                                \
-    uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
+      uninitialized_move_n<T1>::impl(from.x1##_ptr, n, to.x1##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x2##_ptr, n, to.x2##_ptr);                       \
+      uninitialized_move_n<T2>::impl(from.x2##_ptr, n, to.x2##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x3##_ptr, n, to.x3##_ptr);                       \
+      uninitialized_move_n<T3>::impl(from.x3##_ptr, n, to.x3##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x4##_ptr, n, to.x4##_ptr);                       \
+      uninitialized_move_n<T4>::impl(from.x4##_ptr, n, to.x4##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x5##_ptr, n, to.x5##_ptr);                       \
+      uninitialized_move_n<T5>::impl(from.x5##_ptr, n, to.x5##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x6##_ptr, n, to.x6##_ptr);                       \
+      uninitialized_move_n<T6>::impl(from.x6##_ptr, n, to.x6##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x7##_ptr, n, to.x7##_ptr);                       \
+      uninitialized_move_n<T7>::impl(from.x7##_ptr, n, to.x7##_ptr);           \
                                                                                \
-    uninitialized_move_n(from.x8##_ptr, n, to.x8##_ptr);                       \
-  }                                                                            \
+      uninitialized_move_n<T8>::impl(from.x8##_ptr, n, to.x8##_ptr);           \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
+  NULL_SPEC()                                                                  \
+  struct destroy_n<NS_PREFIX() name NO_SPEC()> {                               \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            size_t n) {                                        \
                                                                                \
-    destroy_n(p.x1##_ptr, n);                                                  \
+      destroy_n<T1>::impl(p.x1##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x2##_ptr, n);                                                  \
+      destroy_n<T2>::impl(p.x2##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x3##_ptr, n);                                                  \
+      destroy_n<T3>::impl(p.x3##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x4##_ptr, n);                                                  \
+      destroy_n<T4>::impl(p.x4##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x5##_ptr, n);                                                  \
+      destroy_n<T5>::impl(p.x5##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x6##_ptr, n);                                                  \
+      destroy_n<T6>::impl(p.x6##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x7##_ptr, n);                                                  \
+      destroy_n<T7>::impl(p.x7##_ptr, n);                                      \
                                                                                \
-    destroy_n(p.x8##_ptr, n);                                                  \
-  }                                                                            \
+      destroy_n<T8>::impl(p.x8##_ptr, n);                                      \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
-                                 NS_PREFIX() name##_expr<E> const &e) {        \
+  NULL_SPEC()                                                                  \
+  struct construct_at<NS_PREFIX() name NO_SPEC()> {                            \
+    template <typename E>                                                      \
+    static inline void _impl_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,   \
+                                  NS_PREFIX() name##_expr<E> const &e) {       \
                                                                                \
-    construct_at(p.x1##_ptr, e.x1());                                          \
+      construct_at<T1>::impl(p.x1##_ptr, e.x1());                              \
                                                                                \
-    construct_at(p.x2##_ptr, e.x2());                                          \
+      construct_at<T2>::impl(p.x2##_ptr, e.x2());                              \
                                                                                \
-    construct_at(p.x3##_ptr, e.x3());                                          \
+      construct_at<T3>::impl(p.x3##_ptr, e.x3());                              \
                                                                                \
-    construct_at(p.x4##_ptr, e.x4());                                          \
+      construct_at<T4>::impl(p.x4##_ptr, e.x4());                              \
                                                                                \
-    construct_at(p.x5##_ptr, e.x5());                                          \
+      construct_at<T5>::impl(p.x5##_ptr, e.x5());                              \
                                                                                \
-    construct_at(p.x6##_ptr, e.x6());                                          \
+      construct_at<T6>::impl(p.x6##_ptr, e.x6());                              \
                                                                                \
-    construct_at(p.x7##_ptr, e.x7());                                          \
+      construct_at<T7>::impl(p.x7##_ptr, e.x7());                              \
                                                                                \
-    construct_at(p.x8##_ptr, e.x8());                                          \
-  }                                                                            \
+      construct_at<T8>::impl(p.x8##_ptr, e.x8());                              \
+    }                                                                          \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name NO_SPEC() const &inst) {           \
-    _construct_at_expr(p, inst);                                               \
-  }                                                                            \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name NO_SPEC() const &inst) {          \
+      _impl_expr(p, inst);                                                     \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename, E)                                                        \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           NS_PREFIX() name##_expr<E> const &e) {              \
-    _construct_at_expr(p, e);                                                  \
-  }                                                                            \
+    template <typename E>                                                      \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            NS_PREFIX() name##_expr<E> const &e) {             \
+      _impl_expr(p, e);                                                        \
+    }                                                                          \
                                                                                \
-  TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
-                           Args &&...args) {                                   \
-    _construct_at_expr(p, NS_PREFIX()                                          \
-                              name NO_SPEC()(std::forward<Args>(args)...));    \
-  }                                                                            \
+    template <typename... Args>                                                \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p,         \
+                            Args &&...args) {                                  \
+      _impl_expr(p, NS_PREFIX() name NO_SPEC()(std::forward<Args>(args)...));  \
+    }                                                                          \
+  };                                                                           \
                                                                                \
-  NO_TEMPLATE()                                                                \
-  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
+  NULL_SPEC()                                                                  \
+  struct destroy_at<NS_PREFIX() name NO_SPEC()> {                              \
+    static inline void impl(NS_PREFIX() name##_ptr NO_SPEC() const &p) {       \
                                                                                \
-    destroy_at(p.x1##_ptr);                                                    \
+      destroy_at<T1>::impl(p.x1##_ptr);                                        \
                                                                                \
-    destroy_at(p.x2##_ptr);                                                    \
+      destroy_at<T2>::impl(p.x2##_ptr);                                        \
                                                                                \
-    destroy_at(p.x3##_ptr);                                                    \
+      destroy_at<T3>::impl(p.x3##_ptr);                                        \
                                                                                \
-    destroy_at(p.x4##_ptr);                                                    \
+      destroy_at<T4>::impl(p.x4##_ptr);                                        \
                                                                                \
-    destroy_at(p.x5##_ptr);                                                    \
+      destroy_at<T5>::impl(p.x5##_ptr);                                        \
                                                                                \
-    destroy_at(p.x6##_ptr);                                                    \
+      destroy_at<T6>::impl(p.x6##_ptr);                                        \
                                                                                \
-    destroy_at(p.x7##_ptr);                                                    \
+      destroy_at<T7>::impl(p.x7##_ptr);                                        \
                                                                                \
-    destroy_at(p.x8##_ptr);                                                    \
-  }
+      destroy_at<T8>::impl(p.x8##_ptr);                                        \
+    }                                                                          \
+  };

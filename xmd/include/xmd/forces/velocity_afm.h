@@ -6,7 +6,7 @@
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() vel_afm_tip
-#define FIELDS() int,res_idx,vec3r,afm_orig,vec3r,afm_vel
+#define FIELDS() int,res_idx,xmd::vec3r,afm_orig,xmd::vec3r,afm_vel
 
 GENTYPE()
 

@@ -45,7 +45,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -56,7 +56,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \
@@ -167,10 +167,10 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           ,                                                                    \
-          x2##_ptr{&ptr_->x2()}                                                \
+          x2##_ptr{const_ref_to_ptr(ptr_->x2())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -184,7 +184,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \
@@ -325,13 +325,13 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           ,                                                                    \
-          x2##_ptr{&ptr_->x2()}                                                \
+          x2##_ptr{const_ref_to_ptr(ptr_->x2())}                               \
                                                                                \
           ,                                                                    \
-          x3##_ptr{&ptr_->x3()}                                                \
+          x3##_ptr{const_ref_to_ptr(ptr_->x3())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -348,7 +348,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \
@@ -519,16 +519,16 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           ,                                                                    \
-          x2##_ptr{&ptr_->x2()}                                                \
+          x2##_ptr{const_ref_to_ptr(ptr_->x2())}                               \
                                                                                \
           ,                                                                    \
-          x3##_ptr{&ptr_->x3()}                                                \
+          x3##_ptr{const_ref_to_ptr(ptr_->x3())}                               \
                                                                                \
           ,                                                                    \
-          x4##_ptr{&ptr_->x4()}                                                \
+          x4##_ptr{const_ref_to_ptr(ptr_->x4())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -548,7 +548,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \
@@ -749,19 +749,19 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           ,                                                                    \
-          x2##_ptr{&ptr_->x2()}                                                \
+          x2##_ptr{const_ref_to_ptr(ptr_->x2())}                               \
                                                                                \
           ,                                                                    \
-          x3##_ptr{&ptr_->x3()}                                                \
+          x3##_ptr{const_ref_to_ptr(ptr_->x3())}                               \
                                                                                \
           ,                                                                    \
-          x4##_ptr{&ptr_->x4()}                                                \
+          x4##_ptr{const_ref_to_ptr(ptr_->x4())}                               \
                                                                                \
           ,                                                                    \
-          x5##_ptr{&ptr_->x5()}                                                \
+          x5##_ptr{const_ref_to_ptr(ptr_->x5())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -784,7 +784,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \
@@ -1015,22 +1015,22 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           ,                                                                    \
-          x2##_ptr{&ptr_->x2()}                                                \
+          x2##_ptr{const_ref_to_ptr(ptr_->x2())}                               \
                                                                                \
           ,                                                                    \
-          x3##_ptr{&ptr_->x3()}                                                \
+          x3##_ptr{const_ref_to_ptr(ptr_->x3())}                               \
                                                                                \
           ,                                                                    \
-          x4##_ptr{&ptr_->x4()}                                                \
+          x4##_ptr{const_ref_to_ptr(ptr_->x4())}                               \
                                                                                \
           ,                                                                    \
-          x5##_ptr{&ptr_->x5()}                                                \
+          x5##_ptr{const_ref_to_ptr(ptr_->x5())}                               \
                                                                                \
           ,                                                                    \
-          x6##_ptr{&ptr_->x6()}                                                \
+          x6##_ptr{const_ref_to_ptr(ptr_->x6())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -1056,7 +1056,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \
@@ -1318,25 +1318,25 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           ,                                                                    \
-          x2##_ptr{&ptr_->x2()}                                                \
+          x2##_ptr{const_ref_to_ptr(ptr_->x2())}                               \
                                                                                \
           ,                                                                    \
-          x3##_ptr{&ptr_->x3()}                                                \
+          x3##_ptr{const_ref_to_ptr(ptr_->x3())}                               \
                                                                                \
           ,                                                                    \
-          x4##_ptr{&ptr_->x4()}                                                \
+          x4##_ptr{const_ref_to_ptr(ptr_->x4())}                               \
                                                                                \
           ,                                                                    \
-          x5##_ptr{&ptr_->x5()}                                                \
+          x5##_ptr{const_ref_to_ptr(ptr_->x5())}                               \
                                                                                \
           ,                                                                    \
-          x6##_ptr{&ptr_->x6()}                                                \
+          x6##_ptr{const_ref_to_ptr(ptr_->x6())}                               \
                                                                                \
           ,                                                                    \
-          x7##_ptr{&ptr_->x7()}                                                \
+          x7##_ptr{const_ref_to_ptr(ptr_->x7())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -1365,7 +1365,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \
@@ -1657,28 +1657,28 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
     inline name##_const_ptr(name NO_SPEC() const *ptr_)                        \
         :                                                                      \
                                                                                \
-          x1##_ptr{&ptr_->x1()}                                                \
+          x1##_ptr{const_ref_to_ptr(ptr_->x1())}                               \
                                                                                \
           ,                                                                    \
-          x2##_ptr{&ptr_->x2()}                                                \
+          x2##_ptr{const_ref_to_ptr(ptr_->x2())}                               \
                                                                                \
           ,                                                                    \
-          x3##_ptr{&ptr_->x3()}                                                \
+          x3##_ptr{const_ref_to_ptr(ptr_->x3())}                               \
                                                                                \
           ,                                                                    \
-          x4##_ptr{&ptr_->x4()}                                                \
+          x4##_ptr{const_ref_to_ptr(ptr_->x4())}                               \
                                                                                \
           ,                                                                    \
-          x5##_ptr{&ptr_->x5()}                                                \
+          x5##_ptr{const_ref_to_ptr(ptr_->x5())}                               \
                                                                                \
           ,                                                                    \
-          x6##_ptr{&ptr_->x6()}                                                \
+          x6##_ptr{const_ref_to_ptr(ptr_->x6())}                               \
                                                                                \
           ,                                                                    \
-          x7##_ptr{&ptr_->x7()}                                                \
+          x7##_ptr{const_ref_to_ptr(ptr_->x7())}                               \
                                                                                \
           ,                                                                    \
-          x8##_ptr{&ptr_->x8()}                                                \
+          x8##_ptr{const_ref_to_ptr(ptr_->x8())}                               \
                                                                                \
           {};                                                                  \
                                                                                \
@@ -1710,7 +1710,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
           {};                                                                  \
                                                                                \
-    inline name##_const_ref NO_SPEC() operator*(int) const {                   \
+    inline name##_const_ref NO_SPEC() operator*() const {                      \
       return {                                                                 \
                                                                                \
           *x1##_ptr                                                            \

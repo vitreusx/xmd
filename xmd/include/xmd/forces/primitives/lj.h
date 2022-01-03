@@ -1,7 +1,7 @@
 #pragma once
 #include <tuple>
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+
+
 #include <xmd/utils/math.h>
 #include <xmd/types/scalar.h>
 #include <gentypes/gentype.h>
@@ -9,7 +9,7 @@
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() lj
-#define FIELDS() real,depth,real,r_min
+#define FIELDS() xmd::real,depth,xmd::real,r_min
 
 GEN_EXPR()
 
@@ -17,9 +17,6 @@ namespace xmd {
     class lj: public lj_expr<lj> {
     public:
         lj() = default;
-
-        lj(real depth, real r_min):
-            depth_{depth}, r_min_{r_min} {};
 
         INST_CTORS()
         INST_ASSIGN_COPY()
@@ -48,8 +45,8 @@ GEN_REF()
 GEN_CONST_REF()
 GEN_PTR()
 GEN_CONST_PTR()
-GEN_CONST_SPAN()
 GEN_SPAN()
+GEN_CONST_SPAN()
 GEN_MEMORY()
 GEN_ALLOCATOR()
 GEN_VECTOR()

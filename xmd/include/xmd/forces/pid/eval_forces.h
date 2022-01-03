@@ -9,9 +9,12 @@
 namespace xmd::pid {
     class eval_pid_forces: public vm_aware {
     public:
-        lambda_func bb_plus_lam, bb_minus_lam, ss_lam;
-        lj bb_plus_lj, bb_minus_lj;
-        sink_lj_array ss_ljs;
+        struct conf_t {
+            lambda_func bb_plus_lam, bb_minus_lam, ss_lam;
+            lj bb_plus_lj, bb_minus_lj;
+            const_array<sink_lj> ss_ljs;
+        };
+        conf_t conf;
 
     public:
         const_array<vec3r> r;
@@ -19,6 +22,7 @@ namespace xmd::pid {
         box<vec3r> const *box;
         vector<pid_bundle> const *bundles;
         real *V;
+        array<int> prev, next;
 
         void init_from_vm(vm& vm_inst) override;
 

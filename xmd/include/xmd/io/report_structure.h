@@ -13,11 +13,11 @@ namespace xmd {
         real period, nat_active_thr;
 
     public:
-        xmd::model *xmd_model;
-        res_map_t *res_map;
-        vec3r_array r;
-        std::optional<qa::contact_set*> qa_cont;
-        std::optional<qa::sync_data_array> sync;
+        xmd::model const *xmd_model;
+        res_map_t const *res_map;
+        const_array<vec3r> r;
+        std::optional<set<qa::contact> const*> qa_cont;
+        std::optional<const_array<qa::sync_data>> sync;
         real *t, *last_t;
 
         void init_from_vm(vm& vm_inst) override;

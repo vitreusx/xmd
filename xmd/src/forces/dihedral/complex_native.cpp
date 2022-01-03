@@ -5,7 +5,7 @@
 namespace xmd {
 
     void eval_cnd_forces::operator()() const {
-        for (int idx = 0; idx < dihedrals.size; ++idx) {
+        for (int idx = 0; idx < dihedrals.size(); ++idx) {
             iter(idx);
         }
     }
@@ -21,9 +21,10 @@ namespace xmd {
     }
 
     void eval_cnd_forces::iter(int idx) const {
-        auto i1 = dihedrals.i1[idx], i2 = dihedrals.i2[idx],
-            i3 = dihedrals.i3[idx], i4 = dihedrals.i4[idx];
-        auto nat_phi = dihedrals.nat_phi[idx];
+        auto nat_dih = dihedrals[idx];
+        auto i1 = nat_dih.i1(), i2 = nat_dih.i2(), i3 = nat_dih.i3(),
+            i4 = nat_dih.i4();
+        auto nat_phi = nat_dih.nat_phi();
 
         auto r1 = r[i1], r2 = r[i2], r3 = r[i3], r4 = r[i4];
         auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
@@ -60,7 +61,7 @@ namespace xmd {
 
     void eval_cnd_forces::omp_async() const {
 #pragma omp for nowait schedule(dynamic, 512)
-        for (int idx = 0; idx < dihedrals.size; ++idx) {
+        for (int idx = 0; idx < dihedrals.size(); ++idx) {
             iter(idx);
         }
     }

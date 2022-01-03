@@ -4,34 +4,24 @@
 #include "meta.h"
 
 {% macro _inst_ctors(sig) %}
+    {% set I = list(range(1, len(sig.fields)+1)) %}
+    template<
+        {% set comma = joiner(",") %}
+        {% for idx in I %}
+            {{comma()}} typename _T{{idx}}
+        {% endfor %}
+    >
     inline {{sig.name}}(
-            {% set comma = joiner(",") %}
-            {% for T, x in sig.fields %}
-                {{comma()}}const_ref<{{T}}> {{x}}
-            {% endfor %}
-        ):
-            {% set comma = joiner(",") %}
-            {% for T, x in sig.fields %}
-                {{comma()}}{{x}}##_{{"{"}}{{x}}{{"}"}}
-            {% endfor %}
-        {};
-
-        template<
-            {% set comma = joiner(",") %}
-            {% for idx in range(1, len(sig.fields)+1) %}
-                {{comma()}}typename _T{{idx}}
-            {% endfor %}>
-        inline {{sig.name}}(
-            {% set comma = joiner(",") %}
-            {% for idx in range(1, len(sig.fields)+1) %}
-                {{comma()}} _T{{idx}}&& arg{{idx}}
-            {% endfor %}
-        ):
-            {% set comma = joiner(",") %}
-            {% for (T, x), idx in zip(sig.fields, range(1, len(sig.fields)+1)) %}
-                {{comma()}} {{x}}##_{{"{"}}std::forward<_T{{idx}}>(arg{{idx}}){{"}"}}
-            {% endfor %}
-        {};
+        {% set comma = joiner(",") %}
+        {% for idx in I %}
+            {{comma()}}_T{{idx}}&& arg{{idx}}
+        {% endfor %}
+    ):
+        {% set comma = joiner(",") %}
+        {% for idx, (T, x) in zip(I, sig.fields) %}
+            {{comma()}}{{x}}##_{{"{"}}std::forward<_T{{idx}}>(arg{{idx}}){{"}"}}
+        {% endfor %}
+    {};
 
         inline {{sig.name}}({{sig.name}} const& other):
             {% set comma = joiner(",") %}
@@ -56,6 +46,7 @@
         {% for T, x in sig.fields %}
             {{x}}##_ = other.{{x}}##_;
         {% endfor %}
+        return *this;
     }
 {% endmacro %}
 
@@ -67,6 +58,7 @@
         {% for T, x in sig.fields %}
             {{x}}##_ = e.{{x}}();
         {% endfor %}
+        return *this;
     }
 {% endmacro %}
 

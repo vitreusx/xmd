@@ -1,6 +1,6 @@
 #pragma once
-#include <xmd/types/vector.h>
-#include <xmd/types/array.h>
+
+
 #include <xmd/types/scalar.h>
 
 #define NAMESPACE(...) xmd,nl,__VA_ARGS__

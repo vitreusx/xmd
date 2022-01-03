@@ -1,14 +1,14 @@
 #pragma once
 #include <xmd/utils/math.h>
 #include <xmd/types/scalar.h>
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+
+
 #include "lj.h"
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
 #define NAME() sink_lj
-#define FIELDS() real,depth,real,r_min,real,r_max
+#define FIELDS() xmd::real,depth,xmd::real,r_min,xmd::real,r_max
 
 GEN_EXPR()
 
@@ -52,8 +52,8 @@ GEN_REF()
 GEN_CONST_REF()
 GEN_PTR()
 GEN_CONST_PTR()
-GEN_CONST_SPAN()
 GEN_SPAN()
+GEN_CONST_SPAN()
 GEN_MEMORY()
 GEN_ALLOCATOR()
 GEN_VECTOR()

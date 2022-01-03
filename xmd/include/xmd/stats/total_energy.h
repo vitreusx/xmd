@@ -5,7 +5,7 @@
 namespace xmd {
     class compute_total_energy: public vm_aware {
     public:
-        vec3r_array v;
+        const_array<vec3r> v;
         array<real> mass;
         int num_particles;
         real *K, *V, *E;

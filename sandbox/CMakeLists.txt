@@ -10,12 +10,12 @@ target_compile_options(ref
 file(COPY data DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_executable(test test.cpp)
-target_link_libraries(test PRIVATE xmd)
+target_link_libraries(test PRIVATE gentypes)
 
 target_compile_options(test
     PRIVATE
     $<$<CONFIG:Debug>:$<$<COMPILE_LANGUAGE:CXX>:-g>>
-    $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-g;-O2;-march=native>>
+    $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-g;-Ofast;-march=native>>
     $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 
 add_custom_command(

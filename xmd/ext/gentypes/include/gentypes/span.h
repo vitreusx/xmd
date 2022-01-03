@@ -14,6 +14,8 @@ public:
 
   inline T &operator[](Idx idx) const { return data_[idx]; }
 
+  inline T &at(Idx idx) const { return data_[idx]; }
+
 protected:
   T *data_;
   Idx size_;
@@ -47,6 +49,8 @@ using span = typename span_impl<T, Idx>::type;
     inline name##_ref NO_SPEC() operator[](Idx idx) const {                    \
       return data_[idx];                                                       \
     }                                                                          \
+                                                                               \
+    inline name##_ref NO_SPEC() at(Idx idx) const { return data_[idx]; }       \
                                                                                \
   protected:                                                                   \
     name##_ptr NO_SPEC() data_;                                                \
