@@ -43,33 +43,34 @@ template <typename T, typename Idx> struct set_iter {
 
 template <typename T, typename NodeAlloc, typename Idx> class set_def {
 public:
-  explicit set_def(NodeAlloc const &alloc = NodeAlloc()) : nodes{alloc} {};
+  inline explicit set_def(NodeAlloc const &alloc = NodeAlloc())
+      : nodes{alloc} {};
 
-  explicit set_def(Idx n, T const &init = T(),
-                   NodeAlloc const &alloc = NodeAlloc())
+  inline explicit set_def(Idx n, T const &init = T(),
+                          NodeAlloc const &alloc = NodeAlloc())
       : nodes{n, set_node<T>(init, false), alloc} {};
 
-  Idx size() const { return nodes.size(); }
+  inline Idx size() const { return nodes.size(); }
 
-  set_iter<T, Idx> insert(T const &value = T()) {
+  inline set_iter<T, Idx> insert(T const &value = T()) {
     Idx idx = nodes.size();
     return {nodes.emplace_back(value, false), idx};
   }
 
-  template <typename... Args> set_iter<T, Idx> emplace(Args &&...args) {
+  template <typename... Args> inline set_iter<T, Idx> emplace(Args &&...args) {
     return insert(T(std::forward<Args>(args)...));
   }
 
-  void remove(Idx idx) {
+  inline void remove(Idx idx) {
     destroy_at(&nodes[idx].value());
     nodes[idx].vacant() = true;
   }
 
-  void clear() { nodes.clear(); }
+  inline void clear() { nodes.clear(); }
 
-  ref<set_node<T>> operator[](Idx idx) { return nodes[idx]; }
+  inline ref<set_node<T>> operator[](Idx idx) { return nodes[idx]; }
 
-  const_ref<set_node<T>> operator[](Idx idx) const { return nodes[idx]; }
+  inline const_ref<set_node<T>> operator[](Idx idx) const { return nodes[idx]; }
 
 protected:
   vector<set_node<T>, NodeAlloc, Idx> nodes;
@@ -93,45 +94,47 @@ using set = typename set_impl<T, NodeAlloc, Idx>::type;
   TEMPLATE(typename, NodeAlloc, typename, Idx)                                 \
   class name##_set {                                                           \
   public:                                                                      \
-    explicit name##_set(NodeAlloc const &alloc = NodeAlloc())                  \
+    inline explicit name##_set(NodeAlloc const &alloc = NodeAlloc())           \
         : nodes{alloc} {};                                                     \
                                                                                \
     template <typename _U = name NO_SPEC()>                                    \
-    explicit name##_set(                                                       \
+    inline explicit name##_set(                                                \
         Idx n, _U const &init = _U(), NodeAlloc const &alloc = NodeAlloc(),    \
         std::enable_if_t<std::is_default_constructible_v<_U>, _U *> = 0)       \
         : nodes{n, set_node<name NO_SPEC()>(init, false), alloc} {};           \
                                                                                \
     template <typename E>                                                      \
-    name##_set(Idx n, name##_expr<E> const &e,                                 \
-               NodeAlloc const &alloc = NodeAlloc())                           \
+    inline name##_set(Idx n, name##_expr<E> const &e,                          \
+                      NodeAlloc const &alloc = NodeAlloc())                    \
         : nodes{n, set_node<name NO_SPEC()>(e, false), alloc} {};              \
                                                                                \
-    Idx extent() const { return nodes.size(); }                                \
+    inline Idx extent() const { return nodes.size(); }                         \
                                                                                \
     template <typename E>                                                      \
-    set_iter<name NO_SPEC(), Idx> insert(name##_expr<E> const &e) {            \
+    inline set_iter<name NO_SPEC(), Idx> insert(name##_expr<E> const &e) {     \
       Idx idx = nodes.size();                                                  \
       return {nodes.emplace_back(e, false), idx};                              \
     }                                                                          \
                                                                                \
     template <typename... Args>                                                \
-    set_iter<name NO_SPEC(), Idx> emplace(Args &&...args) {                    \
+    inline set_iter<name NO_SPEC(), Idx> emplace(Args &&...args) {             \
       return insert(name NO_SPEC()(std::forward<Args>(args)...));              \
     }                                                                          \
                                                                                \
-    void remove(Idx idx) {                                                     \
+    inline void remove(Idx idx) {                                              \
       destroy_at(ref_to_ptr(nodes[idx].value()));                              \
       nodes[idx].vacant() = true;                                              \
     }                                                                          \
                                                                                \
-    ref<set_node<name NO_SPEC()>> operator[](Idx idx) { return nodes[idx]; }   \
-                                                                               \
-    const_ref<set_node<name NO_SPEC()>> operator[](Idx idx) const {            \
+    inline ref<set_node<name NO_SPEC()>> operator[](Idx idx) {                 \
       return nodes[idx];                                                       \
     }                                                                          \
                                                                                \
-    void clear() { nodes.clear(); }                                            \
+    inline const_ref<set_node<name NO_SPEC()>> operator[](Idx idx) const {     \
+      return nodes[idx];                                                       \
+    }                                                                          \
+                                                                               \
+    inline void clear() { nodes.clear(); }                                     \
                                                                                \
   protected:                                                                   \
     vector<set_node<name NO_SPEC()>, NodeAlloc, Idx> nodes;                    \

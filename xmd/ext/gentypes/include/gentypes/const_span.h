@@ -5,14 +5,14 @@
 
 template <typename T, typename Idx> class const_span_def {
 public:
-  explicit const_span_def(T const *data_ = nullptr, Idx size_ = 0)
+  inline explicit const_span_def(T const *data_ = nullptr, Idx size_ = 0)
       : data_{data_}, size_{size_} {};
 
-  T const *data() const { return data_; }
+  inline T const *data() const { return data_; }
 
-  Idx size() const { return size_; }
+  inline Idx size() const { return size_; }
 
-  T const &operator[](Idx idx) const { return data_[idx]; }
+  inline T const &operator[](Idx idx) const { return data_[idx]; }
 
 protected:
   T const *data_;
@@ -36,15 +36,16 @@ using const_span = typename const_span_impl<T, Idx>::type;
   TEMPLATE(typename, Idx)                                                      \
   class name##_const_span {                                                    \
   public:                                                                      \
-    explicit name##_const_span(name##_const_ptr NO_SPEC() data_ = nullptr,     \
-                               Idx size_ = 0)                                  \
+    inline explicit name##_const_span(name##_const_ptr NO_SPEC()               \
+                                          data_ = nullptr,                     \
+                                      Idx size_ = 0)                           \
         : data_{data_}, size_{size_} {};                                       \
                                                                                \
-    name##_const_ptr NO_SPEC() data() const { return data_; }                  \
+    inline name##_const_ptr NO_SPEC() data() const { return data_; }           \
                                                                                \
-    Idx size() const { return size_; }                                         \
+    inline Idx size() const { return size_; }                                  \
                                                                                \
-    name##_const_ref NO_SPEC() operator[](Idx idx) const {                     \
+    inline name##_const_ref NO_SPEC() operator[](Idx idx) const {              \
       return data_[idx];                                                       \
     }                                                                          \
                                                                                \

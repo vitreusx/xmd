@@ -15,7 +15,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_CTORS_3(name, T1, x1)                                              \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -26,14 +26,14 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -42,7 +42,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_CTORS_5(name, T1, x1, T2, x2)                                      \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -59,7 +59,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
@@ -69,7 +69,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -81,7 +81,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_CTORS_7(name, T1, x1, T2, x2, T3, x3)                              \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -104,7 +104,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
@@ -117,7 +117,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -132,7 +132,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_CTORS_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                      \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -161,7 +161,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
@@ -177,7 +177,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -195,7 +195,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_CTORS_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)             \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -230,7 +230,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
@@ -249,7 +249,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -270,7 +270,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_CTORS_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)     \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -311,7 +311,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
@@ -333,7 +333,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -358,7 +358,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 #define REF_CTORS_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7, \
                      x7)                                                       \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -405,7 +405,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
@@ -430,7 +430,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -458,7 +458,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 #define REF_CTORS_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7, \
                      x7, T8, x8)                                               \
                                                                                \
-  name##_ref(                                                                  \
+  inline name##_ref(                                                           \
                                                                                \
       ref<T1> x1                                                               \
                                                                                \
@@ -511,7 +511,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name NO_SPEC() & inst_)                                           \
+  inline name##_ref(name NO_SPEC() & inst_)                                    \
       :                                                                        \
                                                                                \
         x1##_{inst_.x1()}                                                      \
@@ -539,7 +539,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
         {};                                                                    \
                                                                                \
-  name##_ref(name##_ref NO_SPEC() const &other)                                \
+  inline name##_ref(name##_ref NO_SPEC() const &other)                         \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -849,7 +849,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_ASSIGN_EXPR_3(name, T1, x1)                                        \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -858,7 +859,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_ASSIGN_EXPR_5(name, T1, x1, T2, x2)                                \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -869,7 +871,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_ASSIGN_EXPR_7(name, T1, x1, T2, x2, T3, x3)                        \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -882,7 +885,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_ASSIGN_EXPR_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -897,7 +901,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define REF_ASSIGN_EXPR_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)       \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -915,7 +920,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 #define REF_ASSIGN_EXPR_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,   \
                            x6)                                                 \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -935,7 +941,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 #define REF_ASSIGN_EXPR_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,   \
                            x6, T7, x7)                                         \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -957,7 +964,8 @@ template <typename T> using ref = typename ref_impl<T>::type;
 #define REF_ASSIGN_EXPR_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,   \
                            x6, T7, x7, T8, x8)                                 \
                                                                                \
-  template <typename E> name##_ref &operator=(name##_expr<E> const &e) {       \
+  template <typename E>                                                        \
+  inline name##_ref &operator=(name##_expr<E> const &e) {                      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \

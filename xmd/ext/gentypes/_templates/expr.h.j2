@@ -9,10 +9,10 @@
     class {{sig.name}}##_expr {
     public:
         {% for T, x in sig.fields %}
-            auto {{x}}() const {
+            inline auto {{x}}() const {
                 return static_cast<Impl const&>(*this).{{x}}();
             }
-            auto {{x}}() {
+            inline auto {{x}}() {
                 return static_cast<Impl&>(*this).{{x}}();
             }
     {% endfor %}

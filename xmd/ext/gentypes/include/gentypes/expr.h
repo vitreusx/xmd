@@ -14,8 +14,8 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
   };                                                                           \
   LEAVE_NS()
 
@@ -24,11 +24,11 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
                                                                                \
-    auto x2() const { return static_cast<Impl const &>(*this).x2(); }          \
-    auto x2() { return static_cast<Impl &>(*this).x2(); }                      \
+    inline auto x2() const { return static_cast<Impl const &>(*this).x2(); }   \
+    inline auto x2() { return static_cast<Impl &>(*this).x2(); }               \
   };                                                                           \
   LEAVE_NS()
 
@@ -37,14 +37,14 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
                                                                                \
-    auto x2() const { return static_cast<Impl const &>(*this).x2(); }          \
-    auto x2() { return static_cast<Impl &>(*this).x2(); }                      \
+    inline auto x2() const { return static_cast<Impl const &>(*this).x2(); }   \
+    inline auto x2() { return static_cast<Impl &>(*this).x2(); }               \
                                                                                \
-    auto x3() const { return static_cast<Impl const &>(*this).x3(); }          \
-    auto x3() { return static_cast<Impl &>(*this).x3(); }                      \
+    inline auto x3() const { return static_cast<Impl const &>(*this).x3(); }   \
+    inline auto x3() { return static_cast<Impl &>(*this).x3(); }               \
   };                                                                           \
   LEAVE_NS()
 
@@ -53,17 +53,17 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
                                                                                \
-    auto x2() const { return static_cast<Impl const &>(*this).x2(); }          \
-    auto x2() { return static_cast<Impl &>(*this).x2(); }                      \
+    inline auto x2() const { return static_cast<Impl const &>(*this).x2(); }   \
+    inline auto x2() { return static_cast<Impl &>(*this).x2(); }               \
                                                                                \
-    auto x3() const { return static_cast<Impl const &>(*this).x3(); }          \
-    auto x3() { return static_cast<Impl &>(*this).x3(); }                      \
+    inline auto x3() const { return static_cast<Impl const &>(*this).x3(); }   \
+    inline auto x3() { return static_cast<Impl &>(*this).x3(); }               \
                                                                                \
-    auto x4() const { return static_cast<Impl const &>(*this).x4(); }          \
-    auto x4() { return static_cast<Impl &>(*this).x4(); }                      \
+    inline auto x4() const { return static_cast<Impl const &>(*this).x4(); }   \
+    inline auto x4() { return static_cast<Impl &>(*this).x4(); }               \
   };                                                                           \
   LEAVE_NS()
 
@@ -72,20 +72,20 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
                                                                                \
-    auto x2() const { return static_cast<Impl const &>(*this).x2(); }          \
-    auto x2() { return static_cast<Impl &>(*this).x2(); }                      \
+    inline auto x2() const { return static_cast<Impl const &>(*this).x2(); }   \
+    inline auto x2() { return static_cast<Impl &>(*this).x2(); }               \
                                                                                \
-    auto x3() const { return static_cast<Impl const &>(*this).x3(); }          \
-    auto x3() { return static_cast<Impl &>(*this).x3(); }                      \
+    inline auto x3() const { return static_cast<Impl const &>(*this).x3(); }   \
+    inline auto x3() { return static_cast<Impl &>(*this).x3(); }               \
                                                                                \
-    auto x4() const { return static_cast<Impl const &>(*this).x4(); }          \
-    auto x4() { return static_cast<Impl &>(*this).x4(); }                      \
+    inline auto x4() const { return static_cast<Impl const &>(*this).x4(); }   \
+    inline auto x4() { return static_cast<Impl &>(*this).x4(); }               \
                                                                                \
-    auto x5() const { return static_cast<Impl const &>(*this).x5(); }          \
-    auto x5() { return static_cast<Impl &>(*this).x5(); }                      \
+    inline auto x5() const { return static_cast<Impl const &>(*this).x5(); }   \
+    inline auto x5() { return static_cast<Impl &>(*this).x5(); }               \
   };                                                                           \
   LEAVE_NS()
 
@@ -94,23 +94,23 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
                                                                                \
-    auto x2() const { return static_cast<Impl const &>(*this).x2(); }          \
-    auto x2() { return static_cast<Impl &>(*this).x2(); }                      \
+    inline auto x2() const { return static_cast<Impl const &>(*this).x2(); }   \
+    inline auto x2() { return static_cast<Impl &>(*this).x2(); }               \
                                                                                \
-    auto x3() const { return static_cast<Impl const &>(*this).x3(); }          \
-    auto x3() { return static_cast<Impl &>(*this).x3(); }                      \
+    inline auto x3() const { return static_cast<Impl const &>(*this).x3(); }   \
+    inline auto x3() { return static_cast<Impl &>(*this).x3(); }               \
                                                                                \
-    auto x4() const { return static_cast<Impl const &>(*this).x4(); }          \
-    auto x4() { return static_cast<Impl &>(*this).x4(); }                      \
+    inline auto x4() const { return static_cast<Impl const &>(*this).x4(); }   \
+    inline auto x4() { return static_cast<Impl &>(*this).x4(); }               \
                                                                                \
-    auto x5() const { return static_cast<Impl const &>(*this).x5(); }          \
-    auto x5() { return static_cast<Impl &>(*this).x5(); }                      \
+    inline auto x5() const { return static_cast<Impl const &>(*this).x5(); }   \
+    inline auto x5() { return static_cast<Impl &>(*this).x5(); }               \
                                                                                \
-    auto x6() const { return static_cast<Impl const &>(*this).x6(); }          \
-    auto x6() { return static_cast<Impl &>(*this).x6(); }                      \
+    inline auto x6() const { return static_cast<Impl const &>(*this).x6(); }   \
+    inline auto x6() { return static_cast<Impl &>(*this).x6(); }               \
   };                                                                           \
   LEAVE_NS()
 
@@ -120,26 +120,26 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
                                                                                \
-    auto x2() const { return static_cast<Impl const &>(*this).x2(); }          \
-    auto x2() { return static_cast<Impl &>(*this).x2(); }                      \
+    inline auto x2() const { return static_cast<Impl const &>(*this).x2(); }   \
+    inline auto x2() { return static_cast<Impl &>(*this).x2(); }               \
                                                                                \
-    auto x3() const { return static_cast<Impl const &>(*this).x3(); }          \
-    auto x3() { return static_cast<Impl &>(*this).x3(); }                      \
+    inline auto x3() const { return static_cast<Impl const &>(*this).x3(); }   \
+    inline auto x3() { return static_cast<Impl &>(*this).x3(); }               \
                                                                                \
-    auto x4() const { return static_cast<Impl const &>(*this).x4(); }          \
-    auto x4() { return static_cast<Impl &>(*this).x4(); }                      \
+    inline auto x4() const { return static_cast<Impl const &>(*this).x4(); }   \
+    inline auto x4() { return static_cast<Impl &>(*this).x4(); }               \
                                                                                \
-    auto x5() const { return static_cast<Impl const &>(*this).x5(); }          \
-    auto x5() { return static_cast<Impl &>(*this).x5(); }                      \
+    inline auto x5() const { return static_cast<Impl const &>(*this).x5(); }   \
+    inline auto x5() { return static_cast<Impl &>(*this).x5(); }               \
                                                                                \
-    auto x6() const { return static_cast<Impl const &>(*this).x6(); }          \
-    auto x6() { return static_cast<Impl &>(*this).x6(); }                      \
+    inline auto x6() const { return static_cast<Impl const &>(*this).x6(); }   \
+    inline auto x6() { return static_cast<Impl &>(*this).x6(); }               \
                                                                                \
-    auto x7() const { return static_cast<Impl const &>(*this).x7(); }          \
-    auto x7() { return static_cast<Impl &>(*this).x7(); }                      \
+    inline auto x7() const { return static_cast<Impl const &>(*this).x7(); }   \
+    inline auto x7() { return static_cast<Impl &>(*this).x7(); }               \
   };                                                                           \
   LEAVE_NS()
 
@@ -149,28 +149,28 @@
   ENTER_NS()                                                                   \
   template <typename Impl> class name##_expr {                                 \
   public:                                                                      \
-    auto x1() const { return static_cast<Impl const &>(*this).x1(); }          \
-    auto x1() { return static_cast<Impl &>(*this).x1(); }                      \
+    inline auto x1() const { return static_cast<Impl const &>(*this).x1(); }   \
+    inline auto x1() { return static_cast<Impl &>(*this).x1(); }               \
                                                                                \
-    auto x2() const { return static_cast<Impl const &>(*this).x2(); }          \
-    auto x2() { return static_cast<Impl &>(*this).x2(); }                      \
+    inline auto x2() const { return static_cast<Impl const &>(*this).x2(); }   \
+    inline auto x2() { return static_cast<Impl &>(*this).x2(); }               \
                                                                                \
-    auto x3() const { return static_cast<Impl const &>(*this).x3(); }          \
-    auto x3() { return static_cast<Impl &>(*this).x3(); }                      \
+    inline auto x3() const { return static_cast<Impl const &>(*this).x3(); }   \
+    inline auto x3() { return static_cast<Impl &>(*this).x3(); }               \
                                                                                \
-    auto x4() const { return static_cast<Impl const &>(*this).x4(); }          \
-    auto x4() { return static_cast<Impl &>(*this).x4(); }                      \
+    inline auto x4() const { return static_cast<Impl const &>(*this).x4(); }   \
+    inline auto x4() { return static_cast<Impl &>(*this).x4(); }               \
                                                                                \
-    auto x5() const { return static_cast<Impl const &>(*this).x5(); }          \
-    auto x5() { return static_cast<Impl &>(*this).x5(); }                      \
+    inline auto x5() const { return static_cast<Impl const &>(*this).x5(); }   \
+    inline auto x5() { return static_cast<Impl &>(*this).x5(); }               \
                                                                                \
-    auto x6() const { return static_cast<Impl const &>(*this).x6(); }          \
-    auto x6() { return static_cast<Impl &>(*this).x6(); }                      \
+    inline auto x6() const { return static_cast<Impl const &>(*this).x6(); }   \
+    inline auto x6() { return static_cast<Impl &>(*this).x6(); }               \
                                                                                \
-    auto x7() const { return static_cast<Impl const &>(*this).x7(); }          \
-    auto x7() { return static_cast<Impl &>(*this).x7(); }                      \
+    inline auto x7() const { return static_cast<Impl const &>(*this).x7(); }   \
+    inline auto x7() { return static_cast<Impl &>(*this).x7(); }               \
                                                                                \
-    auto x8() const { return static_cast<Impl const &>(*this).x8(); }          \
-    auto x8() { return static_cast<Impl &>(*this).x8(); }                      \
+    inline auto x8() const { return static_cast<Impl const &>(*this).x8(); }   \
+    inline auto x8() { return static_cast<Impl &>(*this).x8(); }               \
   };                                                                           \
   LEAVE_NS()

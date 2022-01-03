@@ -5,29 +5,30 @@
 #include <memory>
 
 template <typename T>
-void uninitialized_fill_n(T *data, size_t n, T const &init) {
+inline void uninitialized_fill_n(T *data, size_t n, T const &init) {
   std::uninitialized_fill_n(data, n, init);
 }
 
 template <typename T>
-void uninitialized_copy_n(T const *from, size_t n, T *to) {
+inline void uninitialized_copy_n(T const *from, size_t n, T *to) {
   std::uninitialized_copy_n(from, n, to);
 }
 
-template <typename T> void uninitialized_move_n(T *from, size_t n, T *to) {
+template <typename T>
+inline void uninitialized_move_n(T *from, size_t n, T *to) {
   std::uninitialized_move_n(from, n, to);
 }
 
-template <typename T> void destroy_n(T *data, size_t n) {
+template <typename T> inline void destroy_n(T *data, size_t n) {
   std::destroy_n(data, n);
 }
 
 template <typename T, typename... Args>
-void construct_at(T *p, Args &&...args) {
+inline void construct_at(T *p, Args &&...args) {
   ::new (static_cast<void *>(p)) T(std::forward<Args>(args)...);
 }
 
-template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
+template <typename T> inline void destroy_at(T *p) { std::destroy_at(p); }
 
 #define GEN_MEMORY() GEN_MEMORY_EXP(NAME(), FIELDS())
 

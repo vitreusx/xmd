@@ -11,7 +11,7 @@
 
 #define INST_CTORS_3(name, T1, x1)                                             \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -25,7 +25,7 @@
   template <                                                                   \
                                                                                \
       typename _T1>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -36,7 +36,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -44,7 +44,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -53,7 +53,7 @@
 
 #define INST_CTORS_5(name, T1, x1, T2, x2)                                     \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -76,7 +76,7 @@
                                                                                \
       ,                                                                        \
       typename _T2>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -93,7 +93,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -104,7 +104,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -116,7 +116,7 @@
 
 #define INST_CTORS_7(name, T1, x1, T2, x2, T3, x3)                             \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -148,7 +148,7 @@
                                                                                \
       ,                                                                        \
       typename _T3>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -171,7 +171,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -185,7 +185,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -200,7 +200,7 @@
 
 #define INST_CTORS_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                     \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -241,7 +241,7 @@
                                                                                \
       ,                                                                        \
       typename _T4>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -270,7 +270,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -287,7 +287,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -305,7 +305,7 @@
 
 #define INST_CTORS_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)            \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -355,7 +355,7 @@
                                                                                \
       ,                                                                        \
       typename _T5>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -390,7 +390,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -410,7 +410,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -431,7 +431,7 @@
 
 #define INST_CTORS_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)    \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -490,7 +490,7 @@
                                                                                \
       ,                                                                        \
       typename _T6>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -531,7 +531,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -554,7 +554,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -579,7 +579,7 @@
 #define INST_CTORS_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6,    \
                       T7, x7)                                                  \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -647,7 +647,7 @@
                                                                                \
       ,                                                                        \
       typename _T7>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -694,7 +694,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -720,7 +720,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -748,7 +748,7 @@
 #define INST_CTORS_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6,    \
                       T7, x7, T8, x8)                                          \
                                                                                \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       const_ref<T1> x1                                                         \
                                                                                \
@@ -825,7 +825,7 @@
                                                                                \
       ,                                                                        \
       typename _T8>                                                            \
-  name(                                                                        \
+  inline name(                                                                 \
                                                                                \
       _T1 &&arg1                                                               \
                                                                                \
@@ -878,7 +878,7 @@
                                                                                \
         {};                                                                    \
                                                                                \
-  name(name const &other)                                                      \
+  inline name(name const &other)                                               \
       :                                                                        \
                                                                                \
         x1##_{other.x1##_}                                                     \
@@ -907,7 +907,7 @@
         {};                                                                    \
                                                                                \
   template <typename E>                                                        \
-  name(name##_expr<E> const &e)                                                \
+  inline name(name##_expr<E> const &e)                                         \
       :                                                                        \
                                                                                \
         x1##_{e.x1()}                                                          \
@@ -943,11 +943,11 @@
 
 #define INST_ASSIGN_COPY_3(name, T1, x1)                                       \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) { x1##_ = other.x1##_; }
+  inline name &operator=(name NO_SPEC() const &other) { x1##_ = other.x1##_; }
 
 #define INST_ASSIGN_COPY_5(name, T1, x1, T2, x2)                               \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) {                               \
+  inline name &operator=(name NO_SPEC() const &other) {                        \
                                                                                \
     x1##_ = other.x1##_;                                                       \
                                                                                \
@@ -956,7 +956,7 @@
 
 #define INST_ASSIGN_COPY_7(name, T1, x1, T2, x2, T3, x3)                       \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) {                               \
+  inline name &operator=(name NO_SPEC() const &other) {                        \
                                                                                \
     x1##_ = other.x1##_;                                                       \
                                                                                \
@@ -967,7 +967,7 @@
 
 #define INST_ASSIGN_COPY_9(name, T1, x1, T2, x2, T3, x3, T4, x4)               \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) {                               \
+  inline name &operator=(name NO_SPEC() const &other) {                        \
                                                                                \
     x1##_ = other.x1##_;                                                       \
                                                                                \
@@ -980,7 +980,7 @@
 
 #define INST_ASSIGN_COPY_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)      \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) {                               \
+  inline name &operator=(name NO_SPEC() const &other) {                        \
                                                                                \
     x1##_ = other.x1##_;                                                       \
                                                                                \
@@ -996,7 +996,7 @@
 #define INST_ASSIGN_COPY_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
                             x6)                                                \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) {                               \
+  inline name &operator=(name NO_SPEC() const &other) {                        \
                                                                                \
     x1##_ = other.x1##_;                                                       \
                                                                                \
@@ -1014,7 +1014,7 @@
 #define INST_ASSIGN_COPY_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
                             x6, T7, x7)                                        \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) {                               \
+  inline name &operator=(name NO_SPEC() const &other) {                        \
                                                                                \
     x1##_ = other.x1##_;                                                       \
                                                                                \
@@ -1034,7 +1034,7 @@
 #define INST_ASSIGN_COPY_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
                             x6, T7, x7, T8, x8)                                \
                                                                                \
-  name &operator=(name NO_SPEC() const &other) {                               \
+  inline name &operator=(name NO_SPEC() const &other) {                        \
                                                                                \
     x1##_ = other.x1##_;                                                       \
                                                                                \
@@ -1061,14 +1061,14 @@
 
 #define INST_ASSIGN_EXPR_3(name, T1, x1)                                       \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
   }
 
 #define INST_ASSIGN_EXPR_5(name, T1, x1, T2, x2)                               \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -1077,7 +1077,7 @@
 
 #define INST_ASSIGN_EXPR_7(name, T1, x1, T2, x2, T3, x3)                       \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -1088,7 +1088,7 @@
 
 #define INST_ASSIGN_EXPR_9(name, T1, x1, T2, x2, T3, x3, T4, x4)               \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -1101,7 +1101,7 @@
 
 #define INST_ASSIGN_EXPR_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)      \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -1117,7 +1117,7 @@
 #define INST_ASSIGN_EXPR_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
                             x6)                                                \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -1135,7 +1135,7 @@
 #define INST_ASSIGN_EXPR_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
                             x6, T7, x7)                                        \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \
@@ -1155,7 +1155,7 @@
 #define INST_ASSIGN_EXPR_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,  \
                             x6, T7, x7, T8, x8)                                \
                                                                                \
-  template <typename E> name &operator=(name##_expr<E> const &e) {             \
+  template <typename E> inline name &operator=(name##_expr<E> const &e) {      \
                                                                                \
     x1##_ = e.x1();                                                            \
                                                                                \

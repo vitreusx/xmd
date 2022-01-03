@@ -19,7 +19,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -30,14 +30,14 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \
@@ -62,7 +62,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -79,7 +79,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
@@ -89,7 +89,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \
@@ -121,7 +121,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -144,7 +144,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
@@ -157,7 +157,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \
@@ -196,7 +196,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -225,7 +225,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
@@ -241,7 +241,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \
@@ -287,7 +287,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -322,7 +322,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
@@ -341,7 +341,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \
@@ -394,7 +394,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -435,7 +435,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
@@ -457,7 +457,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \
@@ -518,7 +518,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -565,7 +565,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
@@ -590,7 +590,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \
@@ -658,7 +658,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_const_ref : public name##_expr<name##_const_ref NO_SPEC()> {    \
   public:                                                                      \
-    name##_const_ref(                                                          \
+    inline name##_const_ref(                                                   \
                                                                                \
         const_ref<T1> x1                                                       \
                                                                                \
@@ -711,7 +711,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name NO_SPEC() const &inst_)                              \
+    inline name##_const_ref(name NO_SPEC() const &inst_)                       \
         :                                                                      \
                                                                                \
           x1##_{inst_.x1()}                                                    \
@@ -739,7 +739,7 @@ template <typename T> using const_ref = typename const_ref_impl<T>::type;
                                                                                \
           {};                                                                  \
                                                                                \
-    name##_const_ref(name##_ref NO_SPEC() const &ref_)                         \
+    inline name##_const_ref(name##_ref NO_SPEC() const &ref_)                  \
         :                                                                      \
                                                                                \
           x1##_{ref_.x1()}                                                     \

@@ -17,7 +17,7 @@ using allocator = typename allocator_impl<T>::type;
     NO_TEMPLATE()
     class {{sig.name}}##_allocator {
     public:
-        {{sig.name}}##_ptr NO_SPEC() allocate(size_t n) {
+        inline {{sig.name}}##_ptr NO_SPEC() allocate(size_t n) {
             {{sig.name}}##_ptr NO_SPEC() res;
             {% for T, x in sig.fields %}
                 res.{{x}}##_ptr = {{x}}##_alloc.allocate(n);
@@ -25,7 +25,7 @@ using allocator = typename allocator_impl<T>::type;
             return res;
         }
 
-        void deallocate({{sig.name}}##_ptr NO_SPEC() p, size_t n) {
+        inline void deallocate({{sig.name}}##_ptr NO_SPEC() p, size_t n) {
             if (p) {
                 {% for T, x in sig.fields %}
                     {{x}}##_alloc.deallocate(p.{{x}}##_ptr, n);

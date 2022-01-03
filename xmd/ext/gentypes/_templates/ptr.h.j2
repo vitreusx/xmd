@@ -12,7 +12,7 @@ template<typename T>
 using ptr = typename ptr_impl<T>::type;
 
 template<typename T>
-T *ref_to_ptr(T &ref_) {
+inline T *ref_to_ptr(T &ref_) {
     return &ref_;
 }
 
@@ -21,9 +21,10 @@ T *ref_to_ptr(T &ref_) {
     NO_TEMPLATE()
     class {{sig.name}}##_ptr {
     public:
-        {{sig.name}}##_ptr() = default;
+        inline {{sig.name}}##_ptr():
+            {{sig.name}}##_ptr{nullptr} {};
         
-        {{sig.name}}##_ptr(
+        inline {{sig.name}}##_ptr(
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}ptr<{{T}}> {{x}}
@@ -35,14 +36,14 @@ T *ref_to_ptr(T &ref_) {
             {% endfor %}
         {};
 
-        {{sig.name}}##_ptr(std::nullptr_t):
+        inline {{sig.name}}##_ptr(std::nullptr_t):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_ptr{{"{"}}nullptr{{"}"}}
             {% endfor %}
         {};
         
-        {{sig.name}}##_ptr({{sig.name}} NO_SPEC()* ptr_):
+        inline {{sig.name}}##_ptr({{sig.name}} NO_SPEC()* ptr_):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_ptr{{"{"}}&ptr_->{{x}}(){{"}"}}
@@ -68,7 +69,7 @@ T *ref_to_ptr(T &ref_) {
         };
         
         template<typename Idx>
-        {{sig.name}}##_ref NO_SPEC() operator[](Idx idx) const {
+        inline {{sig.name}}##_ref NO_SPEC() operator[](Idx idx) const {
             return {{"{"}}
                 {% set comma = joiner(",") %}
                 {% for T, x in sig.fields %}

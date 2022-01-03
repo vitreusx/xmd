@@ -4,7 +4,7 @@
 #include "meta.h"
 
 {% macro _inst_ctors(sig) %}
-    {{sig.name}}(
+    inline {{sig.name}}(
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}const_ref<{{T}}> {{x}}
@@ -21,7 +21,7 @@
             {% for idx in range(1, len(sig.fields)+1) %}
                 {{comma()}}typename _T{{idx}}
             {% endfor %}>
-        {{sig.name}}(
+        inline {{sig.name}}(
             {% set comma = joiner(",") %}
             {% for idx in range(1, len(sig.fields)+1) %}
                 {{comma()}} _T{{idx}}&& arg{{idx}}
@@ -33,7 +33,7 @@
             {% endfor %}
         {};
 
-        {{sig.name}}({{sig.name}} const& other):
+        inline {{sig.name}}({{sig.name}} const& other):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_{{"{"}}other.{{x}}##_{{"}"}}
@@ -41,7 +41,7 @@
         {};
 
         template<typename E>
-        {{sig.name}}({{sig.name}}##_expr<E> const& e):
+        inline {{sig.name}}({{sig.name}}##_expr<E> const& e):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_{{"{"}}e.{{x}}(){{"}"}}
@@ -52,7 +52,7 @@
 {{meta.macro_v_alt2("INST_CTORS", _inst_ctors)}}
 
 {% macro _inst_assign_copy(sig) %}
-    {{sig.name}}& operator=({{sig.name}} NO_SPEC() const& other) {
+    inline {{sig.name}}& operator=({{sig.name}} NO_SPEC() const& other) {
         {% for T, x in sig.fields %}
             {{x}}##_ = other.{{x}}##_;
         {% endfor %}
@@ -63,7 +63,7 @@
 
 {% macro _inst_assign_expr(sig) %}
     template<typename E>
-    {{sig.name}}& operator=({{sig.name}}##_expr<E> const& e) {
+    inline {{sig.name}}& operator=({{sig.name}}##_expr<E> const& e) {
         {% for T, x in sig.fields %}
             {{x}}##_ = e.{{x}}();
         {% endfor %}

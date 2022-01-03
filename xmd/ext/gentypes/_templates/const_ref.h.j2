@@ -17,7 +17,7 @@ using const_ref = typename const_ref_impl<T>::type;
     class {{sig.name}}##_const_ref: 
         public {{sig.name}}##_expr<{{sig.name}}##_const_ref NO_SPEC()> {
     public:
-        {{sig.name}}##_const_ref(
+        inline {{sig.name}}##_const_ref(
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}const_ref<{{T}}> {{x}}
@@ -29,14 +29,14 @@ using const_ref = typename const_ref_impl<T>::type;
             {% endfor %}
         {};
 
-        {{sig.name}}##_const_ref({{sig.name}} NO_SPEC() const& inst_):
+        inline {{sig.name}}##_const_ref({{sig.name}} NO_SPEC() const& inst_):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_{{"{"}}inst_.{{x}}(){{"}"}}
             {% endfor %}
         {};
 
-        {{sig.name}}##_const_ref({{sig.name}}##_ref NO_SPEC() const& ref_):
+        inline {{sig.name}}##_const_ref({{sig.name}}##_ref NO_SPEC() const& ref_):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_{{"{"}}ref_.{{x}}(){{"}"}}

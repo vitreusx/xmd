@@ -20,7 +20,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -28,7 +28,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \
@@ -51,7 +51,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -61,7 +61,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \
@@ -88,7 +88,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -100,7 +100,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \
@@ -131,7 +131,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -145,7 +145,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \
@@ -180,7 +180,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -196,7 +196,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \
@@ -235,7 +235,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -253,7 +253,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \
@@ -297,7 +297,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -317,7 +317,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \
@@ -365,7 +365,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
-    name##_ptr NO_SPEC() allocate(size_t n) {                                  \
+    inline name##_ptr NO_SPEC() allocate(size_t n) {                           \
       name##_ptr NO_SPEC() res;                                                \
                                                                                \
       res.x1##_ptr = x1##_alloc.allocate(n);                                   \
@@ -387,7 +387,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
       return res;                                                              \
     }                                                                          \
                                                                                \
-    void deallocate(name##_ptr NO_SPEC() p, size_t n) {                        \
+    inline void deallocate(name##_ptr NO_SPEC() p, size_t n) {                 \
       if (p) {                                                                 \
                                                                                \
         x1##_alloc.deallocate(p.x1##_ptr, n);                                  \

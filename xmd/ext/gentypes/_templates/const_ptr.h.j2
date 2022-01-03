@@ -22,9 +22,9 @@ T const *const_ref_to_ptr(T const& ref_) {
     NO_TEMPLATE()
     class {{sig.name}}##_const_ptr {
     public:
-        {{sig.name}}##_const_ptr() = default;
+        inline {{sig.name}}##_const_ptr() = default;
 
-        {{sig.name}}##_const_ptr(
+        inline {{sig.name}}##_const_ptr(
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}const_ptr<{{T}}> {{x}}
@@ -36,21 +36,21 @@ T const *const_ref_to_ptr(T const& ref_) {
             {% endfor %}
         {};
 
-        {{sig.name}}##_const_ptr(std::nullptr_t):
+        inline {{sig.name}}##_const_ptr(std::nullptr_t):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_ptr{{"{"}}nullptr{{"}"}}
             {% endfor %}
         {};
 
-        {{sig.name}}##_const_ptr({{sig.name}} NO_SPEC() const *ptr_):
+        inline {{sig.name}}##_const_ptr({{sig.name}} NO_SPEC() const *ptr_):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_ptr{{"{"}}&ptr_->{{x}}(){{"}"}}
             {% endfor %}
         {};
 
-        {{sig.name}}##_const_ptr({{sig.name}}##_ptr NO_SPEC() const& p):
+        inline {{sig.name}}##_const_ptr({{sig.name}}##_ptr NO_SPEC() const& p):
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}{{x}}##_ptr{{"{"}}p.{{x}}##_ptr{{"}"}}
@@ -67,7 +67,7 @@ T const *const_ref_to_ptr(T const& ref_) {
         };
 
         template<typename Idx>
-        {{sig.name}}##_const_ref NO_SPEC() operator[](Idx idx) const {
+        inline {{sig.name}}##_const_ref NO_SPEC() operator[](Idx idx) const {
             return {{"{"}}
                 {% set comma = joiner(",") %}
                 {% for T, x in sig.fields %}
@@ -125,7 +125,7 @@ T const *const_ref_to_ptr(T const& ref_) {
     LEAVE_NS()
 
     NO_TEMPLATE()
-    NS_PREFIX() {{sig.name}}##_const_ptr NO_SPEC() const_ref_to_ptr(NS_PREFIX() {{sig.name}}##_const_ref NO_SPEC() const& ref_) {
+    inline NS_PREFIX() {{sig.name}}##_const_ptr NO_SPEC() const_ref_to_ptr(NS_PREFIX() {{sig.name}}##_const_ref NO_SPEC() const& ref_) {
         return {
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
