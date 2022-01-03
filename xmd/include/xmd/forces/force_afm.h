@@ -2,28 +2,23 @@
 #include <xmd/types/vec3.h>
 #include <xmd/vm/vm.h>
 
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() force_afm_tip
+#define FIELDS() int,res_idx,vec3r,pull_force
+
+GENTYPE()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
+
 namespace xmd {
-    struct force_afm_bundle_span {
-        array<int> pulled_idx;
-        vec3r_array pull_force;
-        int size;
-    };
-
-    class force_afm_bundle_vector {
-    public:
-        vector<int> pulled_idx;
-        vec3r_vector pull_force;
-        int size;
-
-        explicit force_afm_bundle_vector(int n = 0);
-        int push_back();
-        force_afm_bundle_span to_span();
-    };
-
     class eval_force_afm_forces: public vm_aware {
     public:
-        vec3r_array F;
-        force_afm_bundle_span bundles;
+        array<vec3r> F;
+        span<force_afm_tip> afm_tips;
 
         void init_from_vm(vm& vm_inst) override;
 

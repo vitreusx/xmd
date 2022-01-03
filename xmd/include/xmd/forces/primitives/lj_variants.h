@@ -7,7 +7,7 @@ namespace xmd {
     class lj_variants: public vm_aware {
     public:
         lj bb, bs, sb;
-        sink_lj_array ss;
+        array<sink_lj> ss;
 
         inline sink_lj operator[](int idx) const {
             switch (idx) {

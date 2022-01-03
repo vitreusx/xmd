@@ -22,6 +22,11 @@
 #define VFUNC_ALT(func, ...)                                                   \
   VFUNC_AUX1_ALT(func, NARG(__VA_ARGS__))(__VA_ARGS__)
 
+#define VFUNC_AUX2_ALT2(name, n) name##n
+#define VFUNC_AUX1_ALT2(name, n) VFUNC_AUX2_ALT2(name, n)
+#define VFUNC_ALT2(func, ...)                                                  \
+  VFUNC_AUX1_ALT2(func, NARG(__VA_ARGS__))(__VA_ARGS__)
+
 #define NO_TEMPLATE() VFUNC_ALT(TEMPLATE_, TEMPLATE_PARAMS(_))
 #define TEMPLATE(...) VFUNC_ALT(TEMPLATE_, TEMPLATE_PARAMS(__VA_ARGS__, _))
 

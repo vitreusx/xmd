@@ -7,11 +7,11 @@
 namespace xmd::nl {
     class verify: public vm_aware {
     public:
-        vec3r_array r;
-        box<vec3r> *box;
+        const_array<vec3r> r;
+        box<vec3r> const *box;
         bool *invalid, *first_time;
         int num_particles;
-        nl_data *data;
+        nl_data const *data;
 
         void init_from_vm(vm& vm_inst) override;
 

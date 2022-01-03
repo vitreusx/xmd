@@ -1,6 +1,5 @@
 #pragma once
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+#include <gentypes/gentype.h>
 #include <xmd/types/scalar.h>
 #include <tuple>
 #include <cmath>
@@ -10,31 +9,38 @@ namespace xmd::pid {
     enum lambda_version {
         COSINE, ALGEBRAIC, GAUSSIAN
     };
+}
 
-    class lambda_func {
+#define NAMESPACE(...) xmd,pid,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() lambda_func
+#define FIELDS() real,psi_0,real,alpha,lambda_version,version
+
+GEN_EXPR()
+
+namespace xmd::pid {
+    class lambda_func: public lambda_func_expr<lambda_func> {
     public:
-        real psi_0, alpha;
-        lambda_version version;
-
         lambda_func() = default;
 
-        lambda_func(real psi_0, real alpha, lambda_version version):
-            psi_0{psi_0}, alpha{alpha}, version{version} {};
+        INST_CTORS()
+        INST_ASSIGN_COPY()
+        INST_ASSIGN_EXPR()
 
         inline bool supp(real psi) const {
-            return abs(alpha * (psi - psi_0)) < M_PI;
+            return abs(alpha_ * (psi - psi_0_)) < M_PI;
         }
 
         inline std::tuple<real, real> operator()(real psi) const {
-            switch (version) {
+            switch (version_) {
             case COSINE: {
-                auto s = alpha * (psi - psi_0);
+                auto s = alpha_ * (psi - psi_0_);
                 auto val = 0.5f * cos(s) + 0.5f;
-                auto deriv = -0.5f * alpha * sin(s);
+                auto deriv = -0.5f * alpha_ * sin(s);
                 return std::make_tuple(val, deriv);
             }
             case ALGEBRAIC: {
-                auto s = alpha * (psi - psi_0);
+                auto s = alpha_ * (psi - psi_0_);
                 auto t = abs(s / M_PI);
                 auto x_inv = 1.0f / (2.0f * t * t - 2.0f * t - 1);
                 auto val = (t * t - 2.0f * t + 1.0f) * x_inv;
@@ -48,6 +54,11 @@ namespace xmd::pid {
             }
             }
         }
+
+        INST_LAZY_FIELDS()
+
+    private:
+        INST_FIELDS()
     };
 
     struct lambda_func_array {
@@ -58,13 +69,20 @@ namespace xmd::pid {
             return { psi_0[idx], alpha[idx], version };
         }
     };
-
-    class lambda_func_vector {
-    public:
-        vector<real> psi_0, alpha;
-        lambda_version version;
-
-        explicit lambda_func_vector(int n = 0, lambda_version version = COSINE);
-        lambda_func_array to_array();
-    };
 }
+
+GEN_REF()
+GEN_CONST_REF()
+GEN_PTR()
+GEN_CONST_PTR()
+GEN_CONST_SPAN()
+GEN_SPAN()
+GEN_MEMORY()
+GEN_ALLOCATOR()
+GEN_VECTOR()
+GEN_SET()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE

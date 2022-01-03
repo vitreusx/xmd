@@ -49,15 +49,15 @@ namespace xmd::nl {
         prepare(data->particles);
         for (int part_idx = 0; part_idx < num_particles; ++part_idx) {
             auto r_ = r[part_idx];
-            auto ix = adjust<int>(
+            auto ix = clamp<int>(
                 floor((r_.x() - x_min) * cell_ax_inv),
-                0, cell_nx-1);
-            auto iy = adjust<int>(
+                0, cell_nx - 1);
+            auto iy = clamp<int>(
                 floor((r_.y() - y_min) * cell_ay_inv),
-                0, cell_ny-1);
-            auto iz = adjust<int>(
+                0, cell_ny - 1);
+            auto iz = clamp<int>(
                 floor((r_.z() - z_min) * cell_az_inv),
-                0, cell_nz-1);
+                0, cell_nz - 1);
 
             auto cell_idx = ix + cell_nx * (iy + cell_ny * iz);
             assign(data->particles, part_idx, cell_idx);

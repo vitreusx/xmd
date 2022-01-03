@@ -6,7 +6,7 @@
 
 namespace xmd {
 
-    heurestic_dihedral_type::heurestic_dihedral_type(const amino_acid &a2,
+    heur_dih_type::heur_dih_type(const amino_acid &a2,
         const amino_acid &a3) {
         auto code2 = (aa_code)a2, code3 = (aa_code)a3;
         int8_t type2 = (code2 == GLY ? (int8_t)0 : (code2 == PRO ? (int8_t)1 : (int8_t)2));
@@ -14,11 +14,11 @@ namespace xmd {
         val = (int8_t)3 * type2 + type3;
     }
 
-    constexpr heurestic_dihedral_type::operator int8_t() {
+    constexpr heur_dih_type::operator int8_t() {
         return val;
     }
 
-    constexpr heurestic_dihedral_type::heurestic_dihedral_type(int8_t val):
+    constexpr heur_dih_type::heur_dih_type(int8_t val):
         val{val} {};
 
     void eval_heurestic_dihedral_forces::operator()() const {
@@ -88,7 +88,7 @@ namespace xmd {
                         dihedrals_vec.i2[dih_idx] = i2;
                         dihedrals_vec.i3[dih_idx] = i3;
                         dihedrals_vec.i4[dih_idx] = i4;
-                        auto type = heurestic_dihedral_type(atypes[i2], atypes[i3]);
+                        auto type = heur_dih_type(atypes[i2], atypes[i3]);
                         dihedrals_vec.type[dih_idx] = type;
 
                         ++dih_idx;

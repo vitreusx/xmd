@@ -7,31 +7,28 @@
 #include <xmd/types/vec3.h>
 #include <xmd/vm/vm.h>
 
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() nat_ss
+#define FIELDS() int,i1,int,i2
+
+GENTYPE()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
+
 namespace xmd {
-    struct nat_ssbond_span {
-        array<int> i1, i2;
-        int size;
-    };
-
-    struct nat_ssbond_vector {
-        vector<int> i1, i2;
-        int size;
-
-        explicit nat_ssbond_vector(int n = 0);
-
-        int push_back();
-        void clear();
-        nat_ssbond_span to_span();
-    };
-
     class eval_nat_ssbond_forces: public vm_aware {
     public:
         real H1, nat_r;
 
     public:
-        vec3r_array r, F;
-        box<vec3r> *box;
-        nat_ssbond_vector *ssbonds;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        box<vec3r> const *box;
+        vector<nat_ss> const *ssbonds;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;
@@ -47,10 +44,11 @@ namespace xmd {
         real cutoff;
 
     public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        nat_ssbond_vector *all_ssobnds, *ssbonds;
+        array<vec3r> r;
+        box<vec3r> const *box;
+        nl::nl_data const *nl;
+        vector<nat_ss> const *all_ssobnds;
+        vector<nat_ss> *ssbonds;
 
         void init_from_vm(vm& vm_inst) override;
 

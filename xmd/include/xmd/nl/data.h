@@ -27,12 +27,9 @@ namespace xmd::nl {
 
     class nl_data {
     public:
-        spatial_data particles, native_contacts;
-        neighbor_cell_list neighbor_cells;
-        nl_pair_vector particle_pairs;
+        vector<nl_pair> particle_pairs;
         real orig_pad, ref_t;
         box<vec3r> orig_box;
-        vec3r_vector orig_r;
-        int num_cells;
+        vector<vec3r> orig_r;
     };
 }

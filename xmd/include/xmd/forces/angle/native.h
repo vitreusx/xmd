@@ -4,31 +4,28 @@
 #include <xmd/types/amino_acid.h>
 #include <xmd/vm/vm.h>
 
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define NAME() nat_ang
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define FIELDS() int,i1,int,i2,int,i3,real,nat_theta
+
+GENTYPE()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
+
 namespace xmd {
-    struct native_angle_span {
-        array<int> i1, i2, i3;
-        array<real> nat_theta;
-        int size;
-    };
-
-    class native_angle_vector {
-    public:
-        explicit native_angle_vector(int n = 0);
-        native_angle_span to_span();
-
-        vector<int> i1, i2, i3;
-        vector<real> nat_theta;
-        int size;
-    };
-
     class eval_native_angle_forces: public vm_aware {
     public:
         real k;
 
     public:
         real *V;
-        vec3r_array r, F;
-        native_angle_span angles;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        const_span<nat_ang> angles;
 
         void init_from_vm(vm& vm_inst) override;
 

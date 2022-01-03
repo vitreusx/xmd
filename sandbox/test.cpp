@@ -1,5 +1,5 @@
 #include <iostream>
-#include <xmd/types/vec3_.h>
+#include <xmd/types/vec3.h>
 using namespace xmd;
 
 using vec3f_const_ptr = vec3_const_ptr<float>;

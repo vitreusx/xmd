@@ -11,13 +11,13 @@ namespace xmd::nl {
         real pad_factor;
 
     public:
-        vec3r_array r;
-        box<vec3r> *box;
+        const_array<vec3r> r;
+        box<vec3r> const *box;
         nl_data *data;
         int num_particles;
-        real *max_cutoff, *t;
+        real const *max_cutoff, *t;
         bool *invalid;
-        array<int> chain_idx, seq_idx;
+        const_array<int> chain_idx, seq_idx;
 
         void init_from_vm(vm& vm_inst) override;
 

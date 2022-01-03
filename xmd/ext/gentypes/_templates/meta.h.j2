@@ -13,7 +13,7 @@
       26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9,   \
       8, 7, 6, 5, 4, 3, 2, 1, 0
 
-{% for version in ["", "_ALT"] %}
+{% for version in ["", "_ALT", "_ALT2"] %}
     #define VFUNC_AUX2{{version}}(name, n) name##n
     #define VFUNC_AUX1{{version}}(name, n) VFUNC_AUX2{{version}}(name, n)
     #define VFUNC{{version}}(func, ...) VFUNC_AUX1{{version}}(func, NARG(__VA_ARGS__))(__VA_ARGS__)

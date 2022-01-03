@@ -6,31 +6,28 @@
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/vm/vm.h>
 
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() pauli_pair
+#define FIELDS() int,i1,int,i2
+
+GENTYPE()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
+
 namespace xmd {
-    struct pauli_pair_span {
-        array<int> i1, i2;
-        int size;
-    };
-
-    struct pauli_pair_vector {
-        vector<int> i1, i2;
-        int size;
-
-        explicit pauli_pair_vector(int n = 0);
-
-        int push_back();
-        void clear();
-        pauli_pair_span to_span();
-    };
-
     class eval_pauli_exclusion_forces: public vm_aware {
     public:
         real depth, r_excl;
 
     public:
-        vec3r_array r, F;
-        box<vec3r> *box;
-        pauli_pair_vector *pairs;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        box<vec3r> const *box;
+        vector<pauli_pair> const *pairs;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;
@@ -46,10 +43,10 @@ namespace xmd {
         real r_excl;
 
     public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        pauli_pair_vector *pairs;
+        const_array<vec3r> r;
+        box<vec3r> const *box;
+        nl::nl_data const *nl;
+        vector<pauli_pair> const *pairs;
 
         void init_from_vm(vm& vm_inst) override;
 

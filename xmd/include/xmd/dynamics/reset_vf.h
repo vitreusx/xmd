@@ -5,7 +5,7 @@
 namespace xmd {
     class reset_vf: public vm_aware {
     public:
-        vec3r_array F;
+        array<vec3r> F;
         real *V;
         int num_particles;
 

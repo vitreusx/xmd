@@ -8,11 +8,11 @@
 namespace xmd::qa {
     class process_candidates: public vm_aware {
     public:
-        candidate_list *candidates;
-        sync_data_array sync;
-        real *t;
-        contact_set *contacts;
-        free_pair_set *free_pairs;
+        set<candidate> *candidates;
+        array<sync_data> sync;
+        real const *t;
+        set<contact> *contacts;
+        set<free_pair> *free_pairs;
 
         void init_from_vm(vm& vm_inst) override;
 

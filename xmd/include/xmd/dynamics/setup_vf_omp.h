@@ -5,7 +5,7 @@
 namespace xmd {
     class setup_vf_omp: public vm_aware {
     public:
-        vec3r_array thread_F;
+        array<vec3r> thread_F;
         real *thread_V;
         int num_particles;
 

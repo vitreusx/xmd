@@ -10,10 +10,10 @@ namespace xmd {
         true_real dt;
 
     public:
-        vec3r_array r, v, F;
-        array<real> mass, mass_inv, mass_rsqrt;
+        array<vec3r> r, v, F;
+        const_ptr<real> mass, mass_inv, mass_rsqrt;
         real *t;
-        vec3tr_array y0, y1, y2, y3, y4, y5;
+        array<vec3tr> y0, y1, y2, y3, y4, y5;
         true_real *true_t;
         int num_particles;
         rand_gen *gen;

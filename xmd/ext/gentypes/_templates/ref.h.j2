@@ -11,13 +11,8 @@ struct ref_impl {
 template<typename T>
 using ref = typename ref_impl<T>::type;
 
-{% macro _gen_ref(sig) %}
-    ENTER_NS()
-    NO_TEMPLATE()
-    class {{sig.name}}##_ref:
-        public {{sig.name}}##_expr<{{sig.name}}##_ref NO_SPEC()> {
-    public:
-        {{sig.name}}##_ref(
+{% macro _ref_ctors(sig) %}
+    {{sig.name}}##_ref(
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
                 {{comma()}}ref<{{T}}> {{x}}
@@ -42,21 +37,33 @@ using ref = typename ref_impl<T>::type;
                 {{comma()}}{{x}}##_{{"{"}}other.{{x}}##_{{"}"}}
             {% endfor %}
         {};
-        
+{% endmacro %}
+
+{{meta.macro_v_alt2("REF_CTORS", _ref_ctors)}}
+
+{% macro _ref_assign_copy(sig) %}
         inline {{sig.name}}##_ref& operator=({{sig.name}}##_ref NO_SPEC() const& other) {
             {% for T, x in sig.fields %}
                 {{x}}##_ = other.{{x}}##_;
             {% endfor %}
             return *this;
         }
+{% endmacro %}
 
+{{meta.macro_v_alt2("REF_ASSIGN_COPY", _ref_assign_copy)}}
+
+{% macro _ref_assign_move(sig) %}
         inline {{sig.name}}##_ref& operator=({{sig.name}}##_ref NO_SPEC()&& other) {
             {% for T, x in sig.fields %}
                 {{x}}##_ = std::move(other.{{x}}##_);
             {% endfor %}
             return *this;
         }
+{% endmacro %}
 
+{{meta.macro_v_alt2("REF_ASSIGN_MOVE", _ref_assign_move)}}
+
+{% macro _ref_assign_expr(sig) %}
         template<typename E>
         {{sig.name}}##_ref& operator=({{sig.name}}##_expr<E> const& e) {
             {% for T, x in sig.fields %}
@@ -64,17 +71,46 @@ using ref = typename ref_impl<T>::type;
             {% endfor %}
             return *this;
         }
-        
+{% endmacro %}
+
+{{meta.macro_v_alt2("REF_ASSIGN_EXPR", _ref_assign_expr)}}
+
+{% macro _ref_lazy_fields(sig) %}
         {% for T, x in sig.fields %}
             inline ref<{{T}}> {{x}}() const {
                 return {{x}}##_;
             }
         {% endfor %}
+{% endmacro %}
 
-    protected:
+{{meta.macro_v_alt2("REF_LAZY_FIELDS", _ref_lazy_fields)}}
+
+{% macro _ref_fields(sig) %}
         {% for T, x in sig.fields %}
             ref<{{T}}> {{x}}##_;
         {% endfor %}
+{% endmacro %}
+
+{{meta.macro_v_alt2("REF_FIELDS", _ref_fields)}}
+
+{% macro _gen_ref(sig) %}
+    ENTER_NS()
+    NO_TEMPLATE()
+    class {{sig.name}}##_ref:
+        public {{sig.name}}##_expr<{{sig.name}}##_ref NO_SPEC()> {
+    public:
+        REF_CTORS()
+
+        REF_ASSIGN_COPY()
+
+        REF_ASSIGN_MOVE()
+
+        REF_ASSIGN_EXPR()
+
+        REF_LAZY_FIELDS()
+
+    protected:
+        REF_FIELDS()
     };
     LEAVE_NS()
 

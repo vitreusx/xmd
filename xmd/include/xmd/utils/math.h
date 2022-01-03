@@ -80,7 +80,7 @@ namespace xmd {
     }
 
     template<typename T>
-    auto adjust(T value, T min_value, T max_value) {
+    auto clamp(T value, T min_value, T max_value) {
         return value < min_value ? min_value : (value < max_value ? value : max_value);
     }
 }

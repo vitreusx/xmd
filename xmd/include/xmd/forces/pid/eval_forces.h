@@ -9,16 +9,15 @@
 namespace xmd::pid {
     class eval_pid_forces: public vm_aware {
     public:
-        struct conf_t {
-            lambda_func bb_plus_lam, bb_minus_lam, ss_lam;
-            lj bb_plus_lj, bb_minus_lj;
-            sink_lj_array ss_ljs;
-        } conf;
+        lambda_func bb_plus_lam, bb_minus_lam, ss_lam;
+        lj bb_plus_lj, bb_minus_lj;
+        sink_lj_array ss_ljs;
 
     public:
-        vec3r_array r, F;
-        box<vec3r> *box;
-        pid_bundle_vector *bundles;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        box<vec3r> const *box;
+        vector<pid_bundle> const *bundles;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;

@@ -1,227 +1,161 @@
 #pragma once
 #include <cstdint>
-#include <xmd/types/array.h>
-#include <xmd/types/vector.h>
+#include <gentypes/gentype.h>
+
+#define NAMESPACE(...) xmd,qa,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() sync_data
+#define FIELDS() int8_t,back,int8_t,side_all,int8_t,side_polar,\
+int8_t,side_hydrophobic
+
+GEN_EXPR()
 
 namespace xmd::qa {
-    class sync_data_cref {
+    class sync_data: public sync_data_expr<sync_data> {
     public:
-        inline sync_data_cref(int8_t const& back, int8_t const& side_all,
-            int8_t const& side_polar, int8_t const& side_hydrophobic):
-            back{back}, side_all{side_all}, side_polar{side_polar},
-            side_hydrophobic{side_hydrophobic} {};
+        sync_data():
+            back_{0}, side_all_{0}, side_polar_{0}, side_hydrophobic_{0} {};
 
-    public:
-        int8_t const &back, &side_all, &side_polar, &side_hydrophobic;
-    };
+        INST_CTORS()
+        INST_ASSIGN_COPY()
+        INST_ASSIGN_EXPR()
 
-    class sync_data {
-    public:
-        sync_data() = default;
+        template<typename E>
+        inline auto& operator+=(sync_data_expr<E> const& e) {
+            back_ += e.back();
+            side_all_ += e.side_all();
+            side_polar_ += e.side_polar();
+            side_hydrophobic_ += e.side_hydrophobic();
+            return *this;
+        }
 
-        inline sync_data(int8_t back, int8_t side_all, int8_t side_polar,
-            int8_t side_hydrophobic):
-            back{back}, side_all{side_all}, side_polar{side_polar},
-            side_hydrophobic{side_hydrophobic} {};
-
-        inline sync_data(sync_data_cref const& other):
-            back{other.back}, side_all{other.side_all},
-            side_polar{other.side_polar}, side_hydrophobic{other.side_hydrophobic} {};
-
-        inline operator sync_data_cref() {
-            return { back, side_all, side_polar, side_hydrophobic };
+        template<typename E>
+        inline auto& operator-=(sync_data_expr<E> const& e) {
+            back_ -= e.back();
+            side_all_ -= e.side_all();
+            side_polar_ -= e.side_polar();
+            side_hydrophobic_ -= e.side_hydrophobic();
+            return *this;
         }
 
         inline bool is_valid() const {
-            return (back >= 0) && (side_all >= 0) && (side_polar >= 0) &&
-                   (side_hydrophobic >= 0);
+            return (back_ >= 0) && (side_all_ >= 0) && (side_polar_ >= 0) &&
+                   (side_hydrophobic_ >= 0);
         }
 
-    public:
-        int8_t back = 0, side_all = 0, side_polar = 0, side_hydrophobic = 0;
+        INST_LAZY_FIELDS()
+
+    protected:
+        INST_FIELDS()
     };
 
-    inline sync_data operator+(sync_data const& s1, sync_data const& s2) {
-        return { static_cast<int8_t>(s1.back + s2.back),
-                 static_cast<int8_t>(s1.side_all + s2.side_all),
-                 static_cast<int8_t>(s1.side_polar + s2.side_polar),
-                 static_cast<int8_t>(s1.side_hydrophobic + s2.side_hydrophobic) };
+    class sync_data_ref: public sync_data_expr<sync_data_ref> {
+    public:
+        REF_CTORS()
+        REF_ASSIGN_COPY()
+        REF_ASSIGN_MOVE()
+        REF_ASSIGN_EXPR()
+
+        template<typename E>
+        inline auto& operator+=(sync_data_expr<E> const& e) {
+            back_ += e.back();
+            side_all_ += e.side_all();
+            side_polar_ += e.side_polar();
+            side_hydrophobic_ += e.side_hydrophobic();
+            return *this;
+        }
+
+        template<typename E>
+        inline auto& operator-=(sync_data_expr<E> const& e) {
+            back_ -= e.back();
+            side_all_ -= e.side_all();
+            side_polar_ -= e.side_polar();
+            side_hydrophobic_ -= e.side_hydrophobic();
+            return *this;
+        }
+
+    protected:
+        REF_FIELDS()
+    };
+
+    template<typename E1, typename E2>
+    class sync_sum_expr:
+        public sync_data_expr<sync_sum_expr<E1, E2>> {
+    public:
+        sync_sum_expr(E1 const& e1, E2 const& e2);
+
+        auto back() const {
+            return e1.back() + e2.back();
+        }
+
+        auto side_all() const {
+            return e1.side_all() + e2.side_all();
+        }
+
+        auto side_polar() const {
+            return e1.side_polar() + e2.side_polar();
+        }
+
+        auto side_hydrophobic() const {
+            return e1.side_hydrophobic() + e2.side_hydrophobic();
+        }
+
+    private:
+        E1 e1;
+        E2 e2;
+    };
+
+    template<typename E1, typename E2>
+    inline auto operator+(sync_data_expr<E1> const& e1, sync_data_expr<E2> const& e2) {
+        return sync_sum_expr<E1, E2>(static_cast<E1 const&>(e1),
+            static_cast<E2 const&>(e2));
     }
 
-    inline sync_data operator-(sync_data const& s1, sync_data const& s2) {
-        return { static_cast<int8_t>(s1.back - s2.back),
-                 static_cast<int8_t>(s1.side_all - s2.side_all),
-                 static_cast<int8_t>(s1.side_polar - s2.side_polar),
-                 static_cast<int8_t>(s1.side_hydrophobic - s2.side_hydrophobic) };
+    template<typename E1, typename E2>
+    class sync_diff_expr:
+        public sync_data_expr<sync_sum_expr<E1, E2>> {
+    public:
+        sync_diff_expr(E1 const& e1, E2 const& e2);
+
+        auto back() const {
+            return e1.back() - e2.back();
+        }
+
+        auto side_all() const {
+            return e1.side_all() - e2.side_all();
+        }
+
+        auto side_polar() const {
+            return e1.side_polar() - e2.side_polar();
+        }
+
+        auto side_hydrophobic() const {
+            return e1.side_hydrophobic() - e2.side_hydrophobic();
+        }
+
+    private:
+        E1 e1;
+        E2 e2;
+    };
+
+    template<typename E1, typename E2>
+    inline auto operator-(sync_data_expr<E1> const& e1, sync_data_expr<E2> const& e2) {
+        return sync_diff_expr<E1, E2>(static_cast<E1 const&>(e1),
+            static_cast<E2 const&>(e2));
     }
-
-    class sync_data_ref {
-    public:
-        inline sync_data_ref(int8_t& back, int8_t& side_all,
-            int8_t& side_polar, int8_t& side_hydrophobic):
-            back{back}, side_all{side_all}, side_polar{side_polar},
-            side_hydrophobic{side_hydrophobic} {};
-
-        inline auto& operator=(sync_data_cref const& other) {
-            back = other.back;
-            side_all = other.side_all;
-            side_polar = other.side_polar;
-            side_hydrophobic = other.side_hydrophobic;
-            return *this;
-        }
-
-        inline auto& operator=(sync_data_ref const& other) {
-            back = other.back;
-            side_all = other.side_all;
-            side_polar = other.side_polar;
-            side_hydrophobic = other.side_hydrophobic;
-            return *this;
-        }
-
-        inline auto& operator=(sync_data const& other) {
-            back = other.back;
-            side_all = other.side_all;
-            side_polar = other.side_polar;
-            side_hydrophobic = other.side_hydrophobic;
-            return *this;
-        }
-
-        inline operator sync_data_cref() const {
-            return { back, side_all, side_polar, side_hydrophobic };
-        }
-
-        inline operator sync_data() const {
-            return { back, side_all, side_polar, side_hydrophobic };
-        }
-
-        inline auto& operator+=(sync_data_cref const& other) {
-//#pragma omp atomic update
-            back += other.back;
-//#pragma omp atomic update
-            side_all += other.side_all;
-//#pragma omp atomic update
-            side_polar += other.side_polar;
-//#pragma omp atomic update
-            side_hydrophobic += other.side_hydrophobic;
-            return *this;
-        }
-
-        inline auto& operator-=(sync_data_cref const& other) {
-//#pragma omp atomic update
-            back -= other.back;
-//#pragma omp atomic update
-            side_all -= other.side_all;
-//#pragma omp atomic update
-            side_polar -= other.side_polar;
-//#pragma omp atomic update
-            side_hydrophobic -= other.side_hydrophobic;
-            return *this;
-        }
-
-        inline auto& operator+=(sync_data const& other) {
-//#pragma omp atomic update
-            back += other.back;
-//#pragma omp atomic update
-            side_all += other.side_all;
-//#pragma omp atomic update
-            side_polar += other.side_polar;
-//#pragma omp atomic update
-            side_hydrophobic += other.side_hydrophobic;
-            return *this;
-        }
-
-        inline auto& operator-=(sync_data const& other) {
-//#pragma omp atomic update
-            back -= other.back;
-//#pragma omp atomic update
-            side_all -= other.side_all;
-//#pragma omp atomic update
-            side_polar -= other.side_polar;
-//#pragma omp atomic update
-            side_hydrophobic -= other.side_hydrophobic;
-            return *this;
-        }
-
-        inline auto& operator+=(sync_data_ref const& other) {
-//#pragma omp atomic update
-            back += other.back;
-//#pragma omp atomic update
-            side_all += other.side_all;
-//#pragma omp atomic update
-            side_polar += other.side_polar;
-//#pragma omp atomic update
-            side_hydrophobic += other.side_hydrophobic;
-            return *this;
-        }
-
-        inline auto& operator-=(sync_data_ref const& other) {
-//#pragma omp atomic update
-            back -= other.back;
-//#pragma omp atomic update
-            side_all -= other.side_all;
-//#pragma omp atomic update
-            side_polar -= other.side_polar;
-//#pragma omp atomic update
-            side_hydrophobic -= other.side_hydrophobic;
-            return *this;
-        }
-
-    public:
-        int8_t &back, &side_all, &side_polar, &side_hydrophobic;
-    };
-
-    class sync_data_array {
-    public:
-        array<int8_t> back, side_all, side_polar, side_hydrophobic;
-
-        inline sync_data_ref operator[](int idx) const {
-            return { back[idx], side_all[idx], side_polar[idx],
-                     side_hydrophobic[idx] };
-        }
-    };
-
-    class sync_data_vector {
-    public:
-        vector<int8_t> back, side_all, side_polar, side_hydrophobic;
-        int size_;
-
-        explicit sync_data_vector(int n = 0);
-
-        inline sync_data_ref operator[](int idx) {
-            return { back[idx], side_all[idx], side_polar[idx],
-                     side_hydrophobic[idx] };
-        }
-
-        inline sync_data_cref operator[](int idx) const {
-            return { back[idx], side_all[idx], side_polar[idx],
-                     side_hydrophobic[idx] };
-        }
-
-        inline sync_data_ref emplace_back() {
-            ++size_;
-            return { back.emplace_back(), side_all.emplace_back(),
-                     side_polar.emplace_back(), side_hydrophobic.emplace_back()
-            };
-        }
-
-        inline int size() const {
-            return size_;
-        }
-
-        inline void clear() {
-            back.clear();
-            side_all.clear();
-            side_polar.clear();
-            side_hydrophobic.clear();
-        }
-
-        inline auto to_array() {
-            sync_data_array a;
-            a.back = back.to_array();
-            a.side_all = side_all.to_array();
-            a.side_polar = side_polar.to_array();
-            a.side_hydrophobic = side_hydrophobic.to_array();
-            return a;
-        }
-    };
 }
+
+GEN_CONST_REF()
+GEN_PTR()
+GEN_CONST_PTR()
+GEN_CONST_SPAN()
+GEN_SPAN()
+GEN_MEMORY()
+GEN_ALLOCATOR()
+GEN_VECTOR()
+GEN_SET()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE

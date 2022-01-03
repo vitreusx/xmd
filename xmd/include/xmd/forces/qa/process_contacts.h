@@ -16,12 +16,13 @@ namespace xmd::qa {
         real factor;
 
     public:
-        vec3r_array r, F;
-        box<vec3r> *box;
-        contact_set *contacts;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        box<vec3r> const *box;
+        set<contact> *contacts;
         real *V, *t;
-        sync_data_array sync;
-        free_pair_set *free_pairs;
+        array<sync_data> sync;
+        set<free_pair> *free_pairs;
 
         void init_from_vm(vm& vm_inst) override;
 

@@ -15,17 +15,29 @@
         {{func("name")|as_macro_body}}
 {% endmacro %}
 
-{% macro macro_v(macro_name, func) %}
+{% macro _macro_v(version, macro_name, func) %}
     #define {{macro_name|upper}}() {{macro_name|upper}}_EXP(NAME(), FIELDS())
     
     #define {{macro_name|upper}}_EXP(name, fields) {{macro_name|upper}}_(name, fields)
 
     #define {{macro_name|upper}}_(...) \
-        VFUNC({{macro_name|upper}}_, __VA_ARGS__)
+        VFUNC{{version}}({{macro_name|upper}}_, __VA_ARGS__)
     
     {% for n in range(1, MAX_FIELDS+1) %}
         {% set sig = macro_sig(n) %}
         #define {{macro_name|upper}}_{{2*n+1}}({{_macro_args(sig)}}) \
             {{func(sig)|as_macro_body}}
     {% endfor %}
+{% endmacro %}
+
+{% macro macro_v(macro_name, func) %}
+    {{_macro_v("", macro_name, func)}}
+{% endmacro %}
+
+{% macro macro_v_alt(macro_name, func) %}
+    {{_macro_v("_ALT", macro_name, func)}}
+{% endmacro %}
+
+{% macro macro_v_alt2(macro_name, func) %}
+    {{_macro_v("_ALT2", macro_name, func)}}
 {% endmacro %}

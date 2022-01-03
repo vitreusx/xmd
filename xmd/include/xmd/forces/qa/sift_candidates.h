@@ -16,13 +16,13 @@ namespace xmd::qa {
         polarization_type ptype[amino_acid::NUM_AA];
 
     public:
-        vec3r_array r, n, h;
-        box<vec3r> *box;
+        const_array<vec3r> r, n, h;
+        box<vec3r> const *box;
         array<amino_acid> atype;
-        sync_data_array sync;
+        const_array<sync_data> sync;
 
-        free_pair_set *free_pairs;
-        candidate_list *candidates;
+        set<free_pair> const *free_pairs;
+        set<candidate> *candidates;
 
         void init_from_vm(vm& vm_inst) override;
 

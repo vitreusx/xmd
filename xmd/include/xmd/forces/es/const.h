@@ -11,9 +11,10 @@ namespace xmd {
         real V_factor;
 
     public:
-        vec3r_array r, F;
-        box<vec3r> *box;
-        es_pair_vector *es_pairs;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        box<vec3r> const *box;
+        vector<es_pair> const *es_pairs;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;

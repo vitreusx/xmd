@@ -8,52 +8,28 @@
 #include <xmd/nl/data.h>
 #include <xmd/vm/vm.h>
 
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() nat_cont
+#define FIELDS() int,i1,int,i2,real,nat_dist
+
+GENTYPE()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
+
 namespace xmd {
-    struct go_contact_span {
-        array<int> i1, i2;
-        array<real> nat_dist;
-        int size;
-    };
-
-    struct go_contact_vector {
-        vector<int> i1, i2;
-        vector<real> nat_dist;
-        int size;
-
-        explicit go_contact_vector(int n = 0);
-
-        inline int push_back() {
-            i1.push_back();
-            i2.push_back();
-            nat_dist.push_back();
-            return size++;
-        }
-
-        inline void clear() {
-            i1.clear();
-            i2.clear();
-            nat_dist.clear();
-            size = 0;
-        }
-
-        inline auto to_span() const {
-            go_contact_span s;
-            s.i1 = i1.data();
-            s.i2 = i2.data();
-            s.nat_dist = nat_dist.data();
-            s.size = size;
-            return s;
-        }
-    };
-
     class eval_go_forces: public vm_aware {
     public:
         real depth;
 
     public:
-        vec3r_array r, F;
-        box<vec3r> *box;
-        go_contact_vector *contacts;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        box<vec3r> const *box;
+        vector<nat_cont> const *contacts;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;
@@ -66,10 +42,11 @@ namespace xmd {
 
     class update_go_contacts: public vm_aware {
     public:
-        vec3r_array r;
-        box<vec3r> *box;
-        nl::nl_data *nl;
-        go_contact_vector *all_contacts, *contacts;
+        const_array<vec3r> r;
+        box<vec3r> const *box;
+        nl::nl_data const *nl;
+        vector<nat_cont> const *all_contacts;
+        vector<nat_cont> *contacts;
 
         void init_from_vm(vm& vm_inst) override;
 

@@ -3,34 +3,14 @@
 #include <xmd/types/array.h>
 #include <xmd/types/scalar.h>
 
-namespace xmd::nl {
-    struct nl_pair_span {
-        array<int> i1, i2;
-        array<bool> is_native;
-        int size;
-    };
+#define NAMESPACE(...) xmd,nl,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() nl_pair
+#define FIELDS() int,i1,int,i2,bool,is_native
 
-    class nl_pair_vector {
-    public:
-        vector<int> i1, i2;
-        vector<bool> is_native;
-        int size;
+GENTYPE()
 
-        int push_back() {
-            i1.push_back();
-            i2.push_back();
-            is_native.push_back();
-            return size++;
-        }
-
-        void clear() {
-            i1.clear();
-            i2.clear();
-            is_native.clear();
-            size = 0;
-        }
-
-        explicit nl_pair_vector(int n = 0);
-        nl_pair_span to_span();
-    };
-}
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE

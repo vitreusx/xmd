@@ -5,43 +5,42 @@
 #include <xmd/vm/vm.h>
 
 namespace xmd {
-    class heurestic_dihedral_type {
+    class heur_dih_type {
     public:
-        heurestic_dihedral_type() = default;
-        heurestic_dihedral_type(amino_acid const& a2, amino_acid const& a3);
+        heur_dih_type() = default;
+
+        heur_dih_type(amino_acid const &a2, amino_acid const &a3);
 
         explicit constexpr operator int8_t();
 
     private:
-        explicit constexpr heurestic_dihedral_type(int8_t val);
+        explicit constexpr heur_dih_type(int8_t val);
 
         int8_t val = 0;
     };
+}
 
-    struct heurestic_dihedral_span {
-        array<int> i1, i2, i3, i4;
-        array<heurestic_dihedral_type> type;
-        int size;
-    };
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() heur_dih
+#define FIELDS() int,i1,int,i2,int,i3,int,i4,heur_dih_type,type
 
-    class heurestic_dihedral_vector {
-    public:
-        explicit heurestic_dihedral_vector(int n = 0);
+GENTYPE()
 
-        heurestic_dihedral_span to_span();
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
 
-        vector<int> i1, i2, i3, i4;
-        vector<heurestic_dihedral_type> type;
-        int size;
-    };
-
+namespace xmd {
     class eval_heurestic_dihedral_forces: public vm_aware {
     public:
         static constexpr int NUM_TERMS = 6, NUM_TYPES = 9;
         real coeffs[NUM_TERMS][NUM_TYPES];
 
-        vec3r_array r, F;
-        heurestic_dihedral_span dihedrals;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        const_span<heur_dih> dihedrals;
         real *V;
 
         void init_from_vm(vm& vm_inst) override;

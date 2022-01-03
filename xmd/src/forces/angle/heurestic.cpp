@@ -7,7 +7,7 @@
 
 namespace xmd {
 
-    heurestic_angle_type::heurestic_angle_type(const amino_acid &a1,
+    heur_ang_type::heur_ang_type(const amino_acid &a1,
         const amino_acid &a2) {
         auto code1 = (aa_code)a1, code2 = (aa_code)a2;
         int8_t type1 = (code1 == GLY ? (int8_t)0 : (code1 == PRO ? (int8_t)1 : (int8_t)2));
@@ -15,11 +15,11 @@ namespace xmd {
         val = (int8_t)3 * type1 + type2;
     }
 
-    constexpr heurestic_angle_type::operator int8_t() {
+    constexpr heur_ang_type::operator int8_t() {
         return val;
     }
 
-    constexpr heurestic_angle_type::heurestic_angle_type(int8_t val) :
+    constexpr heur_ang_type::heur_ang_type(int8_t val) :
         val{val} {};
 
     void eval_heurestic_angle_forces::operator()() const {
@@ -91,7 +91,7 @@ namespace xmd {
                         angles_vec.i1[ang_idx] = i1;
                         angles_vec.i2[ang_idx] = i2;
                         angles_vec.i3[ang_idx] = i3;
-                        auto type = heurestic_angle_type(atypes[i1], atypes[i2]);
+                        auto type = heur_ang_type(atypes[i1], atypes[i2]);
                         angles_vec.type[ang_idx] = type;
 
                         ++ang_idx;

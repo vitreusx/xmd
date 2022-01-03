@@ -1,32 +1,27 @@
 #pragma once
-#include <xmd/types/array.h>
 #include <xmd/types/vec3.h>
 #include <xmd/vm/vm.h>
 #include <xmd/model/model.h>
 #include <unordered_map>
 
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() nat_dih
+#define FIELDS() int,i1,int,i2,int,i3,int,i4,real,nat_phi
+
+GENTYPE()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
+
 namespace xmd {
-    struct native_dihedral_span {
-        array<int> i1, i2, i3, i4;
-        array<real> nat_phi;
-        int size;
-    };
-
-    class native_dihedral_vector {
-    public:
-        explicit native_dihedral_vector(int n = 0);
-
-        native_dihedral_span to_span();
-
-        vector<int> i1, i2, i3, i4;
-        vector<real> nat_phi;
-        int size;
-    };
-
     class eval_native_dihedral_forces_base: public vm_aware {
     public:
-        vec3r_array r, F;
-        native_dihedral_span dihedrals;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        const_span<nat_dih> dihedrals;
         real *V;
 
         virtual void init_from_vm(vm& vm_inst) override;

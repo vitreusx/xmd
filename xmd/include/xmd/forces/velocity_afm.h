@@ -3,32 +3,28 @@
 #include <xmd/forces/primitives/harmonic.h>
 #include <xmd/vm/vm.h>
 
+#define NAMESPACE(...) xmd,__VA_ARGS__
+#define TEMPLATE_PARAMS(...) __VA_ARGS__
+#define NAME() vel_afm_tip
+#define FIELDS() int,res_idx,vec3r,afm_orig,vec3r,afm_vel
+
+GENTYPE()
+
+#undef FIELDS
+#undef NAME
+#undef TEMPLATE_PARAMS
+#undef NAMESPACE
+
 namespace xmd {
-    struct velocity_afm_bundle_span {
-        array<int> pulled_idx;
-        vec3r_array afm_orig, afm_vel;
-        int size;
-    };
-
-    class velocity_afm_bundle_vector {
-    public:
-        vector<int> pulled_idx;
-        vec3r_vector afm_orig, afm_vel;
-        int size;
-
-        explicit velocity_afm_bundle_vector(int n = 0);
-        int push_back();
-        velocity_afm_bundle_span to_span();
-    };
-
     class eval_velocity_afm_forces: public vm_aware {
     public:
         harmonic afm_force;
 
     public:
-        vec3r_array r, F;
+        const_array<vec3r> r;
+        array<vec3r> F;
         real *t;
-        velocity_afm_bundle_span bundles;
+        const_span<vel_afm_tip> afm_tips;
 
         void init_from_vm(vm& vm_inst) override;
 

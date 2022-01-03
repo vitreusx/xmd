@@ -5,7 +5,7 @@
 namespace xmd {
     class reduce_vf_omp: public vm_aware {
     public:
-        vec3r_array shared_F, thread_F;
+        array<vec3r> shared_F, thread_F;
         real *shared_V, *thread_V;
         int num_particles;
 

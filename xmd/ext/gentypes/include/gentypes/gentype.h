@@ -1,5 +1,6 @@
 #pragma once
 #include "allocator.h"
+#include "array.h"
 #include "const_ptr.h"
 #include "const_ref.h"
 #include "const_span.h"

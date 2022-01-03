@@ -20,9 +20,10 @@ namespace xmd::qa {
 
     class precompute_nh: public vm_aware {
     public:
-        vec3r_array r, n, h;
-        box<vec3r> *box;
-        nh_bundle_span bundles;
+        const_array<vec3r> r;
+        array<vec3r> n, h;
+        box<vec3r> const *box;
+        int num_particles;
 
         void init_from_vm(vm& vm_inst) override;
 
