@@ -32,6 +32,7 @@ using span = typename span_impl<T, Idx>::type;
 
 #define GEN_SPAN_(name)                                                        \
                                                                                \
+  ENTER_NS()                                                                   \
   TEMPLATE(typename, Idx)                                                      \
   class name##_span {                                                          \
   public:                                                                      \
@@ -48,8 +49,9 @@ using span = typename span_impl<T, Idx>::type;
     name##_ptr NO_SPEC() data_;                                                \
     Idx size_;                                                                 \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   TEMPLATE(typename, Idx)                                                      \
-  struct span_impl<name NO_SPEC(), Idx> {                                      \
-    using type = name##_span SPEC(typename, Idx);                              \
+  struct span_impl<NS_PREFIX() name NO_SPEC(), Idx> {                          \
+    using type = NS_PREFIX() name##_span SPEC(typename, Idx);                  \
   };

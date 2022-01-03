@@ -18,6 +18,7 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
 
 #define GEN_CONST_PTR_3(name, T1, x1)                                          \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -111,10 +112,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   public:                                                                      \
     const_ptr<T1> x1##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -123,12 +126,13 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };
 
 #define GEN_CONST_PTR_5(name, T1, x1, T2, x2)                                  \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -255,10 +259,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
     const_ptr<T2> x2##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -270,12 +276,13 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };
 
 #define GEN_CONST_PTR_7(name, T1, x1, T2, x2, T3, x3)                          \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -435,10 +442,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
     const_ptr<T3> x3##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -453,12 +462,13 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };
 
 #define GEN_CONST_PTR_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                  \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -651,10 +661,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
     const_ptr<T4> x4##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -672,12 +684,13 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };
 
 #define GEN_CONST_PTR_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)         \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -903,10 +916,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
     const_ptr<T5> x5##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -927,12 +942,13 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };
 
 #define GEN_CONST_PTR_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6) \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -1191,10 +1207,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
     const_ptr<T6> x6##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -1218,13 +1236,14 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };
 
 #define GEN_CONST_PTR_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, \
                          T7, x7)                                               \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -1516,10 +1535,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
     const_ptr<T7> x7##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -1546,13 +1567,14 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };
 
 #define GEN_CONST_PTR_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, \
                          T7, x7, T8, x8)                                       \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_const_ptr {                                                     \
   public:                                                                      \
@@ -1877,10 +1899,12 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
                                                                                \
     const_ptr<T8> x8##_ptr;                                                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
+  NS_PREFIX()                                                                  \
   name##_const_ptr NO_SPEC()                                                   \
-      const_ref_to_ptr(name##_const_ref NO_SPEC() const &ref_) {               \
+      const_ref_to_ptr(NS_PREFIX() name##_const_ref NO_SPEC() const &ref_) {   \
     return {                                                                   \
                                                                                \
         const_ref_to_ptr(ref_.x1())                                            \
@@ -1910,6 +1934,6 @@ template <typename T> T const *const_ref_to_ptr(T const &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct const_ptr_impl<name NO_SPEC()> {                                      \
-    using type = name##_const_ptr NO_SPEC();                                   \
+  struct const_ptr_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_const_ptr NO_SPEC();                       \
   };

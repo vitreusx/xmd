@@ -11,6 +11,7 @@
 
 #define GEN_INST_3(name, T1, x1)                                               \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -59,10 +60,12 @@
                                                                                \
   protected:                                                                   \
     T1 x1##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()
 
 #define GEN_INST_5(name, T1, x1, T2, x2)                                       \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -137,10 +140,12 @@
     T1 x1##_;                                                                  \
                                                                                \
     T2 x2##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()
 
 #define GEN_INST_7(name, T1, x1, T2, x2, T3, x3)                               \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -241,10 +246,12 @@
     T2 x2##_;                                                                  \
                                                                                \
     T3 x3##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()
 
 #define GEN_INST_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                       \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -371,10 +378,12 @@
     T3 x3##_;                                                                  \
                                                                                \
     T4 x4##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()
 
 #define GEN_INST_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)              \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -527,10 +536,12 @@
     T4 x4##_;                                                                  \
                                                                                \
     T5 x5##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()
 
 #define GEN_INST_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)      \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -709,11 +720,13 @@
     T5 x5##_;                                                                  \
                                                                                \
     T6 x6##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()
 
 #define GEN_INST_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
                     x7)                                                        \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -918,11 +931,13 @@
     T6 x6##_;                                                                  \
                                                                                \
     T7 x7##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()
 
 #define GEN_INST_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
                     x7, T8, x8)                                                \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name : public name##_expr<name NO_SPEC()> {                            \
   public:                                                                      \
@@ -1153,4 +1168,5 @@
     T7 x7##_;                                                                  \
                                                                                \
     T8 x8##_;                                                                  \
-  };
+  };                                                                           \
+  LEAVE_NS()

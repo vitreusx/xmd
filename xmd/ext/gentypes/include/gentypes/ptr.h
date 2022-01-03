@@ -17,6 +17,7 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
 
 #define GEN_PTR_3(name, T1, x1)                                                \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -110,9 +111,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   public:                                                                      \
     ptr<T1> x1##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -121,12 +125,13 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };
 
 #define GEN_PTR_5(name, T1, x1, T2, x2)                                        \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -253,9 +258,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
                                                                                \
     ptr<T2> x2##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -267,12 +275,13 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };
 
 #define GEN_PTR_7(name, T1, x1, T2, x2, T3, x3)                                \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -432,9 +441,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
                                                                                \
     ptr<T3> x3##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -449,12 +461,13 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };
 
 #define GEN_PTR_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                        \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -647,9 +660,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
                                                                                \
     ptr<T4> x4##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -667,12 +683,13 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };
 
 #define GEN_PTR_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)               \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -898,9 +915,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
                                                                                \
     ptr<T5> x5##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -921,12 +941,13 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };
 
 #define GEN_PTR_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)       \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -1185,9 +1206,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
                                                                                \
     ptr<T6> x6##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -1211,13 +1235,14 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };
 
 #define GEN_PTR_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
                    x7)                                                         \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -1509,9 +1534,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
                                                                                \
     ptr<T7> x7##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -1538,13 +1566,14 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };
 
 #define GEN_PTR_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
                    x7, T8, x8)                                                 \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ptr {                                                           \
   public:                                                                      \
@@ -1869,9 +1898,12 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
                                                                                \
     ptr<T8> x8##_ptr;                                                          \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NO_TEMPLATE()                                                                \
-  name##_ptr NO_SPEC() ref_to_ptr(name##_ref NO_SPEC() const &ref_) {          \
+  NS_PREFIX()                                                                  \
+  name##_ptr NO_SPEC()                                                         \
+      ref_to_ptr(NS_PREFIX() name##_ref NO_SPEC() const &ref_) {               \
     return {                                                                   \
                                                                                \
         ref_to_ptr(ref_.x1())                                                  \
@@ -1901,6 +1933,6 @@ template <typename T> T *ref_to_ptr(T &ref_) { return &ref_; }
   }                                                                            \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ptr_impl<name NO_SPEC()> {                                            \
-    using type = name##_ptr NO_SPEC();                                         \
+  struct ptr_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ptr NO_SPEC();                             \
   };

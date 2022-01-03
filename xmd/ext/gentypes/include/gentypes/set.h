@@ -89,6 +89,7 @@ using set = typename set_impl<T, NodeAlloc, Idx>::type;
 
 #define GEN_SET_(name)                                                         \
                                                                                \
+  ENTER_NS()                                                                   \
   TEMPLATE(typename, NodeAlloc, typename, Idx)                                 \
   class name##_set {                                                           \
   public:                                                                      \
@@ -135,8 +136,10 @@ using set = typename set_impl<T, NodeAlloc, Idx>::type;
   protected:                                                                   \
     vector<set_node<name NO_SPEC()>, NodeAlloc, Idx> nodes;                    \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   TEMPLATE(typename, NodeAlloc, typename, Idx)                                 \
-  struct set_impl<name NO_SPEC(), NodeAlloc, Idx> {                            \
-    using type = name##_set SPEC(typename, NodeAlloc, typename, Idx);          \
+  struct set_impl<NS_PREFIX() name NO_SPEC(), NodeAlloc, Idx> {                \
+    using type = NS_PREFIX() name##_set                                        \
+        SPEC(typename, NodeAlloc, typename, Idx);                              \
   };

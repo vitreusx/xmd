@@ -13,6 +13,7 @@ template<typename T>
 using allocator = typename allocator_impl<T>::type;
 
 {% macro _gen_allocator(sig) %}
+    ENTER_NS()
     NO_TEMPLATE()
     class {{sig.name}}##_allocator {
     public:
@@ -37,10 +38,11 @@ using allocator = typename allocator_impl<T>::type;
             allocator<{{T}}> {{x}}##_alloc;
         {% endfor %}
     };
+    LEAVE_NS()
 
     NULL_SPEC()
-    struct allocator_impl<{{sig.name}} NO_SPEC()> {
-        using type = {{sig.name}}##_allocator NO_SPEC();
+    struct allocator_impl<NS_PREFIX() {{sig.name}} NO_SPEC()> {
+        using type = NS_PREFIX() {{sig.name}}##_allocator NO_SPEC();
     };
 {% endmacro %}
 

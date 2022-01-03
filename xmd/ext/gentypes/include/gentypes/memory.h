@@ -38,58 +38,63 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
 #define GEN_MEMORY_3(name, T1, x1)                                             \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
   }
@@ -97,8 +102,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
 #define GEN_MEMORY_5(name, T1, x1, T2, x2)                                     \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
                                                                                \
@@ -106,8 +112,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -115,8 +122,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -124,7 +132,7 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
                                                                                \
@@ -132,8 +140,8 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
                                                                                \
@@ -141,24 +149,26 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
                                                                                \
@@ -168,8 +178,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
 #define GEN_MEMORY_7(name, T1, x1, T2, x2, T3, x3)                             \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
                                                                                \
@@ -179,8 +190,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -190,8 +202,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -201,7 +214,7 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
                                                                                \
@@ -211,8 +224,8 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
                                                                                \
@@ -222,24 +235,26 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
                                                                                \
@@ -251,8 +266,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
 #define GEN_MEMORY_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                     \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
                                                                                \
@@ -264,8 +280,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -277,8 +294,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -290,7 +308,7 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
                                                                                \
@@ -302,8 +320,8 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
                                                                                \
@@ -315,24 +333,26 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
                                                                                \
@@ -346,8 +366,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
 #define GEN_MEMORY_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
                                                                                \
@@ -361,8 +382,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -376,8 +398,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -391,7 +414,7 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
                                                                                \
@@ -405,8 +428,8 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
                                                                                \
@@ -420,24 +443,26 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
                                                                                \
@@ -453,8 +478,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
 #define GEN_MEMORY_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)    \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
                                                                                \
@@ -470,8 +496,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -487,8 +514,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -504,7 +532,7 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
                                                                                \
@@ -520,8 +548,8 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
                                                                                \
@@ -537,24 +565,26 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
                                                                                \
@@ -573,8 +603,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
                       T7, x7)                                                  \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
                                                                                \
@@ -592,8 +623,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -611,8 +643,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -630,7 +663,7 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
                                                                                \
@@ -648,8 +681,8 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
                                                                                \
@@ -667,24 +700,26 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
                                                                                \
@@ -705,8 +740,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
                       T7, x7, T8, x8)                                          \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void uninitialized_fill_n(name##_ptr NO_SPEC() const &p, size_t n,    \
-                                   name##_expr<E> const &e) {                  \
+  inline void uninitialized_fill_n(NS_PREFIX() name##_ptr NO_SPEC() const &p,  \
+                                   size_t n,                                   \
+                                   NS_PREFIX() name##_expr<E> const &e) {      \
                                                                                \
     uninitialized_fill_n(p.x1##_ptr, n, e.x1());                               \
                                                                                \
@@ -726,8 +762,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_copy_n(name##_const_ptr NO_SPEC() const &from,     \
-                                   size_t n, name##_ptr NO_SPEC() const &to) { \
+  inline void uninitialized_copy_n(                                            \
+      NS_PREFIX() name##_const_ptr NO_SPEC() const &from, size_t n,            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_copy_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -747,8 +784,9 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void uninitialized_move_n(name##_ptr NO_SPEC() const &from, size_t n, \
-                                   name##_ptr NO_SPEC() const &to) {           \
+  inline void uninitialized_move_n(                                            \
+      NS_PREFIX() name##_ptr NO_SPEC() const &from, size_t n,                  \
+      NS_PREFIX() name##_ptr NO_SPEC() const &to) {                            \
                                                                                \
     uninitialized_move_n(from.x1##_ptr, n, to.x1##_ptr);                       \
                                                                                \
@@ -768,7 +806,7 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_n(name##_ptr NO_SPEC() const &p, size_t n) {             \
+  inline void destroy_n(NS_PREFIX() name##_ptr NO_SPEC() const &p, size_t n) { \
                                                                                \
     destroy_n(p.x1##_ptr, n);                                                  \
                                                                                \
@@ -788,8 +826,8 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void _construct_at_expr(name##_ptr NO_SPEC() const &p,                \
-                                 name##_expr<E> const &e) {                    \
+  inline void _construct_at_expr(NS_PREFIX() name##_ptr NO_SPEC() const &p,    \
+                                 NS_PREFIX() name##_expr<E> const &e) {        \
                                                                                \
     construct_at(p.x1##_ptr, e.x1());                                          \
                                                                                \
@@ -809,24 +847,26 @@ template <typename T> void destroy_at(T *p) { std::destroy_at(p); }
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name NO_SPEC() const &inst) {                       \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name NO_SPEC() const &inst) {           \
     _construct_at_expr(p, inst);                                               \
   }                                                                            \
                                                                                \
   TEMPLATE(typename, E)                                                        \
-  inline void construct_at(name##_ptr NO_SPEC() const &p,                      \
-                           name##_expr<E> const &e) {                          \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           NS_PREFIX() name##_expr<E> const &e) {              \
     _construct_at_expr(p, e);                                                  \
   }                                                                            \
                                                                                \
   TEMPLATE(typename..., Args)                                                  \
-  inline void construct_at(name##_ptr NO_SPEC() const &p, Args &&...args) {    \
-    _construct_at_expr(p, name NO_SPEC()(std::forward<Args>(args)...));        \
+  inline void construct_at(NS_PREFIX() name##_ptr NO_SPEC() const &p,          \
+                           Args &&...args) {                                   \
+    _construct_at_expr(p, NS_PREFIX()                                          \
+                              name NO_SPEC()(std::forward<Args>(args)...));    \
   }                                                                            \
                                                                                \
   NO_TEMPLATE()                                                                \
-  inline void destroy_at(name##_ptr NO_SPEC() const &p) {                      \
+  inline void destroy_at(NS_PREFIX() name##_ptr NO_SPEC() const &p) {          \
                                                                                \
     destroy_at(p.x1##_ptr);                                                    \
                                                                                \

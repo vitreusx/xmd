@@ -4,6 +4,7 @@
 #include "meta.h"
 
 {% macro _gen_inst(sig) %}
+    ENTER_NS()
     NO_TEMPLATE()
     class {{sig.name}}: 
         public {{sig.name}}##_expr<{{sig.name}} NO_SPEC()> {
@@ -66,6 +67,7 @@
             {{T}} {{x}}##_;
         {% endfor %}
     };
+    LEAVE_NS()
 {% endmacro %}
 
 {{meta.macro_v("GEN_INST", _gen_inst)}}

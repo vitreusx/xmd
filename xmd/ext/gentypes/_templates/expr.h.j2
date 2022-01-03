@@ -4,6 +4,7 @@
 #include "meta.h"
 
 {% macro _gen_expr(sig) %}
+    ENTER_NS()
     template<typename Impl>
     class {{sig.name}}##_expr {
     public:
@@ -16,6 +17,7 @@
             }
     {% endfor %}
     };
+    LEAVE_NS()
 {% endmacro %}
 
 {{meta.macro_v("GEN_EXPR", _gen_expr)}}

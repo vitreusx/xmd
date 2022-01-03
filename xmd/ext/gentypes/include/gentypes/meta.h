@@ -267,3 +267,136 @@
   template <spec1 tv1, spec2 tv2, spec3 tv3, spec4 tv4, spec5 tv5, spec6 tv6,  \
             spec7 tv7, spec8 tv8, spec9 tv9, spec10 tv10, spec11 tv11,         \
             spec12 tv12, spec13 tv13, spec14 tv14, spec15 tv15, spec16 tv16>
+
+#define ENTER_NS() VFUNC_ALT(ENTER_NS_, NAMESPACE(_))
+
+#define ENTER_NS_1(_)
+
+#define ENTER_NS_2(ns1, _) namespace ns1 {
+
+#define ENTER_NS_3(ns1, ns2, _)                                                \
+  namespace ns1 {                                                              \
+  namespace ns2 {
+
+#define ENTER_NS_4(ns1, ns2, ns3, _)                                           \
+  namespace ns1 {                                                              \
+  namespace ns2 {                                                              \
+  namespace ns3 {
+
+#define ENTER_NS_5(ns1, ns2, ns3, ns4, _)                                      \
+  namespace ns1 {                                                              \
+  namespace ns2 {                                                              \
+  namespace ns3 {                                                              \
+  namespace ns4 {
+
+#define ENTER_NS_6(ns1, ns2, ns3, ns4, ns5, _)                                 \
+  namespace ns1 {                                                              \
+  namespace ns2 {                                                              \
+  namespace ns3 {                                                              \
+  namespace ns4 {                                                              \
+  namespace ns5 {
+
+#define ENTER_NS_7(ns1, ns2, ns3, ns4, ns5, ns6, _)                            \
+  namespace ns1 {                                                              \
+  namespace ns2 {                                                              \
+  namespace ns3 {                                                              \
+  namespace ns4 {                                                              \
+  namespace ns5 {                                                              \
+  namespace ns6 {
+
+#define ENTER_NS_8(ns1, ns2, ns3, ns4, ns5, ns6, ns7, _)                       \
+  namespace ns1 {                                                              \
+  namespace ns2 {                                                              \
+  namespace ns3 {                                                              \
+  namespace ns4 {                                                              \
+  namespace ns5 {                                                              \
+  namespace ns6 {                                                              \
+  namespace ns7 {
+
+#define ENTER_NS_9(ns1, ns2, ns3, ns4, ns5, ns6, ns7, ns8, _)                  \
+  namespace ns1 {                                                              \
+  namespace ns2 {                                                              \
+  namespace ns3 {                                                              \
+  namespace ns4 {                                                              \
+  namespace ns5 {                                                              \
+  namespace ns6 {                                                              \
+  namespace ns7 {                                                              \
+  namespace ns8 {
+
+#define LEAVE_NS() VFUNC_ALT(LEAVE_NS_, NAMESPACE(_))
+
+#define LEAVE_NS_1(_)
+
+#define LEAVE_NS_2(ns1, _) }
+
+#define LEAVE_NS_3(ns1, ns2, _)                                                \
+  }                                                                            \
+  }
+
+#define LEAVE_NS_4(ns1, ns2, ns3, _)                                           \
+  }                                                                            \
+  }                                                                            \
+  }
+
+#define LEAVE_NS_5(ns1, ns2, ns3, ns4, _)                                      \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }
+
+#define LEAVE_NS_6(ns1, ns2, ns3, ns4, ns5, _)                                 \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }
+
+#define LEAVE_NS_7(ns1, ns2, ns3, ns4, ns5, ns6, _)                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }
+
+#define LEAVE_NS_8(ns1, ns2, ns3, ns4, ns5, ns6, ns7, _)                       \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }
+
+#define LEAVE_NS_9(ns1, ns2, ns3, ns4, ns5, ns6, ns7, ns8, _)                  \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }                                                                            \
+  }
+
+#define NS_PREFIX() VFUNC_ALT(NS_PREFIX_, NAMESPACE(_))
+
+#define NS_PREFIX_1(_)
+
+#define NS_PREFIX_2(ns1, _) ns1::
+
+#define NS_PREFIX_3(ns1, ns2, _) ns1::ns2::
+
+#define NS_PREFIX_4(ns1, ns2, ns3, _) ns1::ns2::ns3::
+
+#define NS_PREFIX_5(ns1, ns2, ns3, ns4, _) ns1::ns2::ns3::ns4::
+
+#define NS_PREFIX_6(ns1, ns2, ns3, ns4, ns5, _) ns1::ns2::ns3::ns4::ns5::
+
+#define NS_PREFIX_7(ns1, ns2, ns3, ns4, ns5, ns6, _)                           \
+  ns1::ns2::ns3::ns4::ns5::ns6::
+
+#define NS_PREFIX_8(ns1, ns2, ns3, ns4, ns5, ns6, ns7, _)                      \
+  ns1::ns2::ns3::ns4::ns5::ns6::ns7::
+
+#define NS_PREFIX_9(ns1, ns2, ns3, ns4, ns5, ns6, ns7, ns8, _)                 \
+  ns1::ns2::ns3::ns4::ns5::ns6::ns7::ns8::

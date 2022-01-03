@@ -140,6 +140,7 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
 
 #define GEN_VECTOR_(name)                                                      \
                                                                                \
+  ENTER_NS()                                                                   \
   TEMPLATE(typename, Alloc, typename, Idx)                                     \
   class name##_vector {                                                        \
   public:                                                                      \
@@ -303,8 +304,10 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
     Idx size_, capacity_;                                                      \
     Alloc alloc_;                                                              \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   TEMPLATE(typename, Alloc, typename, Idx)                                     \
-  struct vector_impl<name NO_SPEC(), Alloc, Idx> {                             \
-    using type = name##_vector SPEC(typename, Alloc, typename, Idx);           \
+  struct vector_impl<NS_PREFIX() name NO_SPEC(), Alloc, Idx> {                 \
+    using type = NS_PREFIX() name##_vector                                     \
+        SPEC(typename, Alloc, typename, Idx);                                  \
   };

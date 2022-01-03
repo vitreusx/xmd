@@ -32,6 +32,7 @@ using const_span = typename const_span_impl<T, Idx>::type;
 
 #define GEN_CONST_SPAN_(name)                                                  \
                                                                                \
+  ENTER_NS()                                                                   \
   TEMPLATE(typename, Idx)                                                      \
   class name##_const_span {                                                    \
   public:                                                                      \
@@ -51,8 +52,9 @@ using const_span = typename const_span_impl<T, Idx>::type;
     name##_const_ptr NO_SPEC() data_;                                          \
     Idx size_;                                                                 \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   TEMPLATE(typename, Idx)                                                      \
-  struct const_span_impl<name NO_SPEC(), Idx> {                                \
-    using type = name##_const_span SPEC(typename, Idx);                        \
+  struct const_span_impl<NS_PREFIX() name NO_SPEC(), Idx> {                    \
+    using type = NS_PREFIX() name##_const_span SPEC(typename, Idx);            \
   };

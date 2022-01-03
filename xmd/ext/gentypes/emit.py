@@ -17,6 +17,8 @@ class Signature:
 class Renderer:
     MAX_FIELDS = 8
     MAX_TEMPLATE_PARAMS = 16
+    MAX_NAMESPACES = 8
+    
     len = len
     zip = zip
 

@@ -15,6 +15,7 @@ template <typename T> using ref = typename ref_impl<T>::type;
 
 #define GEN_REF_3(name, T1, x1)                                                \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -69,14 +70,16 @@ template <typename T> using ref = typename ref_impl<T>::type;
   protected:                                                                   \
     ref<T1> x1##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };
 
 #define GEN_REF_5(name, T1, x1, T2, x2)                                        \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -153,14 +156,16 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
     ref<T2> x2##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };
 
 #define GEN_REF_7(name, T1, x1, T2, x2, T3, x3)                                \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -259,14 +264,16 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
     ref<T3> x3##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };
 
 #define GEN_REF_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                        \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -387,14 +394,16 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
     ref<T4> x4##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };
 
 #define GEN_REF_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)               \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -537,14 +546,16 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
     ref<T5> x5##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };
 
 #define GEN_REF_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)       \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -709,15 +720,17 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
     ref<T6> x6##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };
 
 #define GEN_REF_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
                    x7)                                                         \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -904,15 +917,17 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
     ref<T7> x7##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };
 
 #define GEN_REF_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
                    x7, T8, x8)                                                 \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_ref : public name##_expr<name##_ref NO_SPEC()> {                \
   public:                                                                      \
@@ -1121,8 +1136,9 @@ template <typename T> using ref = typename ref_impl<T>::type;
                                                                                \
     ref<T8> x8##_;                                                             \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct ref_impl<name NO_SPEC()> {                                            \
-    using type = name##_ref NO_SPEC();                                         \
+  struct ref_impl<NS_PREFIX() name NO_SPEC()> {                                \
+    using type = NS_PREFIX() name##_ref NO_SPEC();                             \
   };

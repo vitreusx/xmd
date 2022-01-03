@@ -12,6 +12,7 @@ template<typename T>
 using ref = typename ref_impl<T>::type;
 
 {% macro _gen_ref(sig) %}
+    ENTER_NS()
     NO_TEMPLATE()
     class {{sig.name}}##_ref:
         public {{sig.name}}##_expr<{{sig.name}}##_ref NO_SPEC()> {
@@ -75,10 +76,11 @@ using ref = typename ref_impl<T>::type;
             ref<{{T}}> {{x}}##_;
         {% endfor %}
     };
+    LEAVE_NS()
 
     NULL_SPEC()
-    struct ref_impl<{{sig.name}} NO_SPEC()> {
-        using type = {{sig.name}}##_ref NO_SPEC();
+    struct ref_impl<NS_PREFIX() {{sig.name}} NO_SPEC()> {
+        using type = NS_PREFIX() {{sig.name}}##_ref NO_SPEC();
     };
 {% endmacro %}
 

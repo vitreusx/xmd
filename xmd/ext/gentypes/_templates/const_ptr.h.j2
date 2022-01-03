@@ -18,6 +18,7 @@ T const *const_ref_to_ptr(T const& ref_) {
 }
 
 {% macro _gen_const_ptr(sig) %}
+    ENTER_NS()
     NO_TEMPLATE()
     class {{sig.name}}##_const_ptr {
     public:
@@ -121,9 +122,10 @@ T const *const_ref_to_ptr(T const& ref_) {
             const_ptr<{{T}}> {{x}}##_ptr;
         {% endfor %}
     };
+    LEAVE_NS()
 
     NO_TEMPLATE()
-    {{sig.name}}##_const_ptr NO_SPEC() const_ref_to_ptr({{sig.name}}##_const_ref NO_SPEC() const& ref_) {
+    NS_PREFIX() {{sig.name}}##_const_ptr NO_SPEC() const_ref_to_ptr(NS_PREFIX() {{sig.name}}##_const_ref NO_SPEC() const& ref_) {
         return {
             {% set comma = joiner(",") %}
             {% for T, x in sig.fields %}
@@ -133,8 +135,8 @@ T const *const_ref_to_ptr(T const& ref_) {
     }
 
     NULL_SPEC()
-    struct const_ptr_impl<{{sig.name}} NO_SPEC()> {
-        using type = {{sig.name}}##_const_ptr NO_SPEC();
+    struct const_ptr_impl<NS_PREFIX() {{sig.name}} NO_SPEC()> {
+        using type = NS_PREFIX() {{sig.name}}##_const_ptr NO_SPEC();
     };
 {% endmacro %}
 

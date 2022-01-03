@@ -12,6 +12,7 @@ template<typename T>
 using const_ref = typename const_ref_impl<T>::type;
 
 {% macro _gen_const_ref(sig) %}
+    ENTER_NS()
     NO_TEMPLATE()
     class {{sig.name}}##_const_ref: 
         public {{sig.name}}##_expr<{{sig.name}}##_const_ref NO_SPEC()> {
@@ -53,10 +54,11 @@ using const_ref = typename const_ref_impl<T>::type;
             const_ref<{{T}}> {{x}}##_;
         {% endfor %}
     };
+    LEAVE_NS()
 
     NULL_SPEC()
-    struct const_ref_impl<{{sig.name}} NO_SPEC()> {
-        using type = {{sig.name}}##_const_ref NO_SPEC();
+    struct const_ref_impl<NS_PREFIX() {{sig.name}} NO_SPEC()> {
+        using type = NS_PREFIX() {{sig.name}}##_const_ref NO_SPEC();
     };
 {% endmacro %}
 

@@ -16,6 +16,7 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
 
 #define GEN_ALLOCATOR_3(name, T1, x1)                                          \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -37,14 +38,16 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
   protected:                                                                   \
     allocator<T1> x1##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
 
 #define GEN_ALLOCATOR_5(name, T1, x1, T2, x2)                                  \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -72,14 +75,16 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
                                                                                \
     allocator<T2> x2##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
 
 #define GEN_ALLOCATOR_7(name, T1, x1, T2, x2, T3, x3)                          \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -113,14 +118,16 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
                                                                                \
     allocator<T3> x3##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
 
 #define GEN_ALLOCATOR_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                  \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -160,14 +167,16 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
                                                                                \
     allocator<T4> x4##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
 
 #define GEN_ALLOCATOR_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)         \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -213,14 +222,16 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
                                                                                \
     allocator<T5> x5##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
 
 #define GEN_ALLOCATOR_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6) \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -272,15 +283,17 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
                                                                                \
     allocator<T6> x6##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
 
 #define GEN_ALLOCATOR_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, \
                          T7, x7)                                               \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -338,15 +351,17 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
                                                                                \
     allocator<T7> x7##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
 
 #define GEN_ALLOCATOR_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, \
                          T7, x7, T8, x8)                                       \
                                                                                \
+  ENTER_NS()                                                                   \
   NO_TEMPLATE()                                                                \
   class name##_allocator {                                                     \
   public:                                                                      \
@@ -410,8 +425,9 @@ template <typename T> using allocator = typename allocator_impl<T>::type;
                                                                                \
     allocator<T8> x8##_alloc;                                                  \
   };                                                                           \
+  LEAVE_NS()                                                                   \
                                                                                \
   NULL_SPEC()                                                                  \
-  struct allocator_impl<name NO_SPEC()> {                                      \
-    using type = name##_allocator NO_SPEC();                                   \
+  struct allocator_impl<NS_PREFIX() name NO_SPEC()> {                          \
+    using type = NS_PREFIX() name##_allocator NO_SPEC();                       \
   };
