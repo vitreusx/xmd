@@ -52,3 +52,15 @@ add_custom_command(
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 add_subdirectory(docs)
+
+add_executable(xmd_omp main.cpp)
+
+file(COPY data DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+
+target_compile_options(xmd_omp
+    PRIVATE
+    $<$<CONFIG:Debug>:$<$<COMPILE_LANGUAGE:CXX>:-g>>
+    $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-g;-O2;-march=native>>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
+
+target_link_libraries(xmd_omp PUBLIC xmd)

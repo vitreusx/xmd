@@ -3,11 +3,10 @@
 
 namespace xmd {
     param_file::param_file(const std::filesystem::path &location):
-        param_file(YAML::LoadFile(location), location) {}
+        param_file(YAML::LoadFile(location), location) {};
 
-    param_file::param_file(const YAML::Node &yaml,
-        const std::filesystem::path &location):
-        param_entry(yaml, location) {};
+    param_file::param_file(const YAML::Node &yaml, const std::filesystem::path &location):
+            param_entry(yaml, location) {};
 
     param_file param_file::import(param_entry const& root,
         std::filesystem::path const& relpath) {

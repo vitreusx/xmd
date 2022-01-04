@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.14)
 project(xmd)
 
 set(CMAKE_VERBOSE_MAKEFILE ON CACHE BOOL "ON")

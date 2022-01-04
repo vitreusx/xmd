@@ -1,6 +1,7 @@
 #pragma once
 #include "param_entry.h"
 #include <filesystem>
+#include <vector>
 
 namespace xmd {
     class param_file: public param_entry {
