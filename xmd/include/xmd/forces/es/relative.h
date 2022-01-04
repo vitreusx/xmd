@@ -13,7 +13,7 @@ namespace xmd {
     public:
         const_array<vec3r> r;
         array<vec3r> F;
-        box<vec3r> const *box;
+        box const *box;
         vector<es_pair> const* es_pairs;
         real *V;
 

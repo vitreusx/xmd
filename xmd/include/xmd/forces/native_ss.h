@@ -27,7 +27,7 @@ namespace xmd {
     public:
         const_array<vec3r> r;
         array<vec3r> F;
-        box<vec3r> const *box;
+        box const *box;
         vector<nat_ss> const *ssbonds;
         real *V;
 
@@ -45,7 +45,7 @@ namespace xmd {
 
     public:
         array<vec3r> r;
-        box<vec3r> const *box;
+        box const *box;
         nl::nl_data const *nl;
         vector<nat_ss> const *all_ssbonds;
         vector<nat_ss> *ssbonds;

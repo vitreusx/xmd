@@ -25,7 +25,7 @@ namespace xmd {
         r = vm_inst.find<vector<vec3r>>("r").data();
         F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         es_pairs = &vm_inst.find_or_emplace<vector<es_pair>>("es_pairs");
     }
 

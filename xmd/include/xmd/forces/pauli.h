@@ -26,7 +26,7 @@ namespace xmd {
     public:
         const_array<vec3r> r;
         array<vec3r> F;
-        box<vec3r> const *box;
+        box const *box;
         vector<pauli_pair> const *pairs;
         real *V;
 
@@ -44,7 +44,7 @@ namespace xmd {
 
     public:
         const_array<vec3r> r;
-        box<vec3r> const *box;
+        box const *box;
         nl::nl_data const *nl;
         vector<pauli_pair> *pairs;
 

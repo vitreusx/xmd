@@ -24,7 +24,7 @@ namespace xmd {
 
     void update_go_contacts::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
         all_contacts = &vm_inst.find_or<vector<nat_cont>>("go_all_contacts",
             [&]() -> auto& {
@@ -70,7 +70,7 @@ namespace xmd {
         depth = vm_inst.find_or_emplace<real>("go_depth",
             params["native contacts"]["lj depth"].as<quantity>());
 
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         contacts = &vm_inst.find_or_emplace<vector<nat_cont>>(
             "go_contacts");
         r = vm_inst.find<vector<vec3r>>("r").data();

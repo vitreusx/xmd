@@ -19,7 +19,7 @@ namespace xmd::pid {
     public:
         const_array<vec3r> r;
         array<vec3r> F;
-        box<vec3r> const *box;
+        box const *box;
         vector<pid_bundle> const *bundles;
         real *V;
         array<int> prev, next;

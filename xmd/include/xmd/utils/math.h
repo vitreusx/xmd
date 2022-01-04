@@ -1,6 +1,5 @@
 #pragma once
 #include <cmath>
-#include <Eigen/Core>
 
 namespace xmd {
     template<typename T>
@@ -27,10 +26,6 @@ namespace xmd {
     template<typename T>
     auto abs(T const& x) {
         return std::abs(x);
-    }
-
-    inline Eigen::Vector3d unit(Eigen::Vector3d const& v) {
-        return v.normalized();
     }
 
     template<typename T>

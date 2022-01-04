@@ -14,7 +14,7 @@ namespace xmd {
             for (int idx = 0; idx < (int)xmd_model.residues.size(); ++idx) {
                 auto *ref_res = ref_model->residues[idx].get();
                 auto res_idx = res_map->at(ref_res);
-                xmd_model.residues[idx]->pos = convert<double>(true_r[res_idx]);
+                xmd_model.residues[idx]->pos = true_r[res_idx];
             }
 
             pdb pdb_model(xmd_model);

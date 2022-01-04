@@ -22,7 +22,7 @@ namespace xmd::qa {
 
     void update_free_pairs::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
         pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
 

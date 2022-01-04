@@ -13,7 +13,7 @@ namespace xmd {
             auto gamma = gamma_factor * mass[idx];
             auto noise_sd = noise_factor * gamma_factor_sqrt * mass_rsqrt[idx] ;
 
-            auto [noise_x, noise_y] = local_gen.normalx2<real>();
+            auto [noise_x, noise_y] = local_gen.normal_x2<real>();
             auto noise_z = local_gen.normal<real>();
             auto noise = vec3r(noise_x, noise_y, noise_z);
 

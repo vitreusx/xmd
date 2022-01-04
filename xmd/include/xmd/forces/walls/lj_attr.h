@@ -35,7 +35,7 @@ namespace xmd {
     public:
         const_array<vec3r> r;
         array<vec3r> F, wall_F;
-        box<vec3r> const *box;
+        box const *box;
         span<plane> walls;
         real *V, *t;
         int num_particles;

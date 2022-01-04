@@ -8,7 +8,7 @@ namespace xmd::nl {
     class verify: public vm_aware {
     public:
         const_array<vec3r> r;
-        box<vec3r> const *box;
+        box const *box;
         bool *invalid, *first_time;
         int num_particles;
         nl_data const *data;

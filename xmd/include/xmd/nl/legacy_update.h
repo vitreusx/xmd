@@ -12,7 +12,7 @@ namespace xmd::nl {
 
     public:
         const_array<vec3r> r;
-        box<vec3r> const *box;
+        box const *box;
         nl_data *data;
         int num_particles;
         real const *max_cutoff, *t;

@@ -36,6 +36,10 @@ namespace xmd {
         vec3() :
             x_{0}, y_{0}, z_{0} {};
 
+        template<typename V>
+        vec3(vec3<V> const& other):
+            x_{(U)other.x()}, y_{(U)other.y()}, z_{(U)other.z()} {};
+
         static auto Zero() {
             return zero_expr<U>{};
         }

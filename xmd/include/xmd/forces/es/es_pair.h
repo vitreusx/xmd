@@ -27,7 +27,7 @@ namespace xmd {
 
     public:
         const_array<vec3r> r;
-        box<vec3r> const* box;
+        box const* box;
         nl::nl_data const* nl;
         vector<es_pair> *pairs;
         const_array<amino_acid> atype;

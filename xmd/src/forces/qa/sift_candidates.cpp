@@ -41,7 +41,7 @@ namespace xmd::qa {
 
         candidates = &vm_inst.find<set<candidate>>("qa_candidates");
         atype = vm_inst.find<vector<amino_acid>>("atype").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         r = vm_inst.find<vector<vec3r>>("r").data();
         free_pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
         sync = vm_inst.find<vector<sync_data>>("sync").data();

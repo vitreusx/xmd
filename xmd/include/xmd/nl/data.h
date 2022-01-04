@@ -9,7 +9,7 @@ namespace xmd::nl {
     public:
         vector<nl_pair> particle_pairs;
         real orig_pad, ref_t;
-        box<vec3r> orig_box;
+        box orig_box;
         vector<vec3r> orig_r;
     };
 }

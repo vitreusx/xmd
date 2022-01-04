@@ -40,7 +40,7 @@ namespace xmd {
             q[(short)aa] = stored_q[(short)aa];
 
         r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
         pairs = &vm_inst.find<vector<es_pair>>("es_pairs");
         atype = vm_inst.find<vector<amino_acid>>("atype").data();

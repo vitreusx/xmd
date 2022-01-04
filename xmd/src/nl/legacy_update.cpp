@@ -8,7 +8,7 @@ namespace xmd::nl {
         pad_factor = vm_inst.find_or_emplace<real>("pad_factor",
             params["neighbor list"]["pad factor"].as<quantity>());
         r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         t = &vm_inst.find<float>("t");
         chain_idx = vm_inst.find<vector<int>>("chain_idx").data();
         seq_idx = vm_inst.find<vector<int>>("seq_idx").data();

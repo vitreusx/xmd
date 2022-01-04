@@ -33,7 +33,7 @@ namespace xmd::pid {
         prev = vm_inst.find<vector<int>>("prev").data();
         next = vm_inst.find<vector<int>>("next").data();
         atype = vm_inst.find<vector<amino_acid>>("atype").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
         bundles = &vm_inst.find<vector<pid_bundle>>("pid_bundles");
 

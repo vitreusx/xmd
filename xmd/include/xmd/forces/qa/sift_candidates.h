@@ -17,7 +17,7 @@ namespace xmd::qa {
 
     public:
         const_array<vec3r> r, n, h;
-        box<vec3r> const *box;
+        box const *box;
         array<amino_acid> atype;
         const_array<sync_data> sync;
 

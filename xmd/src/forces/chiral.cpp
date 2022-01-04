@@ -35,10 +35,8 @@ namespace xmd {
                     auto i1 = res_map[dihedral.res1], i2 = res_map[dihedral.res2],
                         i3 = res_map[dihedral.res3], i4 = res_map[dihedral.res4];
 
-                    vec3r nat_r1 = convert<real, double>(dihedral.res1->pos),
-                        nat_r2 = convert<real, double>(dihedral.res2->pos),
-                        nat_r3 = convert<real, double>(dihedral.res3->pos),
-                        nat_r4 = convert<real, double>(dihedral.res4->pos);
+                    vec3r nat_r1 = dihedral.res1->pos, nat_r2 = dihedral.res2->pos,
+                        nat_r3 = dihedral.res3->pos, nat_r4 = dihedral.res4->pos;
 
                     auto nat_r12 = nat_r2 - nat_r1, nat_r23 = nat_r3 - nat_r2,
                         nat_r34 = nat_r4 - nat_r3;

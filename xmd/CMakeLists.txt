@@ -32,7 +32,8 @@ target_compile_options(${TARGET_NAME}
     $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-g;-O2;-march=native>>
     $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 
-find_package(Eigen3 REQUIRED)
+add_subdirectory(ext/eigen-3.4.0)
+find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 find_package(yaml-cpp REQUIRED)
 find_package(OpenMP REQUIRED)
 add_subdirectory(ext/cparse)

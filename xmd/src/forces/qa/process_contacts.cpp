@@ -26,7 +26,7 @@ namespace xmd::qa {
 
         sync = vm_inst.find<vector<sync_data>>("sync").data();
         contacts = &vm_inst.find<set<contact>>("qa_contacts");
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         V = &vm_inst.find<real>("V");
         F = vm_inst.find<vector<vec3r>>("F").data();
         r = vm_inst.find<vector<vec3r>>("r").data();

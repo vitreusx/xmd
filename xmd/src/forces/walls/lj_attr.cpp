@@ -18,7 +18,7 @@ namespace xmd {
         r = vm_inst.find<vector<vec3r>>("r").data();
         F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         num_particles = vm_inst.find<int>("num_particles");
         t = &vm_inst.find<real>("r");
 

@@ -8,7 +8,7 @@ namespace xmd::qa {
     public:
         const_array<vec3r> r;
         array<vec3r> n, h;
-        box<vec3r> const *box;
+        box const *box;
         const_array<int> prev, next;
         int num_particles;
 

@@ -26,7 +26,7 @@ namespace xmd::nl {
     void verify::init_from_vm(vm& vm_inst) {
         r = vm_inst.find<vector<vec3r>>("r").data();
         data = &vm_inst.find<nl_data>("nl_data");
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         invalid = &vm_inst.find_or_emplace<bool>("invalid", true);
         first_time = &vm_inst.find_or_emplace<bool>("nl_first_time", true);
         num_particles = vm_inst.find<int>("num_particles");

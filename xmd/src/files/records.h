@@ -2,8 +2,8 @@
 #include <iostream>
 #include <optional>
 #include <variant>
-#include <Eigen/Core>
-#include <types/scalar.h>
+#include <xmd/types/vec3.h>
+#include <xmd/types/scalar.h>
 
 namespace xmd::records {
     class remark {
@@ -23,7 +23,7 @@ namespace xmd::records {
         std::string residue_name;
         char chain_id;
         int res_seq_num;
-        Eigen::Vector3d pos;
+        vec3tr pos;
 
     public:
         static std::optional<atom> try_parse(std::string const& line);
@@ -61,7 +61,7 @@ namespace xmd::records {
 
     class cryst1 {
     public:
-        Eigen::Vector3d cell;
+        vec3tr cell;
 
     public:
         static std::optional<cryst1> try_parse(std::string const& line);

@@ -18,7 +18,7 @@ namespace xmd::qa {
     public:
         const_array<vec3r> r;
         array<vec3r> F;
-        box<vec3r> const *box;
+        box const *box;
         set<contact> *contacts;
         real *V, *t;
         array<sync_data> sync;

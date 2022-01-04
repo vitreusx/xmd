@@ -25,7 +25,7 @@ namespace xmd {
 
     void update_pauli_pairs::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
         pairs = &vm_inst.find<vector<pauli_pair>>("pauli_pairs");
 
@@ -50,7 +50,7 @@ namespace xmd {
         r = vm_inst.find<vector<vec3r>>("r").data();
         F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         pairs = &vm_inst.find_or_emplace<vector<pauli_pair>>("pauli_pairs");
     }
 

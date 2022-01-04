@@ -20,7 +20,7 @@ namespace xmd {
         F = vm_inst.find<vector<vec3r>>("F").data();
         V = &vm_inst.find<real>("V");
         num_particles = vm_inst.find<int>("num_particles");
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
 
         walls = vm_inst.find_or<vector<plane>>("solid_walls", [&]() -> auto& {
             auto& walls_ = vm_inst.emplace<vector<plane>>("solid_walls");

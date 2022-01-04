@@ -2,7 +2,7 @@
 #include "xmd/model/model.h"
 #include "xmd/types/amino_acid.h"
 #include <xmd/types/scalar.h>
-#include <Eigen/Core>
+#include <xmd/types/vec3.h>
 #include <vector>
 #include <string>
 
@@ -39,7 +39,7 @@ namespace xmd {
         struct atom {
             std::string name;
             size_t serial;
-            Eigen::Vector3d pos;
+            vec3tr pos;
             residue *parent_res;
 
             bool in_backbone() const;
@@ -76,7 +76,7 @@ namespace xmd {
         };
         std::vector<link> links;
 
-        Eigen::Vector3d cryst1;
+        vec3tr cryst1;
 
     private:
         friend class pdb_model_emitter;

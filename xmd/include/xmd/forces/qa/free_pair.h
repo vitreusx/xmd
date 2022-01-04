@@ -24,7 +24,7 @@ namespace xmd::qa {
 
     public:
         const_array<vec3r> r;
-        box<vec3r> const *box;
+        box const *box;
         nl::nl_data *nl;
         set<free_pair> *pairs;
 

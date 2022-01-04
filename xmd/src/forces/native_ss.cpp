@@ -20,7 +20,7 @@ namespace xmd {
 
     void update_nat_ssbonds::init_from_vm(vm &vm_inst) {
         r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         nl = &vm_inst.find<nl::nl_data>("nl_data");
         all_ssbonds = &vm_inst.find_or<vector<nat_ss>>("all_ssbonds",
             [&]() -> auto& {
@@ -64,7 +64,7 @@ namespace xmd {
         nat_r = vm_inst.find_or_emplace<real>("nat_ss_r",
             params["native ssbonds"]["equilibrium dist"].as<quantity>());
 
-        box = &vm_inst.find<xmd::box<vec3r>>("box");
+        box = &vm_inst.find<xmd::box>("box");
         ssbonds = &vm_inst.find_or_emplace<vector<nat_ss>>("ssbonds");
         r = vm_inst.find<vector<vec3r>>("r").data();
         V = &vm_inst.find<real>("V");

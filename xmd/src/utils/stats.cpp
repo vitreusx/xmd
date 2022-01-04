@@ -2,6 +2,7 @@
 #include <xmd/utils/math.h>
 #include <chrono>
 #include <numeric>
+#include <iostream>
 
 namespace xmd {
     stats::stats(std::string name, const std::function<void()> &fn,

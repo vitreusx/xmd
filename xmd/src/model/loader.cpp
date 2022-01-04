@@ -26,8 +26,7 @@ namespace xmd {
         }
 
         if (auto saw_node = params["model"]["morph into SAW"]; saw_node) {
-            auto& seed = vm_inst.find<int>("seed");
-            std::default_random_engine eng(seed);
+            auto& gen = vm_inst.find<rand_gen>("gen");
 
             std::optional<true_real> bond_dist;
             if (auto bond_node = saw_node["bond distance"]; bond_node) {
@@ -39,7 +38,7 @@ namespace xmd {
             auto res_dens = saw_node["residue density"].as<quantity>();
             auto infer_box = saw_node["infer box"].as<bool>();
 
-            stored_model.morph_into_saw(eng, bond_dist, res_dens, infer_box);
+            stored_model.morph_into_saw(gen, bond_dist, res_dens, infer_box);
         }
 
         auto& num_particles = vm_inst.find_or_emplace<int>(
@@ -52,7 +51,7 @@ namespace xmd {
             int res_idx = 0;
             for (auto const& res: stored_model.residues) {
                 res_map[res.get()] = res_idx;
-                r[res_idx] = convert<real, double>(res->pos);
+                r[res_idx] = res->pos;
                 res_idx++;
             }
             return r;
@@ -69,10 +68,10 @@ namespace xmd {
 
         vm_inst.find_or_emplace<vector<real>>("mass", num_particles, (real)1.0);
 
-        vm_inst.find_or<xmd::box<vec3r>>("box", [&]() -> auto& {
-            auto& box = vm_inst.emplace<xmd::box<vec3r>>("box");
-            box.cell = convert<real>(stored_model.model_box.cell);
-            box.cell_inv = convert<real>(stored_model.model_box.cell_inv);
+        vm_inst.find_or<xmd::box>("box", [&]() -> auto& {
+            auto& box = vm_inst.emplace<xmd::box>("box");
+            box.cell = stored_model.model_box.cell;
+            box.cell_inv = stored_model.model_box.cell_inv;
             return box;
         });
 

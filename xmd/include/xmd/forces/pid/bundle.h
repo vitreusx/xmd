@@ -28,7 +28,7 @@ namespace xmd::pid {
         const_array<vec3r> r;
         const_array<int> prev, next;
         const_array<amino_acid> atype;
-        box<vec3r> const *box;
+        box const *box;
         nl::nl_data const *nl;
         vector<pid_bundle> *bundles;
 

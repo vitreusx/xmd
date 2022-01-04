@@ -15,7 +15,7 @@ namespace xmd {
     public:
         const_array<vec3r> r;
         array<vec3r> F;
-        box<vec3r> const *box;
+        box const *box;
         vector<nat_cont> const *contacts;
         real *V;
 
@@ -30,7 +30,7 @@ namespace xmd {
     class update_go_contacts: public vm_aware {
     public:
         const_array<vec3r> r;
-        box<vec3r> const *box;
+        box const *box;
         nl::nl_data const *nl;
         vector<nat_cont> const *all_contacts;
         vector<nat_cont> *contacts;

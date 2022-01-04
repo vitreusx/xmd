@@ -1,6 +1,7 @@
 #pragma once
 #include <tuple>
 #include <xmd/utils/math.h>
+#include <xmd/types/vec3.h>
 
 namespace xmd {
     class rand_gen {
@@ -26,28 +27,41 @@ namespace xmd {
             return res;
         }
 
-        template<typename RealT>
-        inline RealT normal() {
-            auto inv = (RealT)1.0 / (RealT) (1ull << 32);
-            uint64_t val1 = (*this)(), val2 = (*this)();
-            RealT r1 = (RealT)(val1 >> 32ull) * inv;
-            RealT r = sqrt((RealT)(-2.0) * log(r1));
-            if (isnan(r)) r = (RealT)0.0;
-            RealT r2 = (RealT)(val2 >> 32ull) * inv;
-            RealT t = (RealT)(2.0 * M_PI) * r2;
+        template<typename U>
+        inline U uniform() {
+            auto inv = (U)1.0 / (U)(1ull << 32);
+            auto val = (*this)();
+            return (U)(val >> 32ull) * inv;
+        }
+
+        template<typename U>
+        inline U uniform(U a, U b) {
+            return (b - a) * uniform<U>() + a;
+        }
+
+        template<typename U>
+        inline U normal() {
+            auto r1 = uniform<U>(), r2 = uniform<U>();
+            U r = sqrt((U)(-2.0) * log(r1));
+            if (isnan(r)) r = (U)0.0;
+            U t = (U)(2.0 * M_PI) * r2;
             return r * cos(t);
         }
 
-        template<typename RealT>
-        inline std::pair<RealT, RealT> normalx2() {
-            auto inv = (RealT)1.0 / (RealT) (1ull << 32);
-            uint64_t val1 = (*this)(), val2 = (*this)();
-            RealT r1 = (RealT)(val1 >> 32ull) * inv;
-            RealT r = sqrt((RealT)(-2.0) * log(r1));
-            if (isnan(r)) r = (RealT)0.0;
-            RealT r2 = (RealT)(val2 >> 32ull) * inv;
-            RealT t = (RealT)(2.0 * M_PI) * r2;
-            return { r * cos(t), r * sin(t) };
+        template<typename U>
+        inline std::pair<U, U> normal_x2() {
+            auto r1 = uniform<U>(), r2 = uniform<U>();
+            U r = sqrt((U)(-2.0) * log(r1));
+            if (isnan(r)) r = (U)0.0;
+            U t = (U)(2.0 * M_PI) * r2;
+            return std::make_pair(r * cos(t), r * sin(t));
+        }
+
+        template<typename U>
+        inline vec3<U> sphere() {
+            auto [x, y] = normal_x2<U>();
+            auto z = normal<U>();
+            return unit(vec3<U>(x, y, z));
         }
     };
 }

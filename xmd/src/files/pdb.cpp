@@ -232,14 +232,15 @@ namespace xmd {
                 auto &xmd_tether = xmd_model.tethers.emplace_back();
                 xmd_tether.res1 = res1;
                 xmd_tether.res2 = res2;
-                xmd_tether.length = (r2 - r1).norm();
+                xmd_tether.length = norm(r2 - r1);
 
                 if (idx + 2 < xmd_chain->residues.size()) {
                     auto *res3 = xmd_chain->residues[idx + 2];
                     auto r3 = res3->pos;
-                    auto r12_u = (r2 - r1).normalized(), r23_u = (r3 -
-                                                                  r2).normalized();
-                    auto theta = acos(-r12_u.dot(r23_u));
+                    auto r12_u = unit(r2 - r1), r23_u = unit(r3 - r2);
+                    auto cos_theta = dot(r12_u, r23_u);
+                    cos_theta = clamp(cos_theta, (true_real)-1.0, (true_real)1.0);
+                    auto theta = acos(cos_theta);
 
                     auto &xmd_angle = xmd_model.angles.emplace_back();
                     xmd_angle.res1 = res1;
@@ -252,11 +253,12 @@ namespace xmd {
                         auto r4 = res4->pos;
 
                         auto r12 = r2 - r1, r23 = r3 - r2, r34 = r4 - r3;
-                        auto x12_23 = r12.cross(r23), x23_34 = r23.cross(r34);
-                        auto x12_23_u = x12_23.normalized(), x23_34_u = x23_34.normalized();
-                        auto cos_phi = x12_23_u.dot(x23_34_u);
+                        auto x12_23 = cross(r12, r23), x23_34 = cross(r23, r34);
+                        auto x12_23_u = unit(x12_23), x23_34_u = unit(x23_34);
+                        auto cos_phi = dot(x12_23_u, x23_34_u);
+                        cos_phi = clamp(cos_phi, (true_real)-1.0, (true_real)1.0);
                         auto phi = acos(cos_phi);
-                        if (x12_23.dot(r34) < 0.0f) phi = -phi;
+                        if (dot(x12_23, r34) < 0.0f) phi = -phi;
 
                         auto &xmd_dihedral = xmd_model.dihedrals.emplace_back();
                         xmd_dihedral.res1 = res1;
@@ -282,7 +284,7 @@ namespace xmd {
             auto& xmd_ss = xmd_model.contacts.emplace_back();
             xmd_ss.res1 = res_map[res1];
             xmd_ss.res2 = res_map[res2];
-            xmd_ss.length = (xmd_ss.res1->pos - xmd_ss.res2->pos).norm();
+            xmd_ss.length = norm(xmd_ss.res1->pos - xmd_ss.res2->pos);
             xmd_ss.type = xmd::model::NAT_SS;
 
             cont_res_pairs.insert(std::make_pair(res1, res2));
@@ -299,7 +301,7 @@ namespace xmd {
             auto& xmd_cont = xmd_model.contacts.emplace_back();
             xmd_cont.res1 = res_map[res1];
             xmd_cont.res2 = res_map[res2];
-            xmd_cont.length = (xmd_cont.res1->pos - xmd_cont.res2->pos).norm();
+            xmd_cont.length = norm(xmd_cont.res1->pos - xmd_cont.res2->pos);
 
             auto back1 = pdb_link.a1->in_backbone();
             auto back2 = pdb_link.a2->in_backbone();
@@ -358,7 +360,7 @@ namespace xmd {
                         if (abs(seq1 - seq2) < 3)
                             continue;
 
-                        auto dist = (atom1.pos - atom2.pos).norm();
+                        auto dist = norm(atom1.pos - atom2.pos);
                         auto max_overlap_dist = radius1 + radius2;
                         if (dist < max_overlap_dist) {
                             contact_map[{&atom1, &atom2}] = dist;
