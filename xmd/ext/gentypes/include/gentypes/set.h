@@ -13,6 +13,7 @@
 #include "ref.h"
 #include "span.h"
 #include "vector.h"
+#include <boost/serialization/access.hpp>
 #include <type_traits>
 #include <utility>
 
@@ -78,6 +79,14 @@ public:
 
 protected:
   vector<set_node<T>, NodeAlloc, Idx> nodes;
+
+private:
+  friend class boost::serialization::access;
+
+  template <class Archive>
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+    ar &nodes;
+  }
 };
 
 template <typename T, typename NodeAlloc, typename Idx> struct set_impl {
@@ -148,6 +157,14 @@ using set = typename set_impl<T, NodeAlloc, Idx>::type;
                                                                                \
   protected:                                                                   \
     vector<set_node<name NO_SPEC()>, NodeAlloc, Idx> nodes;                    \
+                                                                               \
+  private:                                                                     \
+    friend class boost::serialization::access;                                 \
+                                                                               \
+    template <class Archive>                                                   \
+    void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) { \
+      ar &nodes;                                                               \
+    }                                                                          \
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \

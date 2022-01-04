@@ -114,11 +114,15 @@ using ref = typename ref_impl<T>::type;
 
 {{meta.macro_n("REF_IMPL_SPEC", _ref_impl_spec)}}
 
-{% macro _gen_ref(sig) %}
-    ENTER_NS()
+{% macro _ref_name(name) %}
     NO_TEMPLATE()
-    class {{sig.name}}##_ref:
-        public {{sig.name}}##_expr<{{sig.name}}##_ref NO_SPEC()> {
+    class {{name}}##_ref:
+        public {{name}}##_expr<{{name}}##_ref NO_SPEC()>
+{% endmacro %}
+
+{{meta.macro_n("REF_NAME", _ref_name)}}
+
+{% macro _ref_body() %}
     public:
         REF_CTORS()
         REF_ASSIGN_COPY()
@@ -129,6 +133,14 @@ using ref = typename ref_impl<T>::type;
 
     protected:
         REF_FIELDS()
+{% endmacro %}
+
+{{meta.macro_0("REF_BODY", _ref_body)}}
+
+{% macro _gen_ref(sig) %}
+    ENTER_NS()
+    REF_NAME() {
+        REF_BODY()
     };
     LEAVE_NS()
 

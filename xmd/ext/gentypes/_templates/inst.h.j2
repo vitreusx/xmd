@@ -2,6 +2,7 @@
 
 #pragma once
 #include "meta.h"
+#include <boost/serialization/access.hpp>
 
 {% macro _inst_ctors(sig) %}
     {% set I = list(range(1, len(sig.fields)+1)) %}
@@ -85,12 +86,28 @@
 
 {{meta.macro_v_alt2("INST_FIELDS", _inst_fields)}}
 
-{% macro _gen_inst(sig) %}
-    ENTER_NS()
+{% macro _inst_serialize(sig) %}
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
+        {% for T, x in sig.fields %}
+            ar & {{x}}##_;
+        {% endfor %}
+    }
+{% endmacro %}
+
+{{meta.macro_v_alt2("INST_SERIALIZE", _inst_serialize)}}
+
+{% macro _inst_name(name) %}
     NO_TEMPLATE()
-    class {{sig.name}}: 
-        public {{sig.name}}##_expr<{{sig.name}} NO_SPEC()> {
-    public:        
+    class {{name}}: 
+        public {{name}}##_expr<{{name}} NO_SPEC()>
+{% endmacro %}
+
+{{meta.macro_n("INST_NAME", _inst_name)}}
+
+{% macro _inst_body() %}
+    public:
         INST_CTORS()
         INST_ASSIGN_COPY()
         INST_ASSIGN_EXPR()
@@ -98,6 +115,17 @@
         
     protected:
         INST_FIELDS()
+
+    private:
+        INST_SERIALIZE()
+{% endmacro %}
+
+{{meta.macro_0("INST_BODY", _inst_body)}}
+
+{% macro _gen_inst(sig) %}
+    ENTER_NS()
+    INST_NAME() {
+        INST_BODY()
     };
     LEAVE_NS()
 {% endmacro %}

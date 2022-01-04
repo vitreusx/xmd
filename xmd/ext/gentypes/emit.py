@@ -2,10 +2,11 @@ import jinja2
 from dataclasses import dataclass
 from typing import List, Tuple
 from pathlib import Path
-from glob import glob
 import subprocess
 import re
 from tempfile import NamedTemporaryFile
+import os
+import shutil
 
 
 @dataclass
@@ -18,7 +19,7 @@ class Renderer:
     MAX_FIELDS = 8
     MAX_TEMPLATE_PARAMS = 16
     MAX_NAMESPACES = 8
-    
+
     len = len
     zip = zip
     list = list
@@ -68,13 +69,18 @@ class Renderer:
             f.write(code)
 
     def render_all(self):
-        templates = [*glob("_templates/**.j2"), *glob("_templates/**/*.j2")]
-
-        for template_path in templates:
-            template_path = Path(template_path)
-            out_path = template_path.with_suffix("")
-            out_path = Path("include/gentypes") / out_path.relative_to("_templates")
-            self.render(template_path, out_path)
+        shutil.rmtree("include/gentypes")
+        for root, dirs, files in os.walk("_templates"):
+            for name in files:
+                path = Path(root) / Path(name)
+                relpath = path.relative_to("_templates")
+                if path.suffix == ".j2":
+                    out = Path("include/gentypes") / relpath.with_suffix("")
+                    self.render(path, out)
+                else:
+                    out = Path("include/gentypes") / relpath
+                    out.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(str(path), str(out))
 
 
 def main():

@@ -11,14 +11,11 @@ int8_t,side_hydrophobic
 GEN_EXPR()
 
 namespace xmd::qa {
-    class sync_data : public sync_data_expr<sync_data> {
+    INST_NAME() {
+        INST_BODY()
     public:
         sync_data() :
             back_{0}, side_all_{0}, side_polar_{0}, side_hydrophobic_{0} {};
-
-        INST_CTORS()
-        INST_ASSIGN_COPY()
-        INST_ASSIGN_EXPR()
 
         template<typename E>
         inline auto &operator+=(sync_data_expr<E> const &e) {
@@ -42,21 +39,12 @@ namespace xmd::qa {
             return (back_ >= 0) && (side_all_ >= 0) && (side_polar_ >= 0) &&
                    (side_hydrophobic_ >= 0);
         }
-
-        INST_LAZY_FIELDS()
-
-    protected:
-        INST_FIELDS()
     };
 
-    class sync_data_ref : public sync_data_expr<sync_data_ref> {
-    public:
-        REF_CTORS()
-        REF_ASSIGN_COPY()
-        REF_ASSIGN_MOVE()
-        REF_ASSIGN_EXPR()
-        REF_SWAP()
+    REF_NAME() {
+        REF_BODY()
 
+    public:
         template<typename E>
         inline auto &operator+=(sync_data_expr<E> const &e) {
             back_ += e.back();
@@ -74,11 +62,6 @@ namespace xmd::qa {
             side_hydrophobic_ -= e.side_hydrophobic();
             return *this;
         }
-
-        REF_LAZY_FIELDS()
-
-    protected:
-        REF_FIELDS()
     };
 }
 

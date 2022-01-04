@@ -2,6 +2,7 @@
 
 #pragma once
 #include "meta.h"
+#include <boost/serialization/access.hpp>
 
 #define INST_CTORS() INST_CTORS_EXP(NAME(), FIELDS())
 
@@ -1196,6 +1197,166 @@
                                                                                \
   T8 x8##_;
 
+#define INST_SERIALIZE() INST_SERIALIZE_EXP(NAME(), FIELDS())
+
+#define INST_SERIALIZE_EXP(name, fields) INST_SERIALIZE_(name, fields)
+
+#define INST_SERIALIZE_(...) VFUNC_ALT2(INST_SERIALIZE_, __VA_ARGS__)
+
+#define INST_SERIALIZE_3(name, T1, x1)                                         \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+  }
+
+#define INST_SERIALIZE_5(name, T1, x1, T2, x2)                                 \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+                                                                               \
+    ar &x2##_;                                                                 \
+  }
+
+#define INST_SERIALIZE_7(name, T1, x1, T2, x2, T3, x3)                         \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+                                                                               \
+    ar &x2##_;                                                                 \
+                                                                               \
+    ar &x3##_;                                                                 \
+  }
+
+#define INST_SERIALIZE_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                 \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+                                                                               \
+    ar &x2##_;                                                                 \
+                                                                               \
+    ar &x3##_;                                                                 \
+                                                                               \
+    ar &x4##_;                                                                 \
+  }
+
+#define INST_SERIALIZE_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)        \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+                                                                               \
+    ar &x2##_;                                                                 \
+                                                                               \
+    ar &x3##_;                                                                 \
+                                                                               \
+    ar &x4##_;                                                                 \
+                                                                               \
+    ar &x5##_;                                                                 \
+  }
+
+#define INST_SERIALIZE_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,    \
+                          x6)                                                  \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+                                                                               \
+    ar &x2##_;                                                                 \
+                                                                               \
+    ar &x3##_;                                                                 \
+                                                                               \
+    ar &x4##_;                                                                 \
+                                                                               \
+    ar &x5##_;                                                                 \
+                                                                               \
+    ar &x6##_;                                                                 \
+  }
+
+#define INST_SERIALIZE_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,    \
+                          x6, T7, x7)                                          \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+                                                                               \
+    ar &x2##_;                                                                 \
+                                                                               \
+    ar &x3##_;                                                                 \
+                                                                               \
+    ar &x4##_;                                                                 \
+                                                                               \
+    ar &x5##_;                                                                 \
+                                                                               \
+    ar &x6##_;                                                                 \
+                                                                               \
+    ar &x7##_;                                                                 \
+  }
+
+#define INST_SERIALIZE_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,    \
+                          x6, T7, x7, T8, x8)                                  \
+                                                                               \
+  friend class boost::serialization::access;                                   \
+  template <class Archive>                                                     \
+  void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
+                                                                               \
+    ar &x1##_;                                                                 \
+                                                                               \
+    ar &x2##_;                                                                 \
+                                                                               \
+    ar &x3##_;                                                                 \
+                                                                               \
+    ar &x4##_;                                                                 \
+                                                                               \
+    ar &x5##_;                                                                 \
+                                                                               \
+    ar &x6##_;                                                                 \
+                                                                               \
+    ar &x7##_;                                                                 \
+                                                                               \
+    ar &x8##_;                                                                 \
+  }
+
+#define INST_NAME() INST_NAME_EXP(NAME())
+
+#define INST_NAME_EXP(name) INST_NAME_(name)
+
+#define INST_NAME_(name)                                                       \
+                                                                               \
+  NO_TEMPLATE()                                                                \
+  class name : public name##_expr<name NO_SPEC()>
+
+#define INST_BODY()                                                            \
+                                                                               \
+public:                                                                        \
+  INST_CTORS()                                                                 \
+  INST_ASSIGN_COPY()                                                           \
+  INST_ASSIGN_EXPR()                                                           \
+  INST_LAZY_FIELDS()                                                           \
+                                                                               \
+protected:                                                                     \
+  INST_FIELDS()                                                                \
+                                                                               \
+private:                                                                       \
+  INST_SERIALIZE()
+
 #define GEN_INST() GEN_INST_EXP(NAME(), FIELDS())
 
 #define GEN_INST_EXP(name, fields) GEN_INST_(name, fields)
@@ -1205,129 +1366,49 @@
 #define GEN_INST_3(name, T1, x1)                                               \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()
 
 #define GEN_INST_5(name, T1, x1, T2, x2)                                       \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()
 
 #define GEN_INST_7(name, T1, x1, T2, x2, T3, x3)                               \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()
 
 #define GEN_INST_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                       \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()
 
 #define GEN_INST_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)              \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()
 
 #define GEN_INST_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)      \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()
 
 #define GEN_INST_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
                     x7)                                                        \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()
 
 #define GEN_INST_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
                     x7, T8, x8)                                                \
                                                                                \
   ENTER_NS()                                                                   \
-  NO_TEMPLATE()                                                                \
-  class name : public name##_expr<name NO_SPEC()> {                            \
-  public:                                                                      \
-    INST_CTORS()                                                               \
-    INST_ASSIGN_COPY()                                                         \
-    INST_ASSIGN_EXPR()                                                         \
-    INST_LAZY_FIELDS()                                                         \
-                                                                               \
-  protected:                                                                   \
-    INST_FIELDS()                                                              \
-  };                                                                           \
+  INST_NAME(){INST_BODY()};                                                    \
   LEAVE_NS()

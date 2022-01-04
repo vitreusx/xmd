@@ -10,7 +10,8 @@ target_compile_options(ref
 file(COPY data DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_executable(test test.cpp)
-target_link_libraries(test PRIVATE gentypes)
+find_package(Boost REQUIRED COMPONENTS serialization)
+target_link_libraries(test PRIVATE gentypes Boost::serialization)
 
 target_compile_options(test
     PRIVATE

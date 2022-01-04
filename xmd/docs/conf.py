@@ -17,9 +17,9 @@ import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
-project = 'mdk'
-copyright = '2021, IF PAN & ZPP Team'
-author = 'ZPP Team'
+project = 'xmd'
+copyright = '2022'
+author = 'Jakub Bednarz'
 
 
 # -- General configuration ---------------------------------------------------
@@ -54,7 +54,7 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # Breathe Configuration
-breathe_default_project = 'mdk'
+breathe_default_project = 'xmd'
 
 # We want to print out all the fields by default.
 breathe_default_members = ('members', 'undoc-members', 'private-members',

@@ -28,15 +28,13 @@ namespace xmd {
         }
     };
 
-    template<typename U>
-    class vec3 : public vec3_expr<vec3<U>> {
+    INST_NAME()
+    {
+    INST_BODY()
+
     public:
         vec3() :
             x_{0}, y_{0}, z_{0} {};
-
-        INST_CTORS()
-        INST_ASSIGN_COPY()
-        INST_ASSIGN_EXPR()
 
         static auto Zero() {
             return zero_expr<U>{};
@@ -73,23 +71,12 @@ namespace xmd {
             z_ /= s;
             return *this;
         }
-
-        INST_LAZY_FIELDS()
-
-    private:
-        INST_FIELDS()
     };
 
-    template<typename U>
-    class vec3_ref : public vec3_expr<vec3_ref<U>> {
+    REF_NAME()
+    {
+    REF_BODY()
     public:
-        REF_CTORS()
-        REF_ASSIGN_COPY()
-        REF_ASSIGN_MOVE()
-        REF_ASSIGN_EXPR()
-        REF_SWAP()
-        REF_LAZY_FIELDS()
-
         template<typename E>
         auto &operator+=(vec3_expr<E> const &e) {
             x_ += e.x();
@@ -132,13 +119,10 @@ namespace xmd {
             z_ /= s;
             return *this;
         }
-
-    protected:
-        REF_FIELDS()
     };
 }
 
-REF_IMPL_SPEC()
+    REF_IMPL_SPEC()
 
 namespace xmd {
     template<typename E>

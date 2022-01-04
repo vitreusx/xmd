@@ -1,0 +1,4 @@
+`xmd` namespace
+===============
+
+.. doxygennamespace:: xmd

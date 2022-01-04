@@ -5,7 +5,11 @@
 #include "iterator.h"
 #include "memory.h"
 #include "meta.h"
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/split_member.hpp>
+#include <boost/serialization/vector.hpp>
 #include <type_traits>
+#include <vector>
 
 template <typename T, typename Alloc, typename Idx> class vector_def {
 public:
@@ -150,6 +154,32 @@ protected:
   T *data_;
   Idx size_, capacity_;
   Alloc alloc_;
+
+private:
+  friend class boost::serialization::access;
+
+  template <class Archive>
+  void save(Archive &ar, [[maybe_unused]] const unsigned int version) const {
+    std::vector<T> V;
+    for (Idx idx = 0; idx < size_; ++idx) {
+      V.push_back(at(idx));
+    }
+
+    ar &V;
+  }
+
+  template <class Archive>
+  void load(Archive &ar, [[maybe_unused]] const unsigned int version) {
+    std::vector<T> V;
+    ar &V;
+
+    clear();
+    for (Idx idx = 0; idx < (Idx)V.size(); ++idx) {
+      push_back(V[idx]);
+    }
+  }
+
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
 template <typename T, typename Alloc, typename Idx> struct vector_impl {
@@ -359,6 +389,33 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
     name##_ptr NO_SPEC() data_;                                                \
     Idx size_, capacity_;                                                      \
     Alloc alloc_;                                                              \
+                                                                               \
+  private:                                                                     \
+    friend class boost::serialization::access;                                 \
+                                                                               \
+    template <class Archive>                                                   \
+    void save(Archive &ar,                                                     \
+              [[maybe_unused]] const unsigned int version) const {             \
+      std::vector<name NO_SPEC()> V;                                           \
+      for (Idx idx = 0; idx < size_; ++idx) {                                  \
+        V.push_back(at(idx));                                                  \
+      }                                                                        \
+                                                                               \
+      ar &V;                                                                   \
+    }                                                                          \
+                                                                               \
+    template <class Archive>                                                   \
+    void load(Archive &ar, [[maybe_unused]] const unsigned int version) {      \
+      std::vector<name NO_SPEC()> V;                                           \
+      ar &V;                                                                   \
+                                                                               \
+      clear();                                                                 \
+      for (Idx idx = 0; idx < (Idx)V.size(); ++idx) {                          \
+        push_back(V[idx]);                                                     \
+      }                                                                        \
+    }                                                                          \
+                                                                               \
+    BOOST_SERIALIZATION_SPLIT_MEMBER()                                         \
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \

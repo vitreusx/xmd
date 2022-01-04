@@ -8,3 +8,7 @@ target_include_directories(gentypes
 
 target_compile_features(gentypes
     INTERFACE cxx_std_17)
+
+find_package(Boost REQUIRED COMPONENTS serialization)
+target_link_libraries(gentypes
+    INTERFACE Boost::serialization)

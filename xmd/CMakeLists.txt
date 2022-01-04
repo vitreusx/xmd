@@ -37,10 +37,11 @@ find_package(yaml-cpp REQUIRED)
 find_package(OpenMP REQUIRED)
 add_subdirectory(ext/cparse)
 add_subdirectory(ext/gentypes)
+find_package(Boost REQUIRED COMPONENTS serialization)
 
 target_link_libraries(${TARGET_NAME}
     PUBLIC Eigen3::Eigen yaml-cpp cparse OpenMP::OpenMP_CXX
-    gentypes)
+    gentypes Boost::serialization)
 
 add_custom_command(
     TARGET ${TARGET_NAME}

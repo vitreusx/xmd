@@ -6,6 +6,11 @@
     {%- endfor -%}
 {% endmacro %}
 
+{% macro macro_0(macro_name, func) %}
+    #define {{macro_name|upper}}() \
+        {{func()|as_macro_body}}
+{% endmacro %}
+
 {% macro macro_n(macro_name, func) %}
     #define {{macro_name|upper}}() {{macro_name|upper}}_EXP(NAME())
     
