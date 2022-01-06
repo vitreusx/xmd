@@ -26,7 +26,7 @@ namespace xmd {
     void report_stats::operator()() const {
         if (*t - *last_t >= period) {
             csv_file stats_csv;
-            stats_csv.set_header({ "t", "V", "K", "E", "Rg", "W" });
+            stats_csv.set_header({ "t[tau]", "V[eps]", "K[eps]", "E[eps]", "Rg[A]", "W[A]" });
 
             auto& record = stats_csv.add_record();
 
@@ -34,12 +34,12 @@ namespace xmd {
             comp_asph_t();
             comp_gyr_t();
 
-            record["t"] = std::to_string(*t);
-            record["V"] = std::to_string(*V);
-            record["K"] = std::to_string(*comp_tot_ene_t.K);
-            record["E"] = std::to_string(*comp_tot_ene_t.E);
-            record["Rg"] = std::to_string(*comp_gyr_t.gyration_radius);
-            record["W"] = std::to_string(*comp_asph_t.asphericity);
+            record["t[tau]"] = std::to_string(*t / tau);
+            record["V[eps]"] = std::to_string(*V / eps);
+            record["K[eps]"] = std::to_string(*comp_tot_ene_t.K / eps);
+            record["E[eps]"] = std::to_string(*comp_tot_ene_t.E / eps);
+            record["Rg[A]"] = std::to_string(*comp_gyr_t.gyration_radius / angstrom);
+            record["W[A]"] = std::to_string(*comp_asph_t.asphericity / angstrom);
 
             if (*first_time) {
                 std::ofstream csv_file_stream(csv_path);
