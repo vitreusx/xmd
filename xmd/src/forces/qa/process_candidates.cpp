@@ -7,12 +7,12 @@ namespace xmd::qa {
         }
     }
 
-    void process_candidates::init_from_vm(vm& vm_inst) {
-        candidates = &vm_inst.find<set<candidate>>("qa_candidates");
-        contacts = &vm_inst.find<set<contact>>("qa_contacts");
-        sync = vm_inst.find<vector<sync_data>>("sync").data();
-        free_pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
-        t = &vm_inst.find<real>("t");
+    void process_candidates::declare_vars(context& ctx) {
+        candidates = &ctx.var<set<candidate>>("qa_candidates");
+        contacts = &ctx.var<set<contact>>("qa_contacts");
+        sync = ctx.var<vector<sync_data>>("sync").data();
+        free_pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
+        t = &ctx.var<real>("t");
     }
 
     void process_candidates::iter(int idx) const {

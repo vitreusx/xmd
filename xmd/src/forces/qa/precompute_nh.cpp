@@ -9,17 +9,17 @@ namespace xmd::qa {
         }
     }
 
-    void precompute_nh::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        num_particles = vm_inst.find<int>("num_particles");
+    void precompute_nh::declare_vars(context& ctx) {
+        r = ctx.var<vector<vec3r>>("r").data();
+        num_particles = ctx.var<int>("num_particles");
 
-        n = vm_inst.find_or_emplace<vector<vec3r>>("qa_n",
+        n = ctx.ephemeral<vector<vec3r>>("qa_n",
             num_particles).data();
-        h = vm_inst.find_or_emplace<vector<vec3r>>("qa_h",
+        h = ctx.ephemeral<vector<vec3r>>("qa_h",
             num_particles).data();
 
-        prev = vm_inst.find<vector<int>>("prev").data();
-        next = vm_inst.find<vector<int>>("next").data();
+        prev = ctx.var<vector<int>>("prev").data();
+        next = ctx.var<vector<int>>("next").data();
     }
 
     void precompute_nh::iter(int idx) const {

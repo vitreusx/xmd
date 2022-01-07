@@ -14,13 +14,10 @@
 GEN_EXPR()
 
 namespace xmd {
-    class lj: public lj_expr<lj> {
+    INST_NAME() {
+        INST_BODY()
     public:
         lj() = default;
-
-        INST_CTORS()
-        INST_ASSIGN_COPY()
-        INST_ASSIGN_EXPR()
 
         inline std::tuple<real, real> operator()(real r_inv) const {
             auto s = r_inv * r_min_, s6 = ipow<6>(s), s12 = s6 * s6;
@@ -33,12 +30,8 @@ namespace xmd {
 
         real cutoff() const;
         static real cutoff(real r_min);
-
-        INST_LAZY_FIELDS()
-
-    private:
-        INST_FIELDS()
     };
+    INST_CONSTRUCT_DATA()
 }
 
 GEN_REF()

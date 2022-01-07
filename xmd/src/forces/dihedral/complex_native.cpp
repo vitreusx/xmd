@@ -1,4 +1,4 @@
-#include <params/param_file.h>
+#include <params/yaml_fs_node.h>
 #include <utils/units.h>
 #include "forces/dihedral/complex_native.h"
 
@@ -10,14 +10,14 @@ namespace xmd {
         }
     }
 
-    void eval_cnd_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        CDA = vm_inst.find_or_add<real>("CDA",
+    void eval_cnd_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        CDA = ctx.persistent<real>("CDA",
             params["complex native dihedrals"]["CDA"].as<quantity>());
-        CDA = vm_inst.find_or_add<real>("CDB",
+        CDA = ctx.persistent<real>("CDB",
             params["complex native dihedrals"]["CDB"].as<quantity>());
 
-        eval_native_dihedral_forces_base::init_from_vm(vm_inst);
+        eval_native_dihedral_forces_base::declare_vars(ctx);
     }
 
     void eval_cnd_forces::iter(int idx) const {

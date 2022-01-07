@@ -4,12 +4,12 @@
 #include <xmd/model/box.h>
 #include "contact.h"
 #include "sync_data.h"
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 #include <xmd/forces/primitives/lj_variants.h>
 #include "free_pair.h"
 
 namespace xmd::qa {
-    class process_contacts: public vm_aware {
+    class process_contacts: public ctx_aware {
     public:
         lj_variants ljs;
         real cycle_time, cycle_time_inv, breaking_factor;
@@ -24,7 +24,7 @@ namespace xmd::qa {
         array<sync_data> sync;
         set<free_pair> *free_pairs;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

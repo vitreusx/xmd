@@ -8,10 +8,10 @@ namespace xmd {
         }
     }
 
-    void reset_vf::init_from_vm(vm &vm_inst) {
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
-        num_particles = vm_inst.find<int>("num_particles");
+    void reset_vf::declare_vars(context& ctx) {
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
+        num_particles = ctx.var<int>("num_particles");
     }
 
     void reset_vf::omp_async() const {

@@ -1,10 +1,10 @@
 #pragma once
 #include <chrono>
 #include <xmd/types/scalar.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 namespace xmd {
-    class show_progress_bar: public vm_aware {
+    class show_progress_bar: public ctx_aware {
     public:
         int width;
         real total_time, period;
@@ -16,7 +16,7 @@ namespace xmd {
         using time_point_t = decltype(std::chrono::high_resolution_clock::now());
         time_point_t *start_wall_time;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void operator()() const;

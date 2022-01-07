@@ -1,6 +1,6 @@
 #include "forces/pauli.h"
 #include <xmd/utils/units.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/forces/primitives/shifted_lj.h>
 #include <iostream>
 
@@ -23,14 +23,14 @@ namespace xmd {
         }
     }
 
-    void update_pauli_pairs::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl_data");
-        pairs = &vm_inst.find<vector<pauli_pair>>("pauli_pairs");
+    void update_pauli_pairs::declare_vars(context& ctx) {
+        r = ctx.var<vector<vec3r>>("r").data();
+        box = &ctx.var<xmd::box>("box");
+        nl = &ctx.var<nl::nl_data>("nl_data");
+        pairs = &ctx.var<vector<pauli_pair>>("pauli_pairs");
 
-        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
-        r_excl = vm_inst.find<real>("pauli_r_excl");
+        auto& max_cutoff = ctx.var<real>("max_cutoff");
+        r_excl = ctx.var<real>("pauli_r_excl");
         max_cutoff = max(max_cutoff, r_excl);
     }
 
@@ -40,18 +40,18 @@ namespace xmd {
         }
     }
 
-    void eval_pauli_exclusion_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        r_excl = vm_inst.find_or_emplace<real>("pauli_r_excl",
+    void eval_pauli_exclusion_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        r_excl = ctx.persistent<real>("pauli_r_excl",
             params["Pauli exclusion"]["r_excl"].as<quantity>());
-        depth = vm_inst.find_or_emplace<real>("pauli_depth",
+        depth = ctx.persistent<real>("pauli_depth",
             params["Pauli exclusion"]["depth"].as<quantity>());
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
-        box = &vm_inst.find<xmd::box>("box");
-        pairs = &vm_inst.find_or_emplace<vector<pauli_pair>>("pauli_pairs");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
+        box = &ctx.var<xmd::box>("box");
+        pairs = &ctx.persistent<vector<pauli_pair>>("pauli_pairs");
     }
 
     void eval_pauli_exclusion_forces::iter(int idx) const {

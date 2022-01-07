@@ -8,7 +8,7 @@ namespace xmd {
     public:
         real CDH;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

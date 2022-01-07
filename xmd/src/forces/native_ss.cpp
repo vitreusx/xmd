@@ -2,7 +2,7 @@
 #include <xmd/model/model.h>
 #include <unordered_map>
 #include <xmd/utils/units.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
     void update_nat_ssbonds::operator()() const {
@@ -18,19 +18,18 @@ namespace xmd {
         }
     }
 
-    void update_nat_ssbonds::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl_data");
-        all_ssbonds = &vm_inst.find_or<vector<nat_ss>>("all_ssbonds",
-            [&]() -> auto& {
-                auto& xmd_model = vm_inst.find<xmd::model>("model");
+    void update_nat_ssbonds::declare_vars(context& ctx) {
+        r = ctx.var<vector<vec3r>>("r").data();
+        box = &ctx.var<xmd::box>("box");
+        nl = &ctx.var<nl::nl_data>("nl_data");
+        all_ssbonds = &ctx.persistent<vector<nat_ss>>("all_ssbonds",
+            lazy([&]() -> auto {
+                auto& xmd_model = ctx.var<xmd::model>("model");
                 using res_map_t = std::unordered_map<
                     xmd::model::residue*, int>;
-                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                auto& res_map = ctx.var<res_map_t>("res_map");
 
-                auto& all_ssbonds_ = vm_inst.emplace<vector<nat_ss>>(
-                    "all_ssbonds");
+                vector<nat_ss> all_ssbonds_;
 
                 for (auto const& cont: xmd_model.contacts) {
                     if (cont.type == model::NAT_SS) {
@@ -40,14 +39,14 @@ namespace xmd {
                 }
 
                 return all_ssbonds_;
-            });
+            }));
 
-        ssbonds = &vm_inst.find<vector<nat_ss>>("ssbonds");
+        ssbonds = &ctx.var<vector<nat_ss>>("ssbonds");
 
-        auto& nat_r = vm_inst.find<real>("nat_ss_r");
+        auto& nat_r = ctx.var<real>("nat_ss_r");
         cutoff = harmonic::cutoff(nat_r);
 
-        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        auto& max_cutoff = ctx.var<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
     }
 
@@ -57,17 +56,17 @@ namespace xmd {
         }
     }
 
-    void eval_nat_ssbond_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        H1 = vm_inst.find_or_emplace<real>("nat_ss_H1",
+    void eval_nat_ssbond_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        H1 = ctx.persistent<real>("nat_ss_H1",
             params["native ssbonds"]["H1"].as<quantity>());
-        nat_r = vm_inst.find_or_emplace<real>("nat_ss_r",
+        nat_r = ctx.persistent<real>("nat_ss_r",
             params["native ssbonds"]["equilibrium dist"].as<quantity>());
 
-        box = &vm_inst.find<xmd::box>("box");
-        ssbonds = &vm_inst.find_or_emplace<vector<nat_ss>>("ssbonds");
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        V = &vm_inst.find<real>("V");
+        box = &ctx.var<xmd::box>("box");
+        ssbonds = &ctx.persistent<vector<nat_ss>>("ssbonds");
+        r = ctx.var<vector<vec3r>>("r").data();
+        V = &ctx.var<real>("V");
     }
 
     void eval_nat_ssbond_forces::iter(int idx) const {

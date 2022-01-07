@@ -3,11 +3,11 @@
 #include <Eigen/SVD>
 
 namespace xmd {
-    void compute_asphericity::init_from_vm(vm &vm_inst) {
-        asphericity = &vm_inst.emplace<real>("asphericity");
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        mass = vm_inst.find<vector<real>>("mass").data();
-        num_particles = vm_inst.find<int>("num_particles");
+    void compute_asphericity::declare_vars(context& ctx) {
+        asphericity = &ctx.persistent<real>("asphericity");
+        r = ctx.var<vector<vec3r>>("r").data();
+        mass = ctx.var<vector<real>>("mass").data();
+        num_particles = ctx.var<int>("num_particles");
     }
 
     static Eigen::Vector3<real> cast(vec3r const& v) {

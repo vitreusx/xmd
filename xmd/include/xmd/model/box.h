@@ -47,5 +47,14 @@ namespace xmd {
             vec3r diff = v - u;
             return wrap(diff);
         }
+
+    private:
+        friend class ::boost::serialization::access;
+
+        template<class Archive>
+            void serialize(Archive& ar, [[maybe_unused]] const unsigned int version) {
+                ar & cell;
+                ar & cell_inv;
+            }
     };
 }

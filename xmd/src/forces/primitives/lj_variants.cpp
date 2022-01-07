@@ -1,12 +1,12 @@
 #include "forces/primitives/lj_variants.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <xmd/types/amino_acid.h>
 #include <xmd/files/csv.h>
 
 namespace xmd {
-    void lj_variants::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
+    void lj_variants::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
         auto const& lj_params = params["lj force variants"];
 
         bb.r_min() = lj_params["bb"]["r_min"].as<quantity>();
@@ -19,7 +19,7 @@ namespace xmd {
 
         auto num_ss_lj_types = amino_acid::NUM_AA * amino_acid::NUM_AA;
 
-        auto mut_ss =  vm_inst.emplace<vector<sink_lj>>("ss_ljs_vector",
+        auto mut_ss =  ctx.persistent<vector<sink_lj>>("ss_ljs_vector",
             num_ss_lj_types).view();
         ss = mut_ss;
 

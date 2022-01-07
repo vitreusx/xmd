@@ -33,8 +33,7 @@ target_compile_options(${TARGET_NAME}
     $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 
 add_subdirectory(ext/eigen-3.4.0)
-find_package(Eigen3 3.4 REQUIRED NO_MODULE)
-find_package(yaml-cpp REQUIRED)
+add_subdirectory(ext/yaml-cpp-0.7.0)
 find_package(OpenMP REQUIRED)
 add_subdirectory(ext/cparse)
 add_subdirectory(ext/gentypes)

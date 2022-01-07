@@ -1,4 +1,4 @@
-#include <params/param_file.h>
+#include <params/yaml_fs_node.h>
 #include <utils/units.h>
 #include "forces/dihedral/simple_native.h"
 
@@ -10,12 +10,12 @@ namespace xmd {
         }
     }
 
-    void eval_snd_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        CDH = vm_inst.find_or_add<real>("CDH",
+    void eval_snd_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        CDH = ctx.persistent<real>("CDH",
             params["simple native dihedrals"]["CDH"].as<quantity>());
 
-        eval_native_dihedral_forces_base::init_from_vm(vm_inst);
+        eval_native_dihedral_forces_base::declare_vars(ctx);
     }
 
     void eval_snd_forces::iter(int idx) const {

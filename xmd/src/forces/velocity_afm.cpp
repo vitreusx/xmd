@@ -1,5 +1,5 @@
 #include "forces/velocity_afm.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 
 namespace xmd {
@@ -9,21 +9,20 @@ namespace xmd {
         }
     }
 
-    void eval_velocity_afm_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        afm_force.H1 = vm_inst.find_or_emplace<real>("vel_afm_H1",
+    void eval_velocity_afm_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        afm_force.H1 = ctx.persistent<real>("vel_afm_H1",
             params["velocity AFM"]["H1"].as<quantity>());
-        afm_force.H2 = vm_inst.find_or_emplace<real>("vel_afm_H2",
+        afm_force.H2 = ctx.persistent<real>("vel_afm_H2",
             params["velocity AFM"]["H2"].as<quantity>());
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        t = &vm_inst.find<real>("t");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        t = &ctx.var<real>("t");
 
-        afm_tips = vm_inst.find_or<vector<vel_afm_tip>>("vel_afm_tips",
-            [&]() -> auto& {
-                auto& afm_tips_ = vm_inst.emplace<vector<vel_afm_tip>>(
-                    "vel_afm_bundles");
+        afm_tips = ctx.persistent<vector<vel_afm_tip>>("vel_afm_tips",
+            lazy([&]() -> auto {
+                vector<vel_afm_tip> afm_tips_;
 
                 for (auto const& tip_node: params["velocity AFM"]["AFM tips"]) {
                     auto res_idx = tip_node["residue idx"].as<int>();
@@ -34,7 +33,7 @@ namespace xmd {
                 }
 
                 return afm_tips_;
-            }).view();
+            })).view();
     }
 
     void eval_velocity_afm_forces::iter(int idx) const {

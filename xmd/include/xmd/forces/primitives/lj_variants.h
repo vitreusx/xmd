@@ -1,10 +1,10 @@
 #pragma once
 #include "lj.h"
 #include "sink_lj.h"
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 namespace xmd {
-    class lj_variants: public vm_aware {
+    class lj_variants: public ctx_aware {
     public:
         lj bb, bs, sb;
         const_span<sink_lj> ss;
@@ -18,6 +18,6 @@ namespace xmd {
             };
         }
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
     };
 }

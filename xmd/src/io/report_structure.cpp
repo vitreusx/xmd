@@ -1,6 +1,6 @@
 #include "io/report_structure.h"
 #include <yaml-cpp/yaml.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/text.h>
 #include <xmd/files/csv.h>
 #include <fstream>
@@ -8,28 +8,28 @@
 #include <xmd/utils/units.h>
 
 namespace xmd {
-    void report_structure::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        path_fmt = vm_inst.find_or_emplace<std::string>("rep_struct_path",
+    void report_structure::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        path_fmt = ctx.persistent<std::string>("rep_struct_path",
             params["report structure"]["path format"].as<std::string>());
-        period = vm_inst.find_or_emplace<real>("rep_struct_period",
+        period = ctx.persistent<real>("rep_struct_period",
             params["report structure"]["exec period"].as<quantity>());
 
-        nat_active_thr = vm_inst.find_or_emplace<real>("nat_active_thr",
+        nat_active_thr = ctx.persistent<real>("nat_active_thr",
             params["native contacts"]["active threshold factor"].as<real>());
 
-        xmd_model = &vm_inst.find<xmd::model>("model");
-        res_map = &vm_inst.find<res_map_t>("res_map");
-        r = vm_inst.find<vector<vec3r>>("r").data();
+        xmd_model = &ctx.var<xmd::model>("model");
+        res_map = &ctx.var<res_map_t>("res_map");
+        r = ctx.var<vector<vec3r>>("r").data();
 
-        if (vm_inst.has("sync"))
-            sync = vm_inst.find<vector<qa::sync_data>>("sync").data();
+        if (ctx.has("sync"))
+            sync = ctx.var<vector<qa::sync_data>>("sync").data();
 
-        if (vm_inst.has("qa_contacts"))
-            qa_cont = &vm_inst.find<set<qa::contact>>("qa_contacts");
+        if (ctx.has("qa_contacts"))
+            qa_cont = &ctx.var<set<qa::contact>>("qa_contacts");
 
-        t = &vm_inst.find<real>("t");
-        last_t = &vm_inst.find_or_emplace<real>("rep_struct_last_t",
+        t = &ctx.var<real>("t");
+        last_t = &ctx.ephemeral<real>("rep_struct_last_t",
             std::numeric_limits<real>::lowest());
     }
 

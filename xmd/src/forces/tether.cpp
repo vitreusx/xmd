@@ -2,7 +2,7 @@
 #include <xmd/model/model.h>
 #include <unordered_map>
 #include <xmd/utils/units.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
     void eval_tether_forces::operator()() const {
@@ -18,27 +18,27 @@ namespace xmd {
         }
     }
 
-    void eval_tether_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        H1 = vm_inst.find_or_emplace<real>("tether_H1",
+    void eval_tether_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        H1 = ctx.persistent<real>("tether_H1",
             params["tether forces"]["H1"].as<quantity>());
-        H2 = vm_inst.find_or_emplace<real>("tether_H2",
+        H2 = ctx.persistent<real>("tether_H2",
             params["tether forces"]["H2"].as<quantity>());
-        def_length = vm_inst.find_or_emplace<real>("tether_def_length",
+        def_length = ctx.persistent<real>("tether_def_length",
             params["tether forces"]["def_length"].as<quantity>());
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
 
-        tethers = vm_inst.find_or<vector<tether_pair>>("tethers",
-            [&]() -> auto& {
-                auto& xmd_model = vm_inst.find<model>("model");
+        tethers = ctx.persistent<vector<tether_pair>>("tethers",
+            lazy([&]() -> auto {
+                auto& xmd_model = ctx.var<model>("model");
                 using res_map_t = std::unordered_map<xmd::model::residue*, int>;
-                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                auto& res_map = ctx.var<res_map_t>("res_map");
 
-                auto& tethers_ = vm_inst.emplace<vector<tether_pair>>(
-                    "tethers");
+                vector<tether_pair> tethers_;
+
                 for (auto const& tether: xmd_model.tethers) {
                     auto i1 = res_map[tether.res1], i2 = res_map[tether.res2];
                     auto nat_dist = (real)tether.length.value_or(def_length);
@@ -46,7 +46,7 @@ namespace xmd {
                 }
 
                 return tethers_;
-            }).view();
+            })).view();
     }
 
     void eval_tether_forces::iter(int idx) const {

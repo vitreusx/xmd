@@ -159,16 +159,15 @@ namespace xmd {
         return records.emplace_back(header);
     }
 
-    csv_file param_value_parser<csv_file>::parse(
-        const param_entry &entry) const {
+    csv_file yaml_fs_value_parser<csv_file>::parse(
+        const yaml_fs_node &node) {
 
-        if (auto from_file = entry["from file"]; from_file) {
-            auto relpath = from_file.as<std::string>();
-            auto path = entry.location.value().parent_path() / relpath;
+        if (auto from_file = node["from file"]; from_file) {
+            auto path = node.resolve(from_file.as<std::string>());
             return csv_file(std::ifstream(path));
         }
         else {
-            auto source_txt = entry.as<std::string>();
+            auto source_txt = node.as<std::string>();
             return csv_file(source_txt);
         }
     }

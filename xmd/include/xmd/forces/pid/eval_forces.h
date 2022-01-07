@@ -3,11 +3,11 @@
 #include "bundle.h"
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/forces/primitives/sink_lj.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 #include <xmd/forces/primitives/lj_variants.h>
 
 namespace xmd::pid {
-    class eval_pid_forces: public vm_aware {
+    class eval_pid_forces: public ctx_aware {
     public:
         struct conf_t {
             lambda_func bb_plus_lam, bb_minus_lam, ss_lam;
@@ -24,7 +24,7 @@ namespace xmd::pid {
         real *V;
         array<int> prev, next;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

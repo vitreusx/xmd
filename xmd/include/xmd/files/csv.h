@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <yaml-cpp/yaml.h>
 #include <memory>
-#include <xmd/params/param_entry.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
     class csv_record;
@@ -72,8 +72,8 @@ namespace xmd {
     };
 
     template<>
-    struct param_value_parser<csv_file> {
-        csv_file parse(param_entry const& entry) const;
+    struct yaml_fs_value_parser<csv_file> {
+        static csv_file parse(yaml_fs_node const& node);
     };
 }
 

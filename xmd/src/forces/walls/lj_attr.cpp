@@ -1,29 +1,29 @@
 #include "forces/walls/lj_attr.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <xmd/forces/primitives/lj.h>
 
 namespace xmd {
-    void eval_lj_attr_wall_forces::init_from_vm(vm& vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        wall_min_dist = vm_inst.find_or_emplace<real>("lj_attr_wall_min_dist",
+    void eval_lj_attr_wall_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        wall_min_dist = ctx.persistent<real>("lj_attr_wall_min_dist",
             params["LJ attractive walls"]["wall min dist"].as<quantity>());
-        breaking_factor = vm_inst.find_or_emplace<real>("lj_attr_breaking_factor",
+        breaking_factor = ctx.persistent<real>("lj_attr_breaking_factor",
             params["LJ attractive walls"]["breaking factor"].as<quantity>());
         factor = pow(2.0, -1.0/6.0) * breaking_factor;
-        cycle_time = vm_inst.find_or_emplace<real>("lj_attr_cycle_time",
+        cycle_time = ctx.persistent<real>("lj_attr_cycle_time",
             params["LJ attractive walls"]["cycle time"].as<quantity>());
         cycle_time_inv = 1.0 / cycle_time;
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
-        box = &vm_inst.find<xmd::box>("box");
-        num_particles = vm_inst.find<int>("num_particles");
-        t = &vm_inst.find<real>("r");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
+        box = &ctx.var<xmd::box>("box");
+        num_particles = ctx.var<int>("num_particles");
+        t = &ctx.var<real>("r");
 
-        pairs = vm_inst.find_or<vector<lj_attr_pair>>("lj_attr_pairs", [&]() -> auto& {
-            auto& pairs_ = vm_inst.emplace<vector<lj_attr_pair>>("lj_attr_pairs");
+        pairs = ctx.persistent<vector<lj_attr_pair>>("lj_attr_pairs", lazy([&]() -> auto {
+            vector<lj_attr_pair> pairs_;
 
             for (int wall_idx = 0; wall_idx < walls.size(); ++wall_idx) {
                 for (int part_idx = 0; part_idx < num_particles; ++part_idx) {
@@ -33,20 +33,21 @@ namespace xmd {
             }
 
             return pairs_;
-        }).view();
+        })).view();
 
-        walls = vm_inst.find_or<vector<plane>>("lj_attr_walls", [&]() -> auto& {
-            auto& walls_ = vm_inst.emplace<vector<plane>>("lj_attr_walls");
+        walls = ctx.persistent<vector<plane>>("lj_attr_walls", lazy([&]() -> auto {
+            vector<plane> walls_;
+
             for (auto const& plane_node: params["LJ attractive walls"]["planes"]) {
-                plane p;
-                p.normal = plane_node["normal"].as<vec3r>();
-                p.origin = plane_node["origin"].as<vec3r>();
-                walls_.push_back(p);
+                auto origin = plane_node["origin"].as<vec3r>();
+                auto normal = plane_node["normal"].as<vec3r>();
+                walls_.emplace_back(origin, normal);
             }
-            return walls_;
-        }).view();
 
-        wall_F = vm_inst.find_or_emplace<vector<vec3r>>("lj_attr_wall_F",
+            return walls_;
+        })).view();
+
+        wall_F = ctx.persistent<vector<vec3r>>("lj_attr_wall_F",
             walls.size()).data();
     }
 

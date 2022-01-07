@@ -1,5 +1,5 @@
 #include "forces/qa/sift_candidates.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <xmd/forces/primitives/lj_variants.h>
 
@@ -12,15 +12,15 @@ namespace xmd::qa {
         }
     }
 
-    void sift_candidates::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
+    void sift_candidates::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
         auto const& sift_params = params["quasi-adiabatic"];
 
         min_abs_cos_hr = sift_params["min |cos(h, r)|"].as<quantity>();
         min_abs_cos_hh = sift_params["min |cos(h, h)| for bb"].as<quantity>();
         max_cos_nr = sift_params["max cos(n, r)"].as<quantity>();
 
-        auto& ljs = vm_inst.find<lj_variants>("lj_variants");
+        auto& ljs = ctx.var<lj_variants>("lj_variants");
 
         req_min_dist[(short)contact_type::BACK_BACK()] = ljs.bb.r_min();
         req_min_dist[(short)contact_type::BACK_SIDE()] = ljs.bs.r_min();
@@ -33,20 +33,20 @@ namespace xmd::qa {
             }
         }
 
-        auto& aa_data_ = vm_inst.find<amino_acid_data>(
+        auto& aa_data_ = ctx.var<amino_acid_data>(
             "amino_acid_data");
         for (auto const& aa: amino_acid::all()) {
             ptype[(int)aa] = aa_data_[aa].polarization;
         }
 
-        candidates = &vm_inst.find<set<candidate>>("qa_candidates");
-        atype = vm_inst.find<vector<amino_acid>>("atype").data();
-        box = &vm_inst.find<xmd::box>("box");
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        free_pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
-        sync = vm_inst.find<vector<sync_data>>("sync").data();
-        n = vm_inst.find<vector<vec3r>>("qa_n").data();
-        h = vm_inst.find<vector<vec3r>>("qa_h").data();
+        candidates = &ctx.var<set<candidate>>("qa_candidates");
+        atype = ctx.var<vector<amino_acid>>("atype").data();
+        box = &ctx.var<xmd::box>("box");
+        r = ctx.var<vector<vec3r>>("r").data();
+        free_pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
+        sync = ctx.var<vector<sync_data>>("sync").data();
+        n = ctx.var<vector<vec3r>>("qa_n").data();
+        h = ctx.var<vector<vec3r>>("qa_h").data();
     }
 
     void sift_candidates::iter(int idx) const {

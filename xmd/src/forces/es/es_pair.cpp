@@ -1,5 +1,5 @@
 #include "forces/es/es_pair.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <array>
 
 namespace xmd {
@@ -22,27 +22,27 @@ namespace xmd {
         }
     }
 
-    void update_es_base::init_from_vm(vm &vm_inst) {
+    void update_es_base::declare_vars(context& ctx) {
         using stored_q_t = std::array<real, amino_acid::NUM_AA>;
-        auto& stored_q = vm_inst.find_or<stored_q_t>("stored_q", [&]() -> auto& {
-            auto& stored_q_ = vm_inst.emplace<stored_q_t>("stored_q");
+        auto& stored_q = ctx.persistent<stored_q_t>("stored_q", lazy([&]() -> auto {
+            stored_q_t stored_q_;
 
-            auto& aa_data_ = vm_inst.find<amino_acid_data>(
+            auto& aa_data_ = ctx.var<amino_acid_data>(
                 "amino_acid_data");
             for (auto const& aa: amino_acid::all()) {
                 stored_q_[(short)aa] = aa_data_[aa].charge;
             }
 
             return stored_q_;
-        });
+        }));
 
         for (auto const& aa: amino_acid::all())
             q[(short)aa] = stored_q[(short)aa];
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl_data");
-        pairs = &vm_inst.find<vector<es_pair>>("es_pairs");
-        atype = vm_inst.find<vector<amino_acid>>("atype").data();
+        r = ctx.var<vector<vec3r>>("r").data();
+        box = &ctx.var<xmd::box>("box");
+        nl = &ctx.var<nl::nl_data>("nl_data");
+        pairs = &ctx.var<vector<es_pair>>("es_pairs");
+        atype = ctx.var<vector<amino_acid>>("atype").data();
     }
 }

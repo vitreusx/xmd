@@ -1,11 +1,10 @@
 #include "forces/dihedral/heurestic.h"
 #include <xmd/model/model.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/files/csv.h>
 #include <xmd/utils/units.h>
 
 namespace xmd {
-
     heur_dih_type::heur_dih_type(const amino_acid &a2,
         const amino_acid &a3) {
         auto code2 = (aa_code)a2, code3 = (aa_code)a3;
@@ -27,15 +26,14 @@ namespace xmd {
         }
     }
 
-    void eval_heurestic_dihedral_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
+    void eval_heurestic_dihedral_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
 
         using stored_coeffs_t = std::array<std::array<real, NUM_TERMS>, NUM_TYPES>;
-        auto& stored_coeffs = vm_inst.find_or<stored_coeffs_t>("heur_dih_coeffs",
-            [&]() -> auto& {
+        auto& stored_coeffs = ctx.persistent<stored_coeffs_t>("heur_dih_coeffs",
+            lazy([&]() -> auto {
                 auto coeffs_csv = params["heurestic dihedrals"]["coefficients"].as<csv_file>();
-                auto& stored_coeffs_ = vm_inst.emplace<stored_coeffs_t>(
-                    "heur_dih_coeffs");
+                stored_coeffs_t stored_coeffs_;
 
                 for (auto const& record: coeffs_csv.records) {
                     auto type2 = record["type2"], type3 = record["type3"];
@@ -51,7 +49,7 @@ namespace xmd {
                 }
 
                 return stored_coeffs_;
-            });
+            }));
 
         for (int d = 0; d < NUM_TERMS; ++d) {
             for (int t = 0; t < NUM_TYPES; ++t) {
@@ -59,19 +57,18 @@ namespace xmd {
             }
         }
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
 
-        dihedrals = vm_inst.find_or<vector<heur_dih>>("heurestic_dihedrals",
-            [&]() -> auto& {
-                auto& xmd_model = vm_inst.find<model>("model");
+        dihedrals = ctx.persistent<vector<heur_dih>>("heurestic_dihedrals",
+            lazy([&]() -> auto {
+                auto& xmd_model = ctx.var<model>("model");
                 using res_map_t = std::unordered_map<xmd::model::residue*, int>;
-                auto& res_map = vm_inst.find<res_map_t>("res_map");
-                auto atypes = vm_inst.find<vector<amino_acid>>("atype").data();
+                auto& res_map = ctx.var<res_map_t>("res_map");
+                auto atypes = ctx.var<vector<amino_acid>>("atype").data();
 
-                auto& dihedrals_ = vm_inst.emplace<vector<heur_dih>>(
-                    "heurestic_dihedrals");
+                vector<heur_dih> dihedrals_;
 
                 for (auto const& dihedral: xmd_model.dihedrals) {
                     if (!dihedral.phi.has_value()) {
@@ -84,7 +81,7 @@ namespace xmd {
                 }
 
                 return dihedrals_;
-            }).view();
+            })).view();
     }
 
     void eval_heurestic_dihedral_forces::iter(int idx) const {

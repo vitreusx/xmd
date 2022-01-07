@@ -1,7 +1,7 @@
 #include <xmd/forces/chiral.h>
 #include <xmd/model/model.h>
 #include <unordered_map>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <xmd/utils/convert.h>
 
@@ -12,24 +12,23 @@ namespace xmd {
         }
     }
 
-    void eval_chiral_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        e_chi = vm_inst.find_or_emplace<real>("e_chi",
+    void eval_chiral_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        e_chi = ctx.persistent<real>("e_chi",
             params["chirality"]["e_chi"].as<quantity>());
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
 
-        quads = vm_inst.find_or<vector<chiral_quad>>("chiral_quads",
-            [&]() -> auto& {
-                auto& xmd_model = vm_inst.find<xmd::model>("model");
+        quads = ctx.persistent<vector<chiral_quad>>("chiral_quads",
+            lazy([&]() -> auto {
+                auto& xmd_model = ctx.var<xmd::model>("model");
                 using res_map_t = std::unordered_map<
                     xmd::model::residue*, int>;
-                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                auto& res_map = ctx.var<res_map_t>("res_map");
 
-                auto& quads_ = vm_inst.emplace<vector<chiral_quad>>(
-                    "chiral_quads");
+                vector<chiral_quad> quads_;
 
                 for (auto const& dihedral: xmd_model.dihedrals) {
                     auto i1 = res_map[dihedral.res1], i2 = res_map[dihedral.res2],
@@ -48,7 +47,7 @@ namespace xmd {
                 }
 
                 return quads_;
-            }).view();
+            })).view();
     }
 
     void eval_chiral_forces::iter(int idx) const {

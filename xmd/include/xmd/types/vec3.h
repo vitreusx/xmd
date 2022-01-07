@@ -76,6 +76,7 @@ namespace xmd {
             return *this;
         }
     };
+    INST_CONSTRUCT_DATA()
 
     REF_NAME()
     {
@@ -126,7 +127,7 @@ namespace xmd {
     };
 }
 
-    REF_IMPL_SPEC()
+REF_IMPL_SPEC()
 
 namespace xmd {
     template<typename E>

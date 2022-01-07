@@ -55,8 +55,8 @@ namespace xmd {
         return value;
     };
 
-    quantity param_value_parser<quantity>::parse(
-        const param_entry &entry) const {
+    quantity yaml_fs_value_parser<quantity>::parse(
+        const yaml_fs_node &entry) {
 
         return quantity(entry.as<std::string>());
     }

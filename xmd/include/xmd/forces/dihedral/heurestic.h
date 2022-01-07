@@ -2,21 +2,26 @@
 #include <xmd/types/amino_acid.h>
 #include <xmd/types/vec3.h>
 
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 namespace xmd {
     class heur_dih_type {
     public:
         heur_dih_type() = default;
-
         heur_dih_type(amino_acid const &a2, amino_acid const &a3);
 
         explicit constexpr operator int8_t() const;
 
     private:
         explicit constexpr heur_dih_type(int8_t val);
-
         int8_t val = 0;
+
+        friend class ::boost::serialization::access;
+
+        template<typename Archive>
+        void serialize(Archive& ar, [[maybe_unused]] const unsigned int version) {
+            ar & val;
+        }
     };
 }
 
@@ -33,7 +38,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_heurestic_dihedral_forces: public vm_aware {
+    class eval_heurestic_dihedral_forces: public ctx_aware {
     public:
         static constexpr int NUM_TERMS = 6, NUM_TYPES = 9;
         real coeffs[NUM_TERMS][NUM_TYPES];
@@ -43,7 +48,7 @@ namespace xmd {
         const_span<heur_dih> dihedrals;
         real *V;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

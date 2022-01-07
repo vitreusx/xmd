@@ -1,5 +1,5 @@
 #include "forces/qa/process_contacts.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 
 namespace xmd::qa {
@@ -10,27 +10,27 @@ namespace xmd::qa {
         }
     }
 
-    void process_contacts::init_from_vm(vm &vm_inst) {
-        ljs = vm_inst.find<lj_variants>("lj_variants");
+    void process_contacts::declare_vars(context& ctx) {
+        ljs = ctx.var<lj_variants>("lj_variants");
 
-        auto& params = vm_inst.find<param_file>("params");
+        auto& params = ctx.var<yaml_fs_node>("params");
         auto const& contact_params = params["quasi-adiabatic"];
-        cycle_time = vm_inst.find_or_emplace<real>("qa_cycle_time",
+        cycle_time = ctx.persistent<real>("qa_cycle_time",
             contact_params["(de)saturation time"].as<quantity>());
         cycle_time_inv = (real)1.0/cycle_time;
-        breaking_factor = vm_inst.find_or_emplace<real>("qa_breaking_factor",
+        breaking_factor = ctx.persistent<real>("qa_breaking_factor",
             contact_params["breaking factor"].as<quantity>());
-        t = &vm_inst.find<real>("t");
+        t = &ctx.var<real>("t");
 
         factor = breaking_factor * (real)pow(2.0f, -1.0f/6.0f);
 
-        sync = vm_inst.find<vector<sync_data>>("sync").data();
-        contacts = &vm_inst.find<set<contact>>("qa_contacts");
-        box = &vm_inst.find<xmd::box>("box");
-        V = &vm_inst.find<real>("V");
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        free_pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
+        sync = ctx.var<vector<sync_data>>("sync").data();
+        contacts = &ctx.var<set<contact>>("qa_contacts");
+        box = &ctx.var<xmd::box>("box");
+        V = &ctx.var<real>("V");
+        F = ctx.var<vector<vec3r>>("F").data();
+        r = ctx.var<vector<vec3r>>("r").data();
+        free_pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
     }
 
     void process_contacts::iter(int idx) const {

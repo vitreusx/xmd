@@ -1,7 +1,7 @@
 #include "io/export_pdb.h"
 #include <xmd/files/pdb.h>
 #include <xmd/model/model.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <fstream>
 #include <xmd/utils/convert.h>
@@ -30,19 +30,19 @@ namespace xmd {
         }
     }
 
-    void export_pdb::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        out_file_path = vm_inst.find_or_emplace<std::filesystem::path>(
+    void export_pdb::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        out_file_path = ctx.persistent<std::filesystem::path>(
             "export_pdb_path", params["export pdb"]["path"].as<std::string>());
-        period = vm_inst.find_or_emplace<real>("export_pdb_period",
+        period = ctx.persistent<real>("export_pdb_period",
             params["export pdb"]["exec period"].as<quantity>());
 
-        true_r = vm_inst.find<vector<vec3tr>>("true_r").data();
-        ref_model = &vm_inst.find<xmd::model>("model");
-        res_map = &vm_inst.find<res_map_t>("res_map");
-        serial = &vm_inst.find_or_emplace<int>("serial", 1);
-        last_t = &vm_inst.find_or_emplace<real>("export_pdb_last_t",
+        true_r = ctx.var<vector<vec3tr>>("true_r").data();
+        ref_model = &ctx.var<xmd::model>("model");
+        res_map = &ctx.var<res_map_t>("res_map");
+        serial = &ctx.persistent<int>("serial", 1);
+        last_t = &ctx.ephemeral<real>("export_pdb_last_t",
             std::numeric_limits<real>::lowest());
-        t = &vm_inst.find<real>("t");
+        t = &ctx.var<real>("t");
     };
 }

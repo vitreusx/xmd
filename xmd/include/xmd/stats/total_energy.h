@@ -1,16 +1,16 @@
 #pragma once
 #include <xmd/types/vec3.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 namespace xmd {
-    class compute_total_energy: public vm_aware {
+    class compute_total_energy: public ctx_aware {
     public:
         const_array<vec3r> v;
         array<real> mass;
         int num_particles;
         real *K, *V, *E;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void operator()() const;

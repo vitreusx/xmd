@@ -40,6 +40,7 @@ namespace xmd::qa {
                    (side_hydrophobic_ >= 0);
         }
     };
+    INST_CONSTRUCT_DATA()
 
     REF_NAME() {
         REF_BODY()

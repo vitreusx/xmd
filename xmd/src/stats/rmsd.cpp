@@ -4,11 +4,11 @@
 #include <Eigen/SVD>
 
 namespace xmd {
-    void compute_rmsd::init_from_vm(vm& vm_inst) {
-        rmsd = &vm_inst.find<real>("rmsd");
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        ref_r = vm_inst.find_or_emplace<vector<vec3r>>("rmsd_ref_r").data();
-        num_particles = vm_inst.find<int>("num_particles");
+    void compute_rmsd::declare_vars(context& ctx) {
+        rmsd = &ctx.var<real>("rmsd");
+        r = ctx.var<vector<vec3r>>("r").data();
+        ref_r = ctx.persistent<vector<vec3r>>("rmsd_ref_r").data();
+        num_particles = ctx.var<int>("num_particles");
 
         for (int idx = 0; idx < num_particles; ++idx) {
             ref_r[idx] = r[idx];

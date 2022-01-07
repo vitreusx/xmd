@@ -13,19 +13,13 @@
 GEN_EXPR()
 
 namespace xmd {
-    class sink_lj: public sink_lj_expr<sink_lj> {
+    INST_NAME() {
+        INST_BODY()
     public:
         sink_lj() = default;
 
-        sink_lj(real depth, real r_min, real r_max):
-            depth_{depth}, r_min_{r_min}, r_max_{r_max} {};
-
         explicit sink_lj(lj const& lj_):
             depth_{lj_.depth()}, r_min_{lj_.r_min()}, r_max_{lj_.r_min()} {};
-
-        INST_CTORS()
-        INST_ASSIGN_COPY()
-        INST_ASSIGN_EXPR()
 
         inline std::tuple<real, real> operator()(real r, real r_inv) const {
             auto r_eff = (r < r_min_ ? r_min_ : (r < r_max_ ? r : r_max_));
@@ -40,12 +34,8 @@ namespace xmd {
 
         real cutoff() const;
         static real cutoff(real r_max);
-
-        INST_LAZY_FIELDS()
-
-    private:
-        INST_FIELDS()
     };
+    INST_CONSTRUCT_DATA()
 }
 
 GEN_REF()

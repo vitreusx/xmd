@@ -10,12 +10,12 @@ namespace xmd {
         *E = *V + K_;
     }
 
-    void compute_total_energy::init_from_vm(vm &vm_inst) {
-        v = vm_inst.find<vector<vec3r>>("r").data();
-        mass = vm_inst.find<vector<real>>("mass").data();
-        num_particles = vm_inst.find<int>("num_particles");
-        V = &vm_inst.find<real>("V");
-        K = &vm_inst.find_or_emplace<real>("K", (real)0.0);
-        E = &vm_inst.find_or_emplace<real>("E", (real)0.0);
+    void compute_total_energy::declare_vars(context& ctx) {
+        v = ctx.var<vector<vec3r>>("r").data();
+        mass = ctx.var<vector<real>>("mass").data();
+        num_particles = ctx.var<int>("num_particles");
+        V = &ctx.var<real>("V");
+        K = &ctx.persistent<real>("K", (real)0.0);
+        E = &ctx.persistent<real>("E", (real)0.0);
     }
 }

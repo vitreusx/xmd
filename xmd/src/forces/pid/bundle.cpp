@@ -28,19 +28,19 @@ namespace xmd::pid {
         }
     }
 
-    void update_pid_bundles::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        prev = vm_inst.find<vector<int>>("prev").data();
-        next = vm_inst.find<vector<int>>("next").data();
-        atype = vm_inst.find<vector<amino_acid>>("atype").data();
-        box = &vm_inst.find<xmd::box>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl_data");
-        bundles = &vm_inst.find<vector<pid_bundle>>("pid_bundles");
+    void update_pid_bundles::declare_vars(context& ctx) {
+        r = ctx.var<vector<vec3r>>("r").data();
+        prev = ctx.var<vector<int>>("prev").data();
+        next = ctx.var<vector<int>>("next").data();
+        atype = ctx.var<vector<amino_acid>>("atype").data();
+        box = &ctx.var<xmd::box>("box");
+        nl = &ctx.var<nl::nl_data>("nl_data");
+        bundles = &ctx.var<vector<pid_bundle>>("pid_bundles");
 
-        cutoff = vm_inst.find_or<real>("pid_cutoff", [&]() -> auto& {
-            auto& cutoff_ = vm_inst.emplace<real>("pid_cutoff", 0.0);
+        cutoff = ctx.persistent<real>("pid_cutoff", lazy([&]() -> auto {
+            real cutoff_ = 0.0;
 
-            auto& variants = vm_inst.find<lj_variants>("lj_variants");
+            auto& variants = ctx.var<lj_variants>("lj_variants");
             cutoff_ = max(cutoff_, variants.bb.cutoff());
             cutoff_ = max(cutoff_, variants.bs.cutoff());
             cutoff_ = max(cutoff_, variants.sb.cutoff());
@@ -50,9 +50,9 @@ namespace xmd::pid {
             }
 
             return cutoff_;
-        });
+        }));
 
-        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        auto& max_cutoff = ctx.var<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
     }
 }

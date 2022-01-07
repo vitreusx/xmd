@@ -1,7 +1,7 @@
 #include "forces/go.h"
 #include <xmd/model/model.h>
 #include <unordered_map>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 
 namespace xmd {
@@ -22,19 +22,18 @@ namespace xmd {
         }
     }
 
-    void update_go_contacts::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl_data");
-        all_contacts = &vm_inst.find_or<vector<nat_cont>>("go_all_contacts",
-            [&]() -> auto& {
-                auto& xmd_model = vm_inst.find<xmd::model>("model");
+    void update_go_contacts::declare_vars(context& ctx) {
+        r = ctx.var<vector<vec3r>>("r").data();
+        box = &ctx.var<xmd::box>("box");
+        nl = &ctx.var<nl::nl_data>("nl_data");
+        all_contacts = &ctx.persistent<vector<nat_cont>>("go_all_contacts",
+            lazy([&]() -> auto {
+                auto& xmd_model = ctx.var<xmd::model>("model");
                 using res_map_t = std::unordered_map<
                     xmd::model::residue*, int>;
-                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                auto& res_map = ctx.var<res_map_t>("res_map");
 
-                auto& all_contacts_ = vm_inst.emplace<vector<nat_cont>>(
-                    "go_all_contacts");
+                vector<nat_cont> all_contacts_;
 
                 for (auto const& cont: xmd_model.contacts) {
                     if (cont.type != model::NAT_SS) {
@@ -45,9 +44,9 @@ namespace xmd {
                 }
 
                 return all_contacts_;
-            });
+            }));
 
-        contacts = &vm_inst.find<vector<nat_cont>>("go_contacts");
+        contacts = &ctx.var<vector<nat_cont>>("go_contacts");
 
         real cutoff = 0.0;
         for (int cont_idx = 0; cont_idx < all_contacts->size(); ++cont_idx) {
@@ -55,7 +54,7 @@ namespace xmd {
             cutoff = max(cutoff, lj::cutoff(cont_dist));
         }
 
-        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        auto& max_cutoff = ctx.var<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
     }
 
@@ -65,17 +64,17 @@ namespace xmd {
         }
     }
 
-    void eval_go_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        depth = vm_inst.find_or_emplace<real>("go_depth",
+    void eval_go_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        depth = ctx.persistent<real>("go_depth",
             params["native contacts"]["lj depth"].as<quantity>());
 
-        box = &vm_inst.find<xmd::box>("box");
-        contacts = &vm_inst.find_or_emplace<vector<nat_cont>>(
+        box = &ctx.var<xmd::box>("box");
+        contacts = &ctx.persistent<vector<nat_cont>>(
             "go_contacts");
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        V = &vm_inst.find<real>("V");
-        F = vm_inst.find<vector<vec3r>>("F").data();
+        r = ctx.var<vector<vec3r>>("r").data();
+        V = &ctx.var<real>("V");
+        F = ctx.var<vector<vec3r>>("F").data();
     }
 
     void eval_go_forces::iter(int idx) const {

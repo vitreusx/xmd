@@ -1,6 +1,6 @@
 #include "forces/es/const.h"
 #include <xmd/utils/units.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
 
@@ -10,23 +10,23 @@ namespace xmd {
         }
     }
 
-    void eval_const_es_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
+    void eval_const_es_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
         auto const& const_es_params = params["const ES"];
 
-        permittivity = vm_inst.find_or_add<real>("permittivity",
+        permittivity = ctx.persistent<real>("permittivity",
             const_es_params["permittivity"].as<quantity>());
         V_factor = 1.0f / (4.0f * (real)M_PI * permittivity);
 
-        auto screening_dist = vm_inst.find_or_add<real>("screening_dist",
+        auto screening_dist = ctx.persistent<real>("screening_dist",
             const_es_params["screening distance"].as<quantity>());
         screen_dist_inv = (real)1.0 / screening_dist;
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
-        box = &vm_inst.find<xmd::box>("box");
-        es_pairs = &vm_inst.find_or_emplace<vector<es_pair>>("es_pairs");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
+        box = &ctx.var<xmd::box>("box");
+        es_pairs = &ctx.persistent<vector<es_pair>>("es_pairs");
     }
 
     void eval_const_es_forces::iter(int idx) const {
@@ -57,16 +57,16 @@ namespace xmd {
         }
     }
 
-    void update_const_es::init_from_vm(vm &vm_inst) {
-        update_es_base::init_from_vm(vm_inst);
+    void update_const_es::declare_vars(context& ctx) {
+        update_es_base::declare_vars(ctx);
 
-        auto& params = vm_inst.find<param_file>("params");
+        auto& params = ctx.var<yaml_fs_node>("params");
         auto const& const_es_params = params["const ES"];
-        auto screening_dist = vm_inst.find_or_emplace<real>("screening_dist",
+        auto screening_dist = ctx.persistent<real>("screening_dist",
             const_es_params["screening distance"].as<quantity>());
         cutoff = 2.0 * screening_dist;
 
-        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        auto& max_cutoff = ctx.var<real>("max_cutoff");
         max_cutoff = max(max_cutoff, cutoff);
     }
 

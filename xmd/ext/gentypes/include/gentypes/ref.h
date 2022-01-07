@@ -1338,71 +1338,7 @@ public:                                                                        \
 protected:                                                                     \
   REF_FIELDS()
 
-#define GEN_REF() GEN_REF_EXP(NAME(), FIELDS())
-
-#define GEN_REF_EXP(name, fields) GEN_REF_(name, fields)
-
-#define GEN_REF_(...) VFUNC(GEN_REF_, __VA_ARGS__)
-
-#define GEN_REF_3(name, T1, x1)                                                \
-                                                                               \
-  ENTER_NS()                                                                   \
-  REF_NAME(){REF_BODY()};                                                      \
-  LEAVE_NS()                                                                   \
-                                                                               \
-  REF_IMPL_SPEC()
-
-#define GEN_REF_5(name, T1, x1, T2, x2)                                        \
-                                                                               \
-  ENTER_NS()                                                                   \
-  REF_NAME(){REF_BODY()};                                                      \
-  LEAVE_NS()                                                                   \
-                                                                               \
-  REF_IMPL_SPEC()
-
-#define GEN_REF_7(name, T1, x1, T2, x2, T3, x3)                                \
-                                                                               \
-  ENTER_NS()                                                                   \
-  REF_NAME(){REF_BODY()};                                                      \
-  LEAVE_NS()                                                                   \
-                                                                               \
-  REF_IMPL_SPEC()
-
-#define GEN_REF_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                        \
-                                                                               \
-  ENTER_NS()                                                                   \
-  REF_NAME(){REF_BODY()};                                                      \
-  LEAVE_NS()                                                                   \
-                                                                               \
-  REF_IMPL_SPEC()
-
-#define GEN_REF_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)               \
-                                                                               \
-  ENTER_NS()                                                                   \
-  REF_NAME(){REF_BODY()};                                                      \
-  LEAVE_NS()                                                                   \
-                                                                               \
-  REF_IMPL_SPEC()
-
-#define GEN_REF_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)       \
-                                                                               \
-  ENTER_NS()                                                                   \
-  REF_NAME(){REF_BODY()};                                                      \
-  LEAVE_NS()                                                                   \
-                                                                               \
-  REF_IMPL_SPEC()
-
-#define GEN_REF_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
-                   x7)                                                         \
-                                                                               \
-  ENTER_NS()                                                                   \
-  REF_NAME(){REF_BODY()};                                                      \
-  LEAVE_NS()                                                                   \
-                                                                               \
-  REF_IMPL_SPEC()
-
-#define GEN_REF_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,   \
-                   x7, T8, x8)                                                 \
+#define GEN_REF()                                                              \
                                                                                \
   ENTER_NS()                                                                   \
   REF_NAME(){REF_BODY()};                                                      \

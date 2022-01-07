@@ -35,7 +35,7 @@ public:
   }
 
   inline vector_def(vector_def const &other) {
-    alloc_ = other.alloc;
+    alloc_ = other.alloc_;
     size_ = other.size_;
     capacity_ = other.capacity_;
 
@@ -46,7 +46,7 @@ public:
   inline vector_def &operator=(vector_def const &other) {
     this->~vector_def();
 
-    alloc_ = other.alloc;
+    alloc_ = other.alloc_;
     size_ = other.size_;
     capacity_ = other.capacity_;
 
@@ -84,13 +84,23 @@ public:
 
   inline Idx capacity() const { return capacity_; }
 
-  inline T *data() const { return data_; }
+  inline T *data() { return data_; }
+
+  inline operator T *() { return data(); }
+
+  inline T const *data() const { return data_; }
+
+  inline operator T const *() const { return data(); }
 
   inline span<T, Idx> view() { return span<T, Idx>(data_, size_); }
+
+  inline operator span<T, Idx>() { return view(); }
 
   inline const_span<T, Idx> view() const {
     return const_span<T, Idx>(data_, size_);
   }
+
+  inline operator const_span<T, Idx>() const { return view(); }
 
   inline T &operator[](Idx idx) { return data_[idx]; }
 
@@ -156,7 +166,7 @@ protected:
   Alloc alloc_;
 
 private:
-  friend class boost::serialization::access;
+  friend class ::boost::serialization::access;
 
   template <class Archive>
   void save(Archive &ar, [[maybe_unused]] const unsigned int version) const {
@@ -179,7 +189,10 @@ private:
     }
   }
 
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version) {
+    ::boost::serialization::split_member(ar, *this, version);
+  }
 };
 
 template <typename T, typename Alloc, typename Idx> struct vector_impl {
@@ -234,7 +247,7 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
     }                                                                          \
                                                                                \
     inline name##_vector(name##_vector const &other) {                         \
-      alloc_ = other.alloc;                                                    \
+      alloc_ = other.alloc_;                                                   \
       size_ = other.size_;                                                     \
       capacity_ = other.capacity_;                                             \
                                                                                \
@@ -285,14 +298,24 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
                                                                                \
     inline name##_ptr NO_SPEC() data() { return data_; }                       \
                                                                                \
+    inline operator name##_ptr NO_SPEC()() { return data(); }                  \
+                                                                               \
     inline name##_const_ptr NO_SPEC() data() const { return data_; }           \
+                                                                               \
+    inline operator name##_const_ptr NO_SPEC()() const { return data(); }      \
                                                                                \
     inline name##_span SPEC(typename, Idx) view() {                            \
       return name##_span SPEC(typename, Idx)(data_, size_);                    \
     }                                                                          \
                                                                                \
+    inline operator name##_span SPEC(typename, Idx)() { return view(); }       \
+                                                                               \
     inline name##_const_span SPEC(typename, Idx) view() const {                \
       return name##_span SPEC(typename, Idx)(data_, size_);                    \
+    }                                                                          \
+                                                                               \
+    inline operator name##_const_span SPEC(typename, Idx)() const {            \
+      return view();                                                           \
     }                                                                          \
                                                                                \
     inline name##_ref NO_SPEC() operator[](Idx idx) { return data_[idx]; }     \
@@ -391,14 +414,15 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
     Alloc alloc_;                                                              \
                                                                                \
   private:                                                                     \
-    friend class boost::serialization::access;                                 \
+    friend class ::boost::serialization::access;                               \
                                                                                \
     template <class Archive>                                                   \
     void save(Archive &ar,                                                     \
               [[maybe_unused]] const unsigned int version) const {             \
       std::vector<name NO_SPEC()> V;                                           \
       for (Idx idx = 0; idx < size_; ++idx) {                                  \
-        V.push_back(at(idx));                                                  \
+        name NO_SPEC() item = at(idx);                                         \
+        V.push_back(item);                                                     \
       }                                                                        \
                                                                                \
       ar &V;                                                                   \
@@ -415,7 +439,10 @@ using vector = typename vector_impl<T, Alloc, Idx>::type;
       }                                                                        \
     }                                                                          \
                                                                                \
-    BOOST_SERIALIZATION_SPLIT_MEMBER()                                         \
+    template <class Archive>                                                   \
+    void serialize(Archive &ar, const unsigned int version) {                  \
+      ::boost::serialization::split_member(ar, *this, version);                \
+    }                                                                          \
   };                                                                           \
   LEAVE_NS()                                                                   \
                                                                                \

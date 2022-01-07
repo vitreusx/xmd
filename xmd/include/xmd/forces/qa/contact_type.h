@@ -41,5 +41,12 @@ namespace xmd::qa {
             val{val} {};
 
         int16_t val;
+
+        friend class ::boost::serialization::access;
+
+        template<typename Archive>
+        void serialize(Archive& ar, [[maybe_unused]] const unsigned int version) {
+            ar & val;
+        }
     };
 }

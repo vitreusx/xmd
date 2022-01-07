@@ -1,26 +1,26 @@
 #include "io/report_stats.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <xmd/files/csv.h>
 #include <fstream>
 
 namespace xmd {
-    void report_stats::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        period = vm_inst.find_or_emplace<real>("stats_period",
+    void report_stats::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        period = ctx.persistent<real>("stats_period",
             params["report stats"]["exec period"].as<quantity>());
-        csv_path = vm_inst.find_or_emplace<std::filesystem::path>("stats_path",
+        csv_path = ctx.persistent<std::filesystem::path>("stats_path",
             params["report stats"]["path"].as<std::string>());
 
-        t = &vm_inst.find<real>("t");
-        last_t = &vm_inst.find_or_emplace<real>("stats_last_t",
+        t = &ctx.var<real>("t");
+        last_t = &ctx.ephemeral<real>("stats_last_t",
             std::numeric_limits<real>::lowest());
-        first_time = &vm_inst.find_or_emplace<bool>("stats_first_time", true);
+        first_time = &ctx.ephemeral<bool>("stats_first_time", true);
 
-        V = &vm_inst.find<real>("V");
-        comp_tot_ene_t.init_from_vm(vm_inst);
-        comp_asph_t.init_from_vm(vm_inst);
-        comp_gyr_t.init_from_vm(vm_inst);
+        V = &ctx.var<real>("V");
+        comp_tot_ene_t.declare_vars(ctx);
+        comp_asph_t.declare_vars(ctx);
+        comp_gyr_t.declare_vars(ctx);
     }
 
     void report_stats::operator()() const {

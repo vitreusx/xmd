@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <xmd/utils/math.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <xmd/utils/text.h>
 
@@ -55,20 +55,20 @@ namespace xmd {
         }
     }
 
-    void show_progress_bar::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        width = vm_inst.find_or_emplace<int>("pbar_width",
+    void show_progress_bar::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        width = ctx.persistent<int>("pbar_width",
             params["progress bar"]["width"].as<int>());
-        total_time = vm_inst.find_or_emplace<real>("total_time",
+        total_time = ctx.persistent<real>("total_time",
             params["general"]["total time"].as<quantity>());
-        period = vm_inst.find_or_emplace<real>("pbar_period",
+        period = ctx.persistent<real>("pbar_period",
             params["progress bar"]["update period"].as<quantity>());
 
-        t = &vm_inst.find<real>("t");
-        V = &vm_inst.find<real>("V");
-        first_time = &vm_inst.emplace<bool>("pbar_first_time", true);
-        start_wall_time = &vm_inst.emplace<time_point_t>("start_wall_time");
-        start_t = &vm_inst.emplace<real>("pbar_start_t");
-        last_t = &vm_inst.emplace<real>("pbar_last_t");
+        t = &ctx.var<real>("t");
+        V = &ctx.var<real>("V");
+        first_time = &ctx.ephemeral<bool>("pbar_first_time", true);
+        start_wall_time = &ctx.ephemeral<time_point_t>("start_wall_time");
+        start_t = &ctx.ephemeral<real>("pbar_start_t");
+        last_t = &ctx.ephemeral<real>("pbar_last_t");
     }
 }

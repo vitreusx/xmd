@@ -1,19 +1,18 @@
 #include "forces/qa/qa.h"
 
 namespace xmd::qa {
-    void eval_qa_forces::init_from_vm(vm &vm_inst) {
-        vm_inst.find_or_emplace<set<free_pair>>("qa_free_pairs");
-        vm_inst.find_or_emplace<set<candidate>>("qa_candidates");
-        vm_inst.find_or_emplace<set<contact>>("qa_contacts");
+    void eval_qa_forces::declare_vars(context& ctx) {
+        ctx.persistent<set<free_pair>>("qa_free_pairs");
+        ctx.persistent<set<candidate>>("qa_candidates");
+        ctx.persistent<set<contact>>("qa_contacts");
 
-        vm_inst.find_or<vector<sync_data>>("sync", [&]() -> auto& {
-            auto num_particles = vm_inst.find<int>("num_particles");
-            auto& sync_vec_ = vm_inst.emplace<vector<sync_data>>("sync",
-                num_particles);
+        ctx.persistent<vector<sync_data>>("sync", lazy([&]() -> auto {
+            auto num_particles = ctx.var<int>("num_particles");
+            vector<sync_data> sync_vec_(num_particles);
 
-            auto& aa_data_ = vm_inst.find<amino_acid_data>(
+            auto& aa_data_ = ctx.var<amino_acid_data>(
                 "amino_acid_data");
-            auto& atype = vm_inst.find<vector<amino_acid>>("atype");
+            auto& atype = ctx.var<vector<amino_acid>>("atype");
 
             for (int idx = 0; idx < num_particles; ++idx) {
                 auto const& lim = aa_data_[atype[idx]].limits;
@@ -22,12 +21,12 @@ namespace xmd::qa {
             }
 
             return sync_vec_;
-        });
+        }));
 
-        precompute_nh_t.init_from_vm(vm_inst);
-        sift_candidates_t.init_from_vm(vm_inst);
-        process_candidates_t.init_from_vm(vm_inst);
-        process_contacts_t.init_from_vm(vm_inst);
+        precompute_nh_t.declare_vars(ctx);
+        sift_candidates_t.declare_vars(ctx);
+        process_candidates_t.declare_vars(ctx);
+        process_contacts_t.declare_vars(ctx);
     }
 
     void eval_qa_forces::operator()() const {
@@ -43,8 +42,8 @@ namespace xmd::qa {
         }
     }
 
-    void update_qa::init_from_vm(vm &vm_inst) {
-        update_free_pairs_.init_from_vm(vm_inst);
+    void update_qa::declare_vars(context& ctx) {
+        update_free_pairs_.declare_vars(ctx);
     }
 
     void update_qa::operator()() const {

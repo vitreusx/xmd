@@ -1,5 +1,5 @@
 #include "forces/pid/eval_forces.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 #include <xmd/files/csv.h>
 
@@ -11,55 +11,51 @@ namespace xmd::pid {
         }
     }
 
-    void eval_pid_forces::init_from_vm(vm &vm_inst) {
-        conf = vm_inst.find_or<conf_t>("pid_conf", [&]() -> auto& {
-            auto& params = vm_inst.find<param_file>("params");
-            auto const& pid_params = params["pseudo-improper dihedral"];
+    void eval_pid_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        auto const& pid_params = params["pseudo-improper dihedral"];
 
-            auto& conf_ = vm_inst.emplace<conf_t>("pid_conf");
+        auto& conf_ = ctx.ephemeral<conf_t>("pid_conf");
 
-            auto lambda_ver = COSINE;
-            auto lambda_ver_str = pid_params["lambda version"].as<std::string>();
-            if (lambda_ver_str == "cosine")
-                lambda_ver = COSINE;
-            else if (lambda_ver_str == "algebraic")
-                lambda_ver = ALGEBRAIC;
-            else if (lambda_ver_str == "gaussian")
-                lambda_ver = GAUSSIAN;
+        auto lambda_ver = COSINE;
+        auto lambda_ver_str = pid_params["lambda version"].as<std::string>();
+        if (lambda_ver_str == "cosine")
+            lambda_ver = COSINE;
+        else if (lambda_ver_str == "algebraic")
+            lambda_ver = ALGEBRAIC;
+        else if (lambda_ver_str == "gaussian")
+            lambda_ver = GAUSSIAN;
 
-            auto const& bb_plus_params = pid_params["bb+"];
-            conf_.bb_plus_lam.version() = lambda_ver;
-            conf_.bb_plus_lam.alpha() = bb_plus_params["alpha"].as<quantity>();
-            conf_.bb_plus_lam.psi_0() = bb_plus_params["psi_0"].as<quantity>();
-            conf_.bb_plus_lj.r_min() = bb_plus_params["r_min"].as<quantity>();
-            conf_.bb_plus_lj.depth() = bb_plus_params["depth"].as<quantity>();
+        auto const& bb_plus_params = pid_params["bb+"];
+        conf_.bb_plus_lam.version() = lambda_ver;
+        conf_.bb_plus_lam.alpha() = bb_plus_params["alpha"].as<quantity>();
+        conf_.bb_plus_lam.psi_0() = bb_plus_params["psi_0"].as<quantity>();
+        conf_.bb_plus_lj.r_min() = bb_plus_params["r_min"].as<quantity>();
+        conf_.bb_plus_lj.depth() = bb_plus_params["depth"].as<quantity>();
 
-            auto const& bb_minus_params = pid_params["bb-"];
-            conf_.bb_minus_lam.version() = lambda_ver;
-            conf_.bb_minus_lam.alpha() = bb_minus_params["alpha"].as<quantity>();
-            conf_.bb_minus_lam.psi_0() = bb_minus_params["psi_0"].as<quantity>();
-            conf_.bb_minus_lj.r_min() = bb_minus_params["r_min"].as<quantity>();
-            conf_.bb_minus_lj.depth() = bb_minus_params["depth"].as<quantity>();
+        auto const& bb_minus_params = pid_params["bb-"];
+        conf_.bb_minus_lam.version() = lambda_ver;
+        conf_.bb_minus_lam.alpha() = bb_minus_params["alpha"].as<quantity>();
+        conf_.bb_minus_lam.psi_0() = bb_minus_params["psi_0"].as<quantity>();
+        conf_.bb_minus_lj.r_min() = bb_minus_params["r_min"].as<quantity>();
+        conf_.bb_minus_lj.depth() = bb_minus_params["depth"].as<quantity>();
 
-            auto& lj_variants_ = vm_inst.find_or_emplace<lj_variants>(
-                "lj_variants");
-            conf_.ss_ljs = lj_variants_.ss.data();
+        auto& lj_variants_ = ctx.ephemeral<lj_variants>(
+            "lj_variants");
+        conf_.ss_ljs = lj_variants_.ss.data();
 
-            auto const& ss_params = pid_params["ss"];
-            conf_.ss_lam.psi_0() = ss_params["psi_0"].as<quantity>();
-            conf_.ss_lam.alpha() = ss_params["alpha"].as<quantity>();
+        auto const& ss_params = pid_params["ss"];
+        conf_.ss_lam.psi_0() = ss_params["psi_0"].as<quantity>();
+        conf_.ss_lam.alpha() = ss_params["alpha"].as<quantity>();
 
-            return conf_;
-        });
-
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        box = &vm_inst.find<xmd::box>("box");
-        bundles = &vm_inst.find_or_emplace<vector<pid_bundle>>(
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        box = &ctx.var<xmd::box>("box");
+        bundles = &ctx.persistent<vector<pid_bundle>>(
             "pid_bundles");
-        V = &vm_inst.find<real>("V");
-        prev = vm_inst.find<vector<int>>("prev").data();
-        next = vm_inst.find<vector<int>>("next").data();
+        V = &ctx.var<real>("V");
+        prev = ctx.var<vector<int>>("prev").data();
+        next = ctx.var<vector<int>>("next").data();
     }
 
     void eval_pid_forces::iter(int idx) const {

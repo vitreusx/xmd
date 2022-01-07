@@ -5,10 +5,10 @@
 #include <xmd/utils/math.h>
 #include <xmd/forces/primitives/lj.h>
 #include <xmd/nl/data.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 namespace xmd {
-    class eval_go_forces: public vm_aware {
+    class eval_go_forces: public ctx_aware {
     public:
         real depth;
 
@@ -19,7 +19,7 @@ namespace xmd {
         vector<nat_cont> const *contacts;
         real *V;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;
@@ -27,7 +27,7 @@ namespace xmd {
         void omp_async() const;
     };
 
-    class update_go_contacts: public vm_aware {
+    class update_go_contacts: public ctx_aware {
     public:
         const_array<vec3r> r;
         box const *box;
@@ -35,7 +35,7 @@ namespace xmd {
         vector<nat_cont> const *all_contacts;
         vector<nat_cont> *contacts;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void operator()() const;

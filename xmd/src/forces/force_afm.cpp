@@ -1,5 +1,5 @@
 #include "forces/force_afm.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
     void eval_force_afm_forces::operator()() const {
@@ -8,15 +8,14 @@ namespace xmd {
         }
     }
 
-    void eval_force_afm_forces::init_from_vm(vm &vm_inst) {
-        F = vm_inst.find<vector<vec3r>>("F").data();
+    void eval_force_afm_forces::declare_vars(context& ctx) {
+        F = ctx.var<vector<vec3r>>("F").data();
 
-        afm_tips = vm_inst.find_or<vector<force_afm_tip>>("force_afm_tips",
-            [&]() -> auto& {
-                auto& afm_tips_ = vm_inst.emplace<vector<force_afm_tip>>(
-                    "force_afm_tips");
+        afm_tips = ctx.persistent<vector<force_afm_tip>>("force_afm_tips",
+            lazy([&]() -> auto {
+                vector<force_afm_tip> afm_tips_;
 
-                auto& params = vm_inst.find<param_file>("params");
+                auto& params = ctx.var<yaml_fs_node>("params");
                 for (auto const& tip_node: params["force AFM"]["AFM tips"]) {
                     auto res_idx = tip_node["residue idx"].as<int>();
                     auto pull_force = tip_node["pull force"].as<vec3r>();
@@ -24,7 +23,7 @@ namespace xmd {
                 }
 
                 return afm_tips_;
-            }).view();
+            })).view();
     }
 
     void eval_force_afm_forces::iter(int idx) const {

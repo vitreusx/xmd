@@ -5,7 +5,7 @@
 
 #include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -20,7 +20,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_nat_ssbond_forces: public vm_aware {
+    class eval_nat_ssbond_forces: public ctx_aware {
     public:
         real H1, nat_r;
 
@@ -31,7 +31,7 @@ namespace xmd {
         vector<nat_ss> const *ssbonds;
         real *V;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;
@@ -39,7 +39,7 @@ namespace xmd {
         void omp_async() const;
     };
 
-    class update_nat_ssbonds: public vm_aware {
+    class update_nat_ssbonds: public ctx_aware {
     public:
         real cutoff;
 
@@ -50,7 +50,7 @@ namespace xmd {
         vector<nat_ss> const *all_ssbonds;
         vector<nat_ss> *ssbonds;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void operator()() const;

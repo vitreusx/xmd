@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/forces/primitives/harmonic.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -16,7 +16,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_tether_forces: public vm_aware {
+    class eval_tether_forces: public ctx_aware {
     public:
         real H1, H2;
         real def_length;
@@ -27,7 +27,7 @@ namespace xmd {
         const_span<tether_pair> tethers;
         real *V;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

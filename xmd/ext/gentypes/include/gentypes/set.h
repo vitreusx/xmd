@@ -81,7 +81,7 @@ protected:
   vector<set_node<T>, NodeAlloc, Idx> nodes;
 
 private:
-  friend class boost::serialization::access;
+  friend class ::boost::serialization::access;
 
   template <class Archive>
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
@@ -159,7 +159,7 @@ using set = typename set_impl<T, NodeAlloc, Idx>::type;
     vector<set_node<name NO_SPEC()>, NodeAlloc, Idx> nodes;                    \
                                                                                \
   private:                                                                     \
-    friend class boost::serialization::access;                                 \
+    friend class ::boost::serialization::access;                               \
                                                                                \
     template <class Archive>                                                   \
     void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) { \

@@ -1,6 +1,6 @@
 #include "dynamics/lang_pc.h"
 #include <xmd/utils/units.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
     void lang_pc_step::operator()() const {
@@ -41,61 +41,59 @@ namespace xmd {
         *gen = local_gen;
     }
 
-    void lang_pc_step::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        gamma_factor = vm_inst.find_or_add<real>("gamma_factor",
+    void lang_pc_step::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        gamma_factor = ctx.persistent<real>("gamma_factor",
             params["langevin"]["gamma factor"].as<quantity>());
-        temperature = vm_inst.find_or_add<real>("temperature",
+        temperature = ctx.persistent<real>("temperature",
             params["langevin"]["temperature"].as<quantity>());
-        dt = vm_inst.find_or_add<true_real>("dt",
+        dt = ctx.persistent<true_real>("dt",
             params["integrator"]["dt"].as<quantity>());
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        num_particles = vm_inst.find<int>("num_particles");
-        mass = vm_inst.find<vector<real>>("mass").data();
-        gen = &vm_inst.find<rand_gen>("gen");
+        r = ctx.var<vector<vec3r>>("r").data();
+        num_particles = ctx.var<int>("num_particles");
+        mass = ctx.var<vector<real>>("mass").data();
+        gen = &ctx.var<rand_gen>("gen");
 
-        F = vm_inst.find_or_emplace<vector<vec3r>>("F",
+        F = ctx.persistent<vector<vec3r>>("F",
             num_particles).data();
-        t = &vm_inst.find_or_emplace<real>("t", (real)0.0);
-        mass_inv = vm_inst.find_or<vector<real>>("mass_inv", [&]() -> auto& {
-            auto& mass_inv_ = vm_inst.emplace<vector<real>>("mass_inv",
-                num_particles);
+        t = &ctx.persistent<real>("t", (real)0.0);
+        mass_inv = ctx.persistent<vector<real>>("mass_inv", lazy([&]() -> auto {
+            vector<real> mass_inv_(num_particles);
             for (int idx = 0; idx < num_particles; ++idx)
                 mass_inv_[idx] = (real)1.0 / mass[idx];
             return mass_inv_;
-        }).data();
-        y0 = vm_inst.find_or<vector<vec3tr>>("true_r", [&]() -> auto& {
-            auto& y0_ = vm_inst.emplace<vector<vec3tr>>("true_r",
-                num_particles);
+        })).data();
+        y0 = ctx.persistent<vector<vec3tr>>("true_r", lazy([&]() -> auto {
+            vector<vec3tr> y0_(num_particles);
             for (int idx = 0; idx < num_particles; ++idx)
                 y0_[idx] = r[idx];
             return y0_;
-        }).data();
-        y1 = vm_inst.find_or_emplace<vector<vec3tr>>("y1",
+        })).data();
+        y1 = ctx.persistent<vector<vec3tr>>("y1",
             num_particles).data();
-        y2 = vm_inst.find_or_emplace<vector<vec3tr>>("y2",
+        y2 = ctx.persistent<vector<vec3tr>>("y2",
             num_particles).data();
-        y3 = vm_inst.find_or_emplace<vector<vec3tr>>("y3",
+        y3 = ctx.persistent<vector<vec3tr>>("y3",
             num_particles).data();
-        y4 = vm_inst.find_or_emplace<vector<vec3tr>>("y4",
+        y4 = ctx.persistent<vector<vec3tr>>("y4",
             num_particles).data();
-        y5 = vm_inst.find_or_emplace<vector<vec3tr>>("y5",
+        y5 = ctx.persistent<vector<vec3tr>>("y5",
             num_particles).data();
-        true_t = &vm_inst.find_or_emplace<true_real>("true_t", *t);
+        true_t = &ctx.persistent<true_real>("true_t", *t);
 
-        mass_rsqrt = vm_inst.find_or<vector<real>>("mass_rsqrt",
-            [&]() -> auto& {
-                auto& mass_rsqrt_ = vm_inst.emplace<vector<real>>("mass_rsqrt",
-                    num_particles);
+        mass_rsqrt = ctx.persistent<vector<real>>("mass_rsqrt",
+            lazy([&]() -> auto {
+                vector<real> mass_rsqrt_(num_particles);
+
                 for (int idx = 0; idx < num_particles; ++idx) {
                     mass_rsqrt_[idx] = (real)1.0 / sqrt(mass[idx]);
                 }
 
                 return mass_rsqrt_;
-            }).data();
+            })).data();
 
-        v = vm_inst.find_or_emplace<vector<vec3r>>("v",
+        v = ctx.persistent<vector<vec3r>>("v",
             num_particles).data();
     }
 }

@@ -1,27 +1,25 @@
 #include "nl/legacy_update.h"
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 
 namespace xmd::nl {
-    void legacy_update::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        pad_factor = vm_inst.find_or_emplace<real>("pad_factor",
+    void legacy_update::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        pad_factor = ctx.persistent<real>("pad_factor",
             params["neighbor list"]["pad factor"].as<quantity>());
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box>("box");
-        t = &vm_inst.find<float>("t");
-        chain_idx = vm_inst.find<vector<int>>("chain_idx").data();
-        seq_idx = vm_inst.find<vector<int>>("seq_idx").data();
+        r = ctx.var<vector<vec3r>>("r").data();
+        box = &ctx.var<xmd::box>("box");
+        t = &ctx.var<float>("t");
+        chain_idx = ctx.var<vector<int>>("chain_idx").data();
+        seq_idx = ctx.var<vector<int>>("seq_idx").data();
 
-        num_particles = vm_inst.find<int>("num_particles");
+        num_particles = ctx.var<int>("num_particles");
 
-        data = &vm_inst.find_or<nl_data>("nl_data", [&]() -> auto& {
-            auto& data_ = vm_inst.emplace<nl_data>("nl_data");
-            data_.orig_r = vector<vec3r>(num_particles);
-            return data_;
-        });
-        max_cutoff = &vm_inst.find_or_emplace<real>("max_cutoff");
-        invalid = &vm_inst.find_or_emplace<bool>("invalid", true);
+        data = &ctx.ephemeral<nl_data>("nl_data");
+        data->orig_r = vector<vec3r>(num_particles);
+
+        max_cutoff = &ctx.persistent<real>("max_cutoff");
+        invalid = &ctx.ephemeral<bool>("invalid", true);
     }
 
     void legacy_update::operator()() const {

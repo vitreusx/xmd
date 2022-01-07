@@ -1,6 +1,6 @@
 #include "forces/angle/native.h"
 #include <xmd/model/model.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/utils/units.h>
 
 namespace xmd {
@@ -10,23 +10,22 @@ namespace xmd {
         }
     }
 
-    void eval_native_angle_forces::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
-        k = vm_inst.find_or_add<real>("nat_ang_k",
+    void eval_native_angle_forces::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
+        k = ctx.persistent<real>("nat_ang_k",
             params["native angles"]["k"].as<quantity>());
 
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        F = vm_inst.find<vector<vec3r>>("F").data();
-        V = &vm_inst.find<real>("V");
+        r = ctx.var<vector<vec3r>>("r").data();
+        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.var<real>("V");
 
-        angles = vm_inst.find_or<vector<nat_ang>>("native_angles",
-            [&]() -> auto& {
-                auto& xmd_model = vm_inst.find<model>("model");
+        angles = ctx.persistent<vector<nat_ang>>("native_angles",
+            lazy([&]() -> auto {
+                auto& xmd_model = ctx.var<model>("model");
                 using res_map_t = std::unordered_map<xmd::model::residue*, int>;
-                auto& res_map = vm_inst.find<res_map_t>("res_map");
+                auto& res_map = ctx.var<res_map_t>("res_map");
 
-                auto& angles_ = vm_inst.emplace<vector<nat_ang>>(
-                    "native_angles");
+                vector<nat_ang> angles_;
 
                 for (auto const& angle: xmd_model.angles) {
                     if (angle.theta.has_value()) {
@@ -39,7 +38,7 @@ namespace xmd {
                 }
 
                 return angles_;
-            }).view();
+            })).view();
     }
 
     void eval_native_angle_forces::iter(int idx) const {

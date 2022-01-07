@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/types/amino_acid.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 namespace xmd {
     class heur_ang_type {
@@ -13,8 +13,14 @@ namespace xmd {
 
     private:
         explicit constexpr heur_ang_type(int8_t val);
-
         int8_t val = 0;
+
+        friend class ::boost::serialization::access;
+
+        template<typename Archive>
+        void serialize(Archive& ar, [[maybe_unused]] const unsigned int version) {
+            ar & val;
+        }
     };
 }
 
@@ -31,7 +37,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_heurestic_angle_forces: public vm_aware {
+    class eval_heurestic_angle_forces: public ctx_aware {
     public:
         static constexpr int POLY_DEG = 6, NUM_TYPES = 9;
         real poly_coeffs[POLY_DEG+1][NUM_TYPES];
@@ -42,7 +48,7 @@ namespace xmd {
         const_span<heur_ang> angles;
         real *V;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

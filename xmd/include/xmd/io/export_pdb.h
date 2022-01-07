@@ -1,12 +1,12 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/types/amino_acid.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 #include <xmd/model/model.h>
 #include <xmd/model/loader.h>
 
 namespace xmd {
-    class export_pdb: public vm_aware {
+    class export_pdb: public ctx_aware {
     public:
         std::filesystem::path out_file_path;
         real period;
@@ -18,7 +18,7 @@ namespace xmd {
         int *serial;
         real *last_t, *t;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void operator()() const;

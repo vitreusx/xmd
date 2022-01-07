@@ -1,7 +1,7 @@
 #include "types/amino_acid.h"
 #include "utils/units.h"
 #include <numeric>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
 
@@ -65,12 +65,13 @@ namespace xmd {
         return all_aminoacids;
     }
 
-    amino_acid_data param_value_parser<amino_acid_data>::parse(
-        const param_entry &root) const {
+    amino_acid_data yaml_fs_value_parser<amino_acid_data>::parse(
+        const yaml_fs_node &root) {
 
         auto source = root;
         if (auto from_file_tag = root["from file"]; from_file_tag) {
-            source = param_file::import(root, from_file_tag.as<std::string>());
+            auto path = root.resolve(from_file_tag.as<std::string>());
+            source = yaml_fs_node(path);
         }
 
         amino_acid_data parsed;

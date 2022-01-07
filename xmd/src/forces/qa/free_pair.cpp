@@ -20,17 +20,17 @@ namespace xmd::qa {
         }
     }
 
-    void update_free_pairs::init_from_vm(vm &vm_inst) {
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        box = &vm_inst.find<xmd::box>("box");
-        nl = &vm_inst.find<nl::nl_data>("nl_data");
-        pairs = &vm_inst.find<set<free_pair>>("qa_free_pairs");
+    void update_free_pairs::declare_vars(context& ctx) {
+        r = ctx.var<vector<vec3r>>("r").data();
+        box = &ctx.var<xmd::box>("box");
+        nl = &ctx.var<nl::nl_data>("nl_data");
+        pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
 
-        max_formation_min_dist = vm_inst.find_or<real>("max_formation_min_dist",
-            [&]() -> auto& {
-                auto& dist_ = vm_inst.emplace<real>("max_formation_min_dist", 0.0);
+        max_formation_min_dist = ctx.persistent<real>("max_formation_min_dist",
+            lazy([&]() -> auto {
+                real dist_ = 0.0;
 
-                auto& variants = vm_inst.find<lj_variants>("lj_variants");
+                auto& variants = ctx.var<lj_variants>("lj_variants");
                 dist_ = max(dist_, variants.bb.r_min());
                 dist_ = max(dist_, variants.bs.r_min());
                 dist_ = max(dist_, variants.sb.r_min());
@@ -40,9 +40,9 @@ namespace xmd::qa {
                 }
 
                 return dist_;
-            });
+            }));
 
-        auto& max_cutoff = vm_inst.find<real>("max_cutoff");
+        auto& max_cutoff = ctx.var<real>("max_cutoff");
         max_cutoff = max(max_cutoff, max_formation_min_dist);
     }
 }

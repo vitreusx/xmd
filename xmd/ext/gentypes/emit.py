@@ -23,6 +23,8 @@ class Renderer:
     len = len
     zip = zip
     list = list
+    reversed = reversed
+    range = range
 
     @staticmethod
     def macro_sig(n: int) -> Signature:

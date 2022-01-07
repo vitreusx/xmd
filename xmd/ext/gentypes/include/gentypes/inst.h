@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include "def_memory.h"
 #include "meta.h"
 #include <boost/serialization/access.hpp>
 
@@ -14,17 +15,17 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -47,26 +48,26 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       ,                                                                        \
-      typename _T2                                                             \
+      typename U2                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T2 &&arg2                                                               \
+      U2 &&x2##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x2##_{std::forward<_T2>(arg2)}                                         \
+        x2##_{std::forward<U2>(x2##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -95,35 +96,35 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       ,                                                                        \
-      typename _T2                                                             \
+      typename U2                                                              \
                                                                                \
       ,                                                                        \
-      typename _T3                                                             \
+      typename U3                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T2 &&arg2                                                               \
+      U2 &&x2##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T3 &&arg3                                                               \
+      U3 &&x3##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x2##_{std::forward<_T2>(arg2)}                                         \
+        x2##_{std::forward<U2>(x2##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x3##_{std::forward<_T3>(arg3)}                                         \
+        x3##_{std::forward<U3>(x3##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -158,44 +159,44 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       ,                                                                        \
-      typename _T2                                                             \
+      typename U2                                                              \
                                                                                \
       ,                                                                        \
-      typename _T3                                                             \
+      typename U3                                                              \
                                                                                \
       ,                                                                        \
-      typename _T4                                                             \
+      typename U4                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T2 &&arg2                                                               \
+      U2 &&x2##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T3 &&arg3                                                               \
+      U3 &&x3##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T4 &&arg4                                                               \
+      U4 &&x4##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x2##_{std::forward<_T2>(arg2)}                                         \
+        x2##_{std::forward<U2>(x2##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x3##_{std::forward<_T3>(arg3)}                                         \
+        x3##_{std::forward<U3>(x3##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x4##_{std::forward<_T4>(arg4)}                                         \
+        x4##_{std::forward<U4>(x4##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -236,53 +237,53 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       ,                                                                        \
-      typename _T2                                                             \
+      typename U2                                                              \
                                                                                \
       ,                                                                        \
-      typename _T3                                                             \
+      typename U3                                                              \
                                                                                \
       ,                                                                        \
-      typename _T4                                                             \
+      typename U4                                                              \
                                                                                \
       ,                                                                        \
-      typename _T5                                                             \
+      typename U5                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T2 &&arg2                                                               \
+      U2 &&x2##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T3 &&arg3                                                               \
+      U3 &&x3##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T4 &&arg4                                                               \
+      U4 &&x4##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T5 &&arg5                                                               \
+      U5 &&x5##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x2##_{std::forward<_T2>(arg2)}                                         \
+        x2##_{std::forward<U2>(x2##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x3##_{std::forward<_T3>(arg3)}                                         \
+        x3##_{std::forward<U3>(x3##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x4##_{std::forward<_T4>(arg4)}                                         \
+        x4##_{std::forward<U4>(x4##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x5##_{std::forward<_T5>(arg5)}                                         \
+        x5##_{std::forward<U5>(x5##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -329,62 +330,62 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       ,                                                                        \
-      typename _T2                                                             \
+      typename U2                                                              \
                                                                                \
       ,                                                                        \
-      typename _T3                                                             \
+      typename U3                                                              \
                                                                                \
       ,                                                                        \
-      typename _T4                                                             \
+      typename U4                                                              \
                                                                                \
       ,                                                                        \
-      typename _T5                                                             \
+      typename U5                                                              \
                                                                                \
       ,                                                                        \
-      typename _T6                                                             \
+      typename U6                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T2 &&arg2                                                               \
+      U2 &&x2##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T3 &&arg3                                                               \
+      U3 &&x3##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T4 &&arg4                                                               \
+      U4 &&x4##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T5 &&arg5                                                               \
+      U5 &&x5##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T6 &&arg6                                                               \
+      U6 &&x6##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x2##_{std::forward<_T2>(arg2)}                                         \
+        x2##_{std::forward<U2>(x2##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x3##_{std::forward<_T3>(arg3)}                                         \
+        x3##_{std::forward<U3>(x3##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x4##_{std::forward<_T4>(arg4)}                                         \
+        x4##_{std::forward<U4>(x4##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x5##_{std::forward<_T5>(arg5)}                                         \
+        x5##_{std::forward<U5>(x5##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x6##_{std::forward<_T6>(arg6)}                                         \
+        x6##_{std::forward<U6>(x6##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -438,71 +439,71 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       ,                                                                        \
-      typename _T2                                                             \
+      typename U2                                                              \
                                                                                \
       ,                                                                        \
-      typename _T3                                                             \
+      typename U3                                                              \
                                                                                \
       ,                                                                        \
-      typename _T4                                                             \
+      typename U4                                                              \
                                                                                \
       ,                                                                        \
-      typename _T5                                                             \
+      typename U5                                                              \
                                                                                \
       ,                                                                        \
-      typename _T6                                                             \
+      typename U6                                                              \
                                                                                \
       ,                                                                        \
-      typename _T7                                                             \
+      typename U7                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T2 &&arg2                                                               \
+      U2 &&x2##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T3 &&arg3                                                               \
+      U3 &&x3##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T4 &&arg4                                                               \
+      U4 &&x4##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T5 &&arg5                                                               \
+      U5 &&x5##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T6 &&arg6                                                               \
+      U6 &&x6##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T7 &&arg7                                                               \
+      U7 &&x7##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x2##_{std::forward<_T2>(arg2)}                                         \
+        x2##_{std::forward<U2>(x2##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x3##_{std::forward<_T3>(arg3)}                                         \
+        x3##_{std::forward<U3>(x3##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x4##_{std::forward<_T4>(arg4)}                                         \
+        x4##_{std::forward<U4>(x4##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x5##_{std::forward<_T5>(arg5)}                                         \
+        x5##_{std::forward<U5>(x5##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x6##_{std::forward<_T6>(arg6)}                                         \
+        x6##_{std::forward<U6>(x6##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x7##_{std::forward<_T7>(arg7)}                                         \
+        x7##_{std::forward<U7>(x7##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -562,80 +563,80 @@
                                                                                \
   template <                                                                   \
                                                                                \
-      typename _T1                                                             \
+      typename U1                                                              \
                                                                                \
       ,                                                                        \
-      typename _T2                                                             \
+      typename U2                                                              \
                                                                                \
       ,                                                                        \
-      typename _T3                                                             \
+      typename U3                                                              \
                                                                                \
       ,                                                                        \
-      typename _T4                                                             \
+      typename U4                                                              \
                                                                                \
       ,                                                                        \
-      typename _T5                                                             \
+      typename U5                                                              \
                                                                                \
       ,                                                                        \
-      typename _T6                                                             \
+      typename U6                                                              \
                                                                                \
       ,                                                                        \
-      typename _T7                                                             \
+      typename U7                                                              \
                                                                                \
       ,                                                                        \
-      typename _T8                                                             \
+      typename U8                                                              \
                                                                                \
       >                                                                        \
   inline name(                                                                 \
                                                                                \
-      _T1 &&arg1                                                               \
+      U1 &&x1##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T2 &&arg2                                                               \
+      U2 &&x2##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T3 &&arg3                                                               \
+      U3 &&x3##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T4 &&arg4                                                               \
+      U4 &&x4##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T5 &&arg5                                                               \
+      U5 &&x5##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T6 &&arg6                                                               \
+      U6 &&x6##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T7 &&arg7                                                               \
+      U7 &&x7##_init                                                           \
                                                                                \
       ,                                                                        \
-      _T8 &&arg8                                                               \
+      U8 &&x8##_init                                                           \
                                                                                \
       )                                                                        \
       :                                                                        \
                                                                                \
-        x1##_{std::forward<_T1>(arg1)}                                         \
+        x1##_{std::forward<U1>(x1##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x2##_{std::forward<_T2>(arg2)}                                         \
+        x2##_{std::forward<U2>(x2##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x3##_{std::forward<_T3>(arg3)}                                         \
+        x3##_{std::forward<U3>(x3##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x4##_{std::forward<_T4>(arg4)}                                         \
+        x4##_{std::forward<U4>(x4##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x5##_{std::forward<_T5>(arg5)}                                         \
+        x5##_{std::forward<U5>(x5##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x6##_{std::forward<_T6>(arg6)}                                         \
+        x6##_{std::forward<U6>(x6##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x7##_{std::forward<_T7>(arg7)}                                         \
+        x7##_{std::forward<U7>(x7##_init)}                                     \
                                                                                \
         ,                                                                      \
-        x8##_{std::forward<_T8>(arg8)}                                         \
+        x8##_{std::forward<U8>(x8##_init)}                                     \
                                                                                \
         {};                                                                    \
                                                                                \
@@ -1205,7 +1206,8 @@
 
 #define INST_SERIALIZE_3(name, T1, x1)                                         \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1214,7 +1216,8 @@
 
 #define INST_SERIALIZE_5(name, T1, x1, T2, x2)                                 \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1225,7 +1228,8 @@
 
 #define INST_SERIALIZE_7(name, T1, x1, T2, x2, T3, x3)                         \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1238,7 +1242,8 @@
 
 #define INST_SERIALIZE_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                 \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1253,7 +1258,8 @@
 
 #define INST_SERIALIZE_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)        \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1271,7 +1277,8 @@
 #define INST_SERIALIZE_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,    \
                           x6)                                                  \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1291,7 +1298,8 @@
 #define INST_SERIALIZE_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,    \
                           x6, T7, x7)                                          \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1313,7 +1321,8 @@
 #define INST_SERIALIZE_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6,    \
                           x6, T7, x7, T8, x8)                                  \
                                                                                \
-  friend class boost::serialization::access;                                   \
+  friend class ::boost::serialization::access;                                 \
+                                                                               \
   template <class Archive>                                                     \
   void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {   \
                                                                                \
@@ -1357,58 +1366,525 @@ protected:                                                                     \
 private:                                                                       \
   INST_SERIALIZE()
 
-#define GEN_INST() GEN_INST_EXP(NAME(), FIELDS())
+#define ENTER_BOOST_SERIALIZATION_NS() namespace boost::serialization {
+#define LEAVE_BOOST_SERIALIZATION_NS() }
 
-#define GEN_INST_EXP(name, fields) GEN_INST_(name, fields)
+#define INST_CONSTRUCT_DATA() INST_CONSTRUCT_DATA_EXP(NAME(), FIELDS())
 
-#define GEN_INST_(...) VFUNC(GEN_INST_, __VA_ARGS__)
+#define INST_CONSTRUCT_DATA_EXP(name, fields) INST_CONSTRUCT_DATA_(name, fields)
 
-#define GEN_INST_3(name, T1, x1)                                               \
+#define INST_CONSTRUCT_DATA_(...) VFUNC_ALT2(INST_CONSTRUCT_DATA_, __VA_ARGS__)
+
+#define INST_CONSTRUCT_DATA_3(name, T1, x1)                                    \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define INST_CONSTRUCT_DATA_5(name, T1, x1, T2, x2)                            \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+                                                                               \
+    T2 x2##_inst = inst->x2();                                                 \
+    save_construct_data(ar, &x2##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T2)) unsigned char x2##_buf[sizeof(T2)];                   \
+    T2 &x2##_ref = *reinterpret_cast<T2 *>(&x2##_buf[0]);                      \
+    ar >> x2##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x2##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define INST_CONSTRUCT_DATA_7(name, T1, x1, T2, x2, T3, x3)                    \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+                                                                               \
+    T2 x2##_inst = inst->x2();                                                 \
+    save_construct_data(ar, &x2##_inst, version);                              \
+                                                                               \
+    T3 x3##_inst = inst->x3();                                                 \
+    save_construct_data(ar, &x3##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T3)) unsigned char x3##_buf[sizeof(T3)];                   \
+    T3 &x3##_ref = *reinterpret_cast<T3 *>(&x3##_buf[0]);                      \
+    ar >> x3##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T2)) unsigned char x2##_buf[sizeof(T2)];                   \
+    T2 &x2##_ref = *reinterpret_cast<T2 *>(&x2##_buf[0]);                      \
+    ar >> x2##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x2##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x3##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define INST_CONSTRUCT_DATA_9(name, T1, x1, T2, x2, T3, x3, T4, x4)            \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+                                                                               \
+    T2 x2##_inst = inst->x2();                                                 \
+    save_construct_data(ar, &x2##_inst, version);                              \
+                                                                               \
+    T3 x3##_inst = inst->x3();                                                 \
+    save_construct_data(ar, &x3##_inst, version);                              \
+                                                                               \
+    T4 x4##_inst = inst->x4();                                                 \
+    save_construct_data(ar, &x4##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T4)) unsigned char x4##_buf[sizeof(T4)];                   \
+    T4 &x4##_ref = *reinterpret_cast<T4 *>(&x4##_buf[0]);                      \
+    ar >> x4##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T3)) unsigned char x3##_buf[sizeof(T3)];                   \
+    T3 &x3##_ref = *reinterpret_cast<T3 *>(&x3##_buf[0]);                      \
+    ar >> x3##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T2)) unsigned char x2##_buf[sizeof(T2)];                   \
+    T2 &x2##_ref = *reinterpret_cast<T2 *>(&x2##_buf[0]);                      \
+    ar >> x2##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x2##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x3##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x4##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define INST_CONSTRUCT_DATA_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)   \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+                                                                               \
+    T2 x2##_inst = inst->x2();                                                 \
+    save_construct_data(ar, &x2##_inst, version);                              \
+                                                                               \
+    T3 x3##_inst = inst->x3();                                                 \
+    save_construct_data(ar, &x3##_inst, version);                              \
+                                                                               \
+    T4 x4##_inst = inst->x4();                                                 \
+    save_construct_data(ar, &x4##_inst, version);                              \
+                                                                               \
+    T5 x5##_inst = inst->x5();                                                 \
+    save_construct_data(ar, &x5##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T5)) unsigned char x5##_buf[sizeof(T5)];                   \
+    T5 &x5##_ref = *reinterpret_cast<T5 *>(&x5##_buf[0]);                      \
+    ar >> x5##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T4)) unsigned char x4##_buf[sizeof(T4)];                   \
+    T4 &x4##_ref = *reinterpret_cast<T4 *>(&x4##_buf[0]);                      \
+    ar >> x4##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T3)) unsigned char x3##_buf[sizeof(T3)];                   \
+    T3 &x3##_ref = *reinterpret_cast<T3 *>(&x3##_buf[0]);                      \
+    ar >> x3##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T2)) unsigned char x2##_buf[sizeof(T2)];                   \
+    T2 &x2##_ref = *reinterpret_cast<T2 *>(&x2##_buf[0]);                      \
+    ar >> x2##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x2##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x3##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x4##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x5##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define INST_CONSTRUCT_DATA_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5,   \
+                               T6, x6)                                         \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+                                                                               \
+    T2 x2##_inst = inst->x2();                                                 \
+    save_construct_data(ar, &x2##_inst, version);                              \
+                                                                               \
+    T3 x3##_inst = inst->x3();                                                 \
+    save_construct_data(ar, &x3##_inst, version);                              \
+                                                                               \
+    T4 x4##_inst = inst->x4();                                                 \
+    save_construct_data(ar, &x4##_inst, version);                              \
+                                                                               \
+    T5 x5##_inst = inst->x5();                                                 \
+    save_construct_data(ar, &x5##_inst, version);                              \
+                                                                               \
+    T6 x6##_inst = inst->x6();                                                 \
+    save_construct_data(ar, &x6##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T6)) unsigned char x6##_buf[sizeof(T6)];                   \
+    T6 &x6##_ref = *reinterpret_cast<T6 *>(&x6##_buf[0]);                      \
+    ar >> x6##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T5)) unsigned char x5##_buf[sizeof(T5)];                   \
+    T5 &x5##_ref = *reinterpret_cast<T5 *>(&x5##_buf[0]);                      \
+    ar >> x5##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T4)) unsigned char x4##_buf[sizeof(T4)];                   \
+    T4 &x4##_ref = *reinterpret_cast<T4 *>(&x4##_buf[0]);                      \
+    ar >> x4##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T3)) unsigned char x3##_buf[sizeof(T3)];                   \
+    T3 &x3##_ref = *reinterpret_cast<T3 *>(&x3##_buf[0]);                      \
+    ar >> x3##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T2)) unsigned char x2##_buf[sizeof(T2)];                   \
+    T2 &x2##_ref = *reinterpret_cast<T2 *>(&x2##_buf[0]);                      \
+    ar >> x2##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x2##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x3##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x4##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x5##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x6##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define INST_CONSTRUCT_DATA_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5,   \
+                               T6, x6, T7, x7)                                 \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+                                                                               \
+    T2 x2##_inst = inst->x2();                                                 \
+    save_construct_data(ar, &x2##_inst, version);                              \
+                                                                               \
+    T3 x3##_inst = inst->x3();                                                 \
+    save_construct_data(ar, &x3##_inst, version);                              \
+                                                                               \
+    T4 x4##_inst = inst->x4();                                                 \
+    save_construct_data(ar, &x4##_inst, version);                              \
+                                                                               \
+    T5 x5##_inst = inst->x5();                                                 \
+    save_construct_data(ar, &x5##_inst, version);                              \
+                                                                               \
+    T6 x6##_inst = inst->x6();                                                 \
+    save_construct_data(ar, &x6##_inst, version);                              \
+                                                                               \
+    T7 x7##_inst = inst->x7();                                                 \
+    save_construct_data(ar, &x7##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T7)) unsigned char x7##_buf[sizeof(T7)];                   \
+    T7 &x7##_ref = *reinterpret_cast<T7 *>(&x7##_buf[0]);                      \
+    ar >> x7##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T6)) unsigned char x6##_buf[sizeof(T6)];                   \
+    T6 &x6##_ref = *reinterpret_cast<T6 *>(&x6##_buf[0]);                      \
+    ar >> x6##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T5)) unsigned char x5##_buf[sizeof(T5)];                   \
+    T5 &x5##_ref = *reinterpret_cast<T5 *>(&x5##_buf[0]);                      \
+    ar >> x5##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T4)) unsigned char x4##_buf[sizeof(T4)];                   \
+    T4 &x4##_ref = *reinterpret_cast<T4 *>(&x4##_buf[0]);                      \
+    ar >> x4##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T3)) unsigned char x3##_buf[sizeof(T3)];                   \
+    T3 &x3##_ref = *reinterpret_cast<T3 *>(&x3##_buf[0]);                      \
+    ar >> x3##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T2)) unsigned char x2##_buf[sizeof(T2)];                   \
+    T2 &x2##_ref = *reinterpret_cast<T2 *>(&x2##_buf[0]);                      \
+    ar >> x2##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x2##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x3##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x4##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x5##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x6##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x7##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define INST_CONSTRUCT_DATA_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5,   \
+                               T6, x6, T7, x7, T8, x8)                         \
+                                                                               \
+  ENTER_BOOST_SERIALIZATION_NS()                                               \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void save_construct_data(Archive &ar,                                        \
+                           NS_PREFIX() name NO_SPEC() const *inst,             \
+                           const unsigned int version) {                       \
+                                                                               \
+    T1 x1##_inst = inst->x1();                                                 \
+    save_construct_data(ar, &x1##_inst, version);                              \
+                                                                               \
+    T2 x2##_inst = inst->x2();                                                 \
+    save_construct_data(ar, &x2##_inst, version);                              \
+                                                                               \
+    T3 x3##_inst = inst->x3();                                                 \
+    save_construct_data(ar, &x3##_inst, version);                              \
+                                                                               \
+    T4 x4##_inst = inst->x4();                                                 \
+    save_construct_data(ar, &x4##_inst, version);                              \
+                                                                               \
+    T5 x5##_inst = inst->x5();                                                 \
+    save_construct_data(ar, &x5##_inst, version);                              \
+                                                                               \
+    T6 x6##_inst = inst->x6();                                                 \
+    save_construct_data(ar, &x6##_inst, version);                              \
+                                                                               \
+    T7 x7##_inst = inst->x7();                                                 \
+    save_construct_data(ar, &x7##_inst, version);                              \
+                                                                               \
+    T8 x8##_inst = inst->x8();                                                 \
+    save_construct_data(ar, &x8##_inst, version);                              \
+  }                                                                            \
+                                                                               \
+  TEMPLATE(typename, Archive)                                                  \
+  void load_construct_data(Archive &ar, NS_PREFIX() name NO_SPEC() * inst,     \
+                           [[maybe_unused]] const unsigned int version) {      \
+                                                                               \
+    alignas(alignof(T8)) unsigned char x8##_buf[sizeof(T8)];                   \
+    T8 &x8##_ref = *reinterpret_cast<T8 *>(&x8##_buf[0]);                      \
+    ar >> x8##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T7)) unsigned char x7##_buf[sizeof(T7)];                   \
+    T7 &x7##_ref = *reinterpret_cast<T7 *>(&x7##_buf[0]);                      \
+    ar >> x7##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T6)) unsigned char x6##_buf[sizeof(T6)];                   \
+    T6 &x6##_ref = *reinterpret_cast<T6 *>(&x6##_buf[0]);                      \
+    ar >> x6##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T5)) unsigned char x5##_buf[sizeof(T5)];                   \
+    T5 &x5##_ref = *reinterpret_cast<T5 *>(&x5##_buf[0]);                      \
+    ar >> x5##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T4)) unsigned char x4##_buf[sizeof(T4)];                   \
+    T4 &x4##_ref = *reinterpret_cast<T4 *>(&x4##_buf[0]);                      \
+    ar >> x4##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T3)) unsigned char x3##_buf[sizeof(T3)];                   \
+    T3 &x3##_ref = *reinterpret_cast<T3 *>(&x3##_buf[0]);                      \
+    ar >> x3##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T2)) unsigned char x2##_buf[sizeof(T2)];                   \
+    T2 &x2##_ref = *reinterpret_cast<T2 *>(&x2##_buf[0]);                      \
+    ar >> x2##_ref;                                                            \
+                                                                               \
+    alignas(alignof(T1)) unsigned char x1##_buf[sizeof(T1)];                   \
+    T1 &x1##_ref = *reinterpret_cast<T1 *>(&x1##_buf[0]);                      \
+    ar >> x1##_ref;                                                            \
+                                                                               \
+    ::new (static_cast<void *>(inst)) NS_PREFIX() name NO_SPEC()(              \
+                                                                               \
+        x1##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x2##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x3##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x4##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x5##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x6##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x7##_ref                                                               \
+                                                                               \
+        ,                                                                      \
+        x8##_ref);                                                             \
+  }                                                                            \
+                                                                               \
+  LEAVE_BOOST_SERIALIZATION_NS()
+
+#define GEN_INST()                                                             \
                                                                                \
   ENTER_NS()                                                                   \
   INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
-
-#define GEN_INST_5(name, T1, x1, T2, x2)                                       \
-                                                                               \
-  ENTER_NS()                                                                   \
-  INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
-
-#define GEN_INST_7(name, T1, x1, T2, x2, T3, x3)                               \
-                                                                               \
-  ENTER_NS()                                                                   \
-  INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
-
-#define GEN_INST_9(name, T1, x1, T2, x2, T3, x3, T4, x4)                       \
-                                                                               \
-  ENTER_NS()                                                                   \
-  INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
-
-#define GEN_INST_11(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5)              \
-                                                                               \
-  ENTER_NS()                                                                   \
-  INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
-
-#define GEN_INST_13(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6)      \
-                                                                               \
-  ENTER_NS()                                                                   \
-  INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
-
-#define GEN_INST_15(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
-                    x7)                                                        \
-                                                                               \
-  ENTER_NS()                                                                   \
-  INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
-
-#define GEN_INST_17(name, T1, x1, T2, x2, T3, x3, T4, x4, T5, x5, T6, x6, T7,  \
-                    x7, T8, x8)                                                \
-                                                                               \
-  ENTER_NS()                                                                   \
-  INST_NAME(){INST_BODY()};                                                    \
-  LEAVE_NS()
+  LEAVE_NS()                                                                   \
+  INST_CONSTRUCT_DATA()

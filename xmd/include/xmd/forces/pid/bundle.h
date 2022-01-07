@@ -5,7 +5,7 @@
 #include <xmd/model/box.h>
 #include <xmd/types/vec3.h>
 #include <xmd/nl/data.h>
-#include <xmd/vm/vm.h>
+#include <xmd/ctx/context.h>
 
 #define NAMESPACE(...) xmd,pid,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -20,7 +20,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd::pid {
-    class update_pid_bundles: public vm_aware {
+    class update_pid_bundles: public ctx_aware {
     public:
         real cutoff;
 
@@ -32,7 +32,7 @@ namespace xmd::pid {
         nl::nl_data const *nl;
         vector<pid_bundle> *bundles;
 
-        void init_from_vm(vm& vm_inst) override;
+        void declare_vars(context& ctx) override;
 
     public:
         void operator()() const;

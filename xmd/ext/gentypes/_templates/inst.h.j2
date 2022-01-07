@@ -2,6 +2,7 @@
 
 #pragma once
 #include "meta.h"
+#include "def_memory.h"
 #include <boost/serialization/access.hpp>
 
 {% macro _inst_ctors(sig) %}
@@ -9,18 +10,18 @@
     template<
         {% set comma = joiner(",") %}
         {% for idx in I %}
-            {{comma()}} typename _T{{idx}}
+            {{comma()}} typename U{{idx}}
         {% endfor %}
     >
     inline {{sig.name}}(
         {% set comma = joiner(",") %}
-        {% for idx in I %}
-            {{comma()}}_T{{idx}}&& arg{{idx}}
+        {% for idx, (T, x) in zip(I, sig.fields) %}
+            {{comma()}}U{{idx}}&& x{{idx}}##_init
         {% endfor %}
     ):
         {% set comma = joiner(",") %}
         {% for idx, (T, x) in zip(I, sig.fields) %}
-            {{comma()}}{{x}}##_{{"{"}}std::forward<_T{{idx}}>(arg{{idx}}){{"}"}}
+            {{comma()}}{{x}}##_{{"{"}}std::forward<U{{idx}}>(x{{idx}}##_init){{"}"}}
         {% endfor %}
     {};
 
@@ -87,7 +88,8 @@
 {{meta.macro_v_alt2("INST_FIELDS", _inst_fields)}}
 
 {% macro _inst_serialize(sig) %}
-    friend class boost::serialization::access;
+    friend class ::boost::serialization::access;
+
     template<class Archive>
     void serialize(Archive &ar, [[maybe_unused]] const unsigned int version) {
         {% for T, x in sig.fields %}
@@ -122,12 +124,47 @@
 
 {{meta.macro_0("INST_BODY", _inst_body)}}
 
-{% macro _gen_inst(sig) %}
+#define ENTER_BOOST_SERIALIZATION_NS() namespace boost::serialization {
+#define LEAVE_BOOST_SERIALIZATION_NS() }
+
+{% macro _inst_construct_data(sig) %}
+    ENTER_BOOST_SERIALIZATION_NS()
+    
+    TEMPLATE(typename,Archive)
+    void save_construct_data(Archive& ar, NS_PREFIX() {{sig.name}} NO_SPEC() const *inst, const unsigned int version) {
+        {% for T, x in sig.fields %}
+            {{T}} {{x}}##_inst = inst->{{x}}();
+            save_construct_data(ar, &{{x}}##_inst, version);
+        {% endfor %}
+    }
+
+    TEMPLATE(typename,Archive)
+    void load_construct_data(Archive& ar, NS_PREFIX() {{sig.name}} NO_SPEC() *inst, [[maybe_unused]] const unsigned int version) {
+        {% for T, x in reversed(sig.fields) %}
+            alignas(alignof({{T}})) unsigned char {{x}}##_buf[sizeof({{T}})];
+            {{T}}& {{x}}##_ref = *reinterpret_cast<{{T}}*>(&{{x}}##_buf[0]);
+            ar >> {{x}}##_ref;
+        {% endfor %}
+
+        ::new (static_cast<void*>(inst)) NS_PREFIX() {{sig.name}} NO_SPEC()(
+            {% set comma = joiner(",") %}
+            {% for T, x in sig.fields %}
+                {{comma()}}{{x}}##_ref
+            {% endfor %});
+    }
+    
+    LEAVE_BOOST_SERIALIZATION_NS()
+{% endmacro %}
+
+{{meta.macro_v_alt2("INST_CONSTRUCT_DATA", _inst_construct_data)}}
+
+{% macro _gen_inst() %}
     ENTER_NS()
     INST_NAME() {
         INST_BODY()
     };
     LEAVE_NS()
+    INST_CONSTRUCT_DATA()
 {% endmacro %}
 
-{{meta.macro_v("GEN_INST", _gen_inst)}}
+{{meta.macro_0("GEN_INST", _gen_inst)}}

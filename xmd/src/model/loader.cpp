@@ -1,7 +1,7 @@
 #include "model/loader.h"
 #include <xmd/types/vec3.h>
 #include <xmd/model/native_contact.h>
-#include <xmd/params/param_file.h>
+#include <xmd/params/yaml_fs_node.h>
 #include <xmd/files/pdb.h>
 #include <xmd/files/seq_file.h>
 #include <fstream>
@@ -11,10 +11,10 @@
 
 namespace xmd {
 
-    void model_loader::init_from_vm(vm &vm_inst) {
-        auto& params = vm_inst.find<param_file>("params");
+    void model_loader::declare_vars(context& ctx) {
+        auto& params = ctx.var<yaml_fs_node>("params");
 
-        auto& stored_model = vm_inst.find_or_emplace<model>("model");
+        auto& stored_model = ctx.ephemeral<model>("model");
         if (auto seqfile_node = params["model"]["seqfile"]; seqfile_node) {
             auto seqfile = seq_file(seqfile_node.as<std::string>());
             stored_model = seqfile.to_model();
@@ -26,7 +26,7 @@ namespace xmd {
         }
 
         if (auto saw_node = params["model"]["morph into SAW"]; saw_node) {
-            auto& gen = vm_inst.find<rand_gen>("gen");
+            auto& gen = ctx.var<rand_gen>("gen");
 
             std::optional<true_real> bond_dist;
             if (auto bond_node = saw_node["bond distance"]; bond_node) {
@@ -41,42 +41,46 @@ namespace xmd {
             stored_model.morph_into_saw(gen, bond_dist, res_dens, infer_box);
         }
 
-        auto& num_particles = vm_inst.find_or_emplace<int>(
+        auto& num_particles = ctx.persistent<int>(
             "num_particles", stored_model.residues.size());
 
-        auto& res_map = vm_inst.find_or_emplace<res_map_t>("res_map");
+        auto& res_map = ctx.ephemeral<res_map_t>("res_map");
+        int res_idx = 0;
+        for (auto const& res: stored_model.residues) {
+            res_map[res.get()] = res_idx++;
+        }
 
-        vm_inst.find_or<vector<vec3r>>("r", [&]() -> auto& {
-            auto& r = vm_inst.emplace<vector<vec3r>>("r", num_particles);
-            int res_idx = 0;
+        ctx.persistent<vector<vec3r>>("r", lazy([&]() -> auto {
+            vector<vec3r> r(num_particles);
+
             for (auto const& res: stored_model.residues) {
-                res_map[res.get()] = res_idx;
-                r[res_idx] = res->pos;
-                res_idx++;
+                r[res_map[res.get()]] = res->pos;
             }
-            return r;
-        });
 
-        vm_inst.find_or<vector<amino_acid>>("atype", [&]() -> auto& {
-            auto& atype = vm_inst.emplace<vector<amino_acid>>("atype", num_particles);
+            return r;
+        }));
+
+        ctx.persistent<vector<amino_acid>>("atype", lazy([&]() -> auto {
+            vector<amino_acid> atype(num_particles);
+
             for (auto const& res: stored_model.residues) {
                 atype[res_map[res.get()]] = res->type;
             }
 
             return atype;
-        });
+        }));
 
-        vm_inst.find_or_emplace<vector<real>>("mass", num_particles, (real)1.0);
+        ctx.persistent<vector<real>>("mass", num_particles, (real)1.0);
 
-        vm_inst.find_or<xmd::box>("box", [&]() -> auto& {
-            auto& box = vm_inst.emplace<xmd::box>("box");
+        ctx.persistent<xmd::box>("box", lazy([&]() -> auto {
+            xmd::box box;
             box.cell = stored_model.model_box.cell;
             box.cell_inv = stored_model.model_box.cell_inv;
             return box;
-        });
+        }));
 
-        vm_inst.find_or<vector<nat_cont>>("native_contacts", [&]() -> auto& {
-            auto& nc = vm_inst.emplace<vector<nat_cont>>("native_contacts");
+        ctx.persistent<vector<nat_cont>>("native_contacts", lazy([&]() -> auto {
+            vector<nat_cont> nc;
 
             for (int nc_idx = 0; nc_idx < (int)stored_model.contacts.size(); ++nc_idx) {
                 auto const& xmd_cont = stored_model.contacts[nc_idx];
@@ -90,11 +94,11 @@ namespace xmd {
             });
 
             return nc;
-        });
+        }));
 
-        vm_inst.find_or<vector<int>>("prev", [&]() -> auto& {
-            auto& prev = vm_inst.emplace<vector<int>>("prev",
-                num_particles, -1);
+        ctx.persistent<vector<int>>("prev", lazy([&]() -> auto {
+            vector<int> prev(num_particles, -1);
+
             for (auto const& res: stored_model.residues) {
                 if (res->seq_idx > 0) {
                     auto prev_ptr = res->parent->residues[res->seq_idx-1];
@@ -102,11 +106,10 @@ namespace xmd {
                 }
             }
             return prev;
-        });
+        }));
 
-        vm_inst.find_or<vector<int>>("next", [&]() -> auto& {
-            auto& next = vm_inst.emplace<vector<int>>("next",
-                num_particles, -1);
+        ctx.persistent<vector<int>>("next", lazy([&]() -> auto {
+            vector<int> next(num_particles, -1);
             for (auto const& res: stored_model.residues) {
                 if (res->seq_idx < (int)res->parent->residues.size()-1) {
                     auto next_ptr = res->parent->residues[res->seq_idx+1];
@@ -114,24 +117,22 @@ namespace xmd {
                 }
             }
             return next;
-        });
+        }));
 
-        vm_inst.find_or<vector<int>>("chain_idx", [&]() -> auto& {
-            auto& chain_idx = vm_inst.emplace<vector<int>>("chain_idx",
-                num_particles, -1);
+        ctx.persistent<vector<int>>("chain_idx", lazy([&]() -> auto {
+            vector<int> chain_idx(num_particles, -1);
             for (auto const& res: stored_model.residues) {
                 chain_idx[res_map[res.get()]] = res->parent->chain_idx;
             }
             return chain_idx;
-        });
+        }));
 
-        vm_inst.find_or<vector<int>>("seq_idx", [&]() -> auto& {
-            auto& seq_idx = vm_inst.emplace<vector<int>>("seq_idx",
-                num_particles, -1);
+        ctx.persistent<vector<int>>("seq_idx", lazy([&]() -> auto {
+            vector<int> seq_idx(num_particles, -1);
             for (auto const& res: stored_model.residues) {
                 seq_idx[res_map[res.get()]] = res->seq_idx;
             }
             return seq_idx;
-        });
+        }));
     }
 }

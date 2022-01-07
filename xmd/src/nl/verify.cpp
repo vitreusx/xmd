@@ -23,12 +23,12 @@ namespace xmd::nl {
         }
     }
 
-    void verify::init_from_vm(vm& vm_inst) {
-        r = vm_inst.find<vector<vec3r>>("r").data();
-        data = &vm_inst.find<nl_data>("nl_data");
-        box = &vm_inst.find<xmd::box>("box");
-        invalid = &vm_inst.find_or_emplace<bool>("invalid", true);
-        first_time = &vm_inst.find_or_emplace<bool>("nl_first_time", true);
-        num_particles = vm_inst.find<int>("num_particles");
+    void verify::declare_vars(context& ctx) {
+        r = ctx.var<vector<vec3r>>("r").data();
+        data = &ctx.var<nl_data>("nl_data");
+        box = &ctx.var<xmd::box>("box");
+        invalid = &ctx.ephemeral<bool>("invalid", true);
+        first_time = &ctx.ephemeral<bool>("nl_first_time", true);
+        num_particles = ctx.var<int>("num_particles");
     }
 }

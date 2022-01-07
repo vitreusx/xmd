@@ -2,7 +2,8 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <xmd/params/param_entry.h>
+#include <xmd/params/yaml_fs_node.h>
+
 #include "scalar.h"
 
 namespace xmd {
@@ -40,6 +41,13 @@ namespace xmd {
 
     private:
         aa_code code = ALA;
+
+        friend ::boost::serialization::access;
+
+        template<typename Archive>
+        void serialize(Archive& ar, [[maybe_unused]] const unsigned int version) {
+            ar & code;
+        }
     };
 }
 
@@ -76,12 +84,12 @@ namespace xmd {
         std::unordered_map<amino_acid, aa_data> data;
         aa_data const& operator[](amino_acid const& aa) const;
 
-        friend struct param_value_parser<amino_acid_data>;
+        friend struct yaml_fs_value_parser<amino_acid_data>;
     };
 
     template<>
-    struct param_value_parser<amino_acid_data> {
-        amino_acid_data parse(param_entry const& entry) const;
+    struct yaml_fs_value_parser<amino_acid_data> {
+        static amino_acid_data parse(yaml_fs_node const& root);
     };
 }
 
