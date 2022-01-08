@@ -9,7 +9,7 @@ namespace xmd {
     }
 
     void eval_force_afm_forces::declare_vars(context& ctx) {
-        F = ctx.var<vector<vec3r>>("F").data();
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
 
         afm_tips = ctx.persistent<vector<force_afm_tip>>("force_afm_tips",
             lazy([&]() -> auto {
@@ -32,7 +32,7 @@ namespace xmd {
     }
 
     void eval_force_afm_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < afm_tips.size(); ++idx) {
             iter(idx);
         }

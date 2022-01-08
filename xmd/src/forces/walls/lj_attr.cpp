@@ -16,8 +16,8 @@ namespace xmd {
         cycle_time_inv = 1.0 / cycle_time;
 
         r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.var<vector<vec3r>>("F").data();
-        V = &ctx.var<real>("V");
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
+        V = &ctx.per_thread().var<real>("V");
         box = &ctx.var<xmd::box>("box");
         num_particles = ctx.var<int>("num_particles");
         t = &ctx.var<real>("r");
@@ -102,7 +102,7 @@ namespace xmd {
     }
 
     void eval_lj_attr_wall_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < pairs.size(); ++idx) {
             loop(idx);
         }

@@ -73,8 +73,8 @@ namespace xmd {
         contacts = &ctx.persistent<vector<nat_cont>>(
             "go_contacts");
         r = ctx.var<vector<vec3r>>("r").data();
-        V = &ctx.var<real>("V");
-        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.per_thread().var<real>("V");
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
     }
 
     void eval_go_forces::iter(int idx) const {
@@ -95,7 +95,7 @@ namespace xmd {
     }
 
     void eval_go_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < contacts->size(); ++idx) {
             iter(idx);
         }

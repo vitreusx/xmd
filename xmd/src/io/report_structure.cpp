@@ -44,7 +44,7 @@ namespace xmd {
     }
 
     void report_structure::operator()() const {
-        if (*t - *last_t > period) {
+        if (*t - *last_t >= period) {
             std::stringstream yaml_ss;
 
             csv_file res_csv;

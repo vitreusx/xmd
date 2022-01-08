@@ -60,7 +60,7 @@ namespace xmd {
     }
 
     void eval_cnd_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < dihedrals.size(); ++idx) {
             iter(idx);
         }

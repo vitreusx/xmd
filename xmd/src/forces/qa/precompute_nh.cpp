@@ -33,7 +33,7 @@ namespace xmd::qa {
     }
 
     void precompute_nh::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < num_particles; ++idx) {
             iter(idx);
         }

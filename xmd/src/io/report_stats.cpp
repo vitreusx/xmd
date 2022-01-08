@@ -17,7 +17,7 @@ namespace xmd {
             std::numeric_limits<real>::lowest());
         first_time = &ctx.ephemeral<bool>("stats_first_time", true);
 
-        V = &ctx.var<real>("V");
+        V = &ctx.per_thread().var<real>("V");
         comp_tot_ene_t.declare_vars(ctx);
         comp_asph_t.declare_vars(ctx);
         comp_gyr_t.declare_vars(ctx);

@@ -15,8 +15,12 @@ namespace xmd::nl {
 
         num_particles = ctx.var<int>("num_particles");
 
-        data = &ctx.ephemeral<nl_data>("nl_data");
-        data->orig_r = vector<vec3r>(num_particles);
+        data = &ctx.ephemeral<nl_data>("nl_data",
+            lazy([&]() -> auto {
+                nl_data data_;
+                data_.orig_r = vector<vec3r>(num_particles);
+                return data_;
+            }));
 
         max_cutoff = &ctx.persistent<real>("max_cutoff");
         invalid = &ctx.ephemeral<bool>("invalid", true);

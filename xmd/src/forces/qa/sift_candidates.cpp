@@ -114,7 +114,7 @@ namespace xmd::qa {
     }
 
     void sift_candidates::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < free_pairs->extent(); ++idx) {
             iter(idx);
         }

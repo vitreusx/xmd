@@ -32,7 +32,7 @@ namespace xmd {
             *first_time = false;
         }
 
-        if (*t - *last_t > period) {
+        if (*t - *last_t >= period) {
             auto progress = *t / total_time;
 
             auto now = high_resolution_clock::now();
@@ -59,8 +59,7 @@ namespace xmd {
         auto& params = ctx.var<yaml_fs_node>("params");
         width = ctx.persistent<int>("pbar_width",
             params["progress bar"]["width"].as<int>());
-        total_time = ctx.persistent<real>("total_time",
-            params["general"]["total time"].as<quantity>());
+        total_time = ctx.var<real>("total_time");
         period = ctx.persistent<real>("pbar_period",
             params["progress bar"]["update period"].as<quantity>());
 

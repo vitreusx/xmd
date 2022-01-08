@@ -2,8 +2,8 @@
 #include <xmd/ctx/context.h>
 #include <xmd/model/loader.h>
 #include <xmd/dynamics/reset_vf.h>
-#include <xmd/dynamics/setup_vf_omp.h>
-#include <xmd/dynamics/reduce_vf_omp.h>
+#include <xmd/dynamics/reset_thread_vf.h>
+#include <xmd/dynamics/reduce_vf.h>
 #include <xmd/dynamics/lang_pc.h>
 #include <xmd/forces/all.h>
 #include <xmd/io/show_progress_bar.h>
@@ -23,7 +23,8 @@
 using namespace xmd;
 
 int main(int argc, char **argv) {
-    std::string param_path = "parameters.yml";
+    omp_set_num_threads(2);
+    std::string param_path = "data/examples/defaults.yml";
 
     if (argc > 1) {
         std::string arg1 = argv[1];
@@ -45,179 +46,198 @@ int main(int argc, char **argv) {
             return yaml_fs_node(merged, param_path);
         }));
 
+    def_ctx.ephemeral<real>("total_time",
+        params["general"]["total time"].as<quantity>());
+    def_ctx.ephemeral<amino_acid_data>("amino_acid_data",
+        params["amino acid data"].as<amino_acid_data>());
+    def_ctx.ephemeral<lj_variants>("lj_variants");
     auto& seed = def_ctx.ephemeral<int>("seed",
         params["general"]["seed"].as<int>());
     def_ctx.ephemeral<xmd::rand_gen>("gen", seed);
 
     model_loader().declare_vars(def_ctx);
 
-    auto &t = def_ctx.persistent<real>("t", (real) 0.0);
-    def_ctx.persistent<real>("V", (real) 0.0);
-    def_ctx.ephemeral<amino_acid_data>("amino_acid_data",
-        params["amino acid data"].as<amino_acid_data>());
-    def_ctx.ephemeral<lj_variants>("lj_variants");
-
-    auto &lang_pc_enabled = def_ctx.ephemeral<bool>("lang_pc_enabled",
-        params["langevin"]["enabled"].as<bool>());
-    auto &lang_pc_ = def_ctx.ephemeral<lang_pc_step>("lang_pc");
-
-    auto &reset_vf_ = def_ctx.ephemeral<reset_vf>("reset_vf");
-
-    auto &chir_enabled = def_ctx.ephemeral<bool>("chir_enabled",
-        params["chirality"]["enabled"].as<bool>());
-    auto &eval_chir_ = def_ctx.ephemeral<eval_chiral_forces>("eval_chir");
-
-    auto &tethers_enabled =def_ctx.ephemeral<bool>("tethers_enabled",
-        params["tether forces"]["enabled"].as<bool>());
-    auto &tethers_ = def_ctx.ephemeral<eval_tether_forces>("eval_tether");
-
-    auto &nat_ang_enabled = def_ctx.ephemeral<bool>("nat_ang_enabled",
-        params["native angles"]["enabled"].as<bool>());
-    auto &nat_ang_ = def_ctx.ephemeral<eval_native_angle_forces>(
-        "eval_nat_ang");
-
-    auto &nat_comp_dih_enabled = def_ctx.ephemeral<bool>("nat_comp_dih_enabled",
-        params["complex native dihedrals"]["enabled"].as<bool>());
-    auto &nat_comp_dih_ = def_ctx.ephemeral<eval_cnd_forces>("eval_cnd");
-
-    auto &nat_simp_dih_enabled = def_ctx.ephemeral<bool>("nat_simp_dih_enabled",
-        params["simple native dihedrals"]["enabled"].as<bool>());
-    auto &nat_simp_dih_ = def_ctx.ephemeral<eval_snd_forces>("eval_snd");
-
-    auto &legacy_update_ = def_ctx.ephemeral<nl::legacy_update>("legacy_update");
-    auto &nl_verify_ = def_ctx.ephemeral<nl::verify>("nl_verify");
-    auto &invalid = def_ctx.ephemeral<bool>("invalid", true);
-
-    auto &pauli_enabled = def_ctx.ephemeral<bool>("pauli_enabled",
-        params["Pauli exclusion"]["enabled"].as<bool>());
-    auto &eval_pauli_ = def_ctx.ephemeral<eval_pauli_exclusion_forces>(
-        "eval_pauli");
-    auto &update_pauli_ = def_ctx.ephemeral<update_pauli_pairs>(
-        "update_pauli");
-
-    auto &go_enabled = def_ctx.ephemeral<bool>("go_enabled",
-        params["native contacts"]["enabled"].as<bool>());
-    auto &eval_go_ = def_ctx.ephemeral<eval_go_forces>("eval_go");
-    auto &update_go_ = def_ctx.ephemeral<update_go_contacts>("update_go");
-
-    auto &ss_enabled = def_ctx.ephemeral<bool>("ss_enabled",
-        params["native ssbonds"]["enabled"].as<bool>());
-    auto &eval_ss_ = def_ctx.ephemeral<eval_nat_ssbond_forces>("eval_ss");
-    auto &update_ss_ = def_ctx.ephemeral<update_nat_ssbonds>("update_ss");
-
-    auto &const_es_enabled = def_ctx.ephemeral<bool>("const_es_enabled",
-        params["const ES"]["enabled"].as<bool>());
-    auto &eval_const_es_ = def_ctx.ephemeral<eval_const_es_forces>(
-        "eval_const_es");
-    auto &update_const_es_ = def_ctx.ephemeral<update_const_es>(
-        "update_const_es");
-
-    auto &rel_es_enabled = def_ctx.ephemeral<bool>("rel_es_enabled",
-        params["relative ES"]["enabled"].as<bool>());
-    auto &eval_rel_es_ = def_ctx.ephemeral<eval_relative_es_forces>(
-        "eval_rel_es");
-    auto &update_rel_es_ = def_ctx.ephemeral<update_relative_es>(
-        "update_rel_es");
-
-    auto &qa_enabled = def_ctx.ephemeral<bool>("qa_enabled",
-        params["quasi-adiabatic"]["enabled"].as<bool>());
-    auto &eval_qa_ = def_ctx.ephemeral<qa::eval_qa_forces>("eval_qa");
-    auto &update_qa_ = def_ctx.ephemeral<qa::update_free_pairs>(
-        "update_qa");
-
-    auto &pid_enabled = def_ctx.ephemeral<bool>("pid_enabled",
-        params["pseudo-improper dihedral"]["enabled"].as<bool>());
-    auto &eval_pid_ = def_ctx.ephemeral<pid::eval_pid_forces>("eval_pid");
-    auto &update_pid_ = def_ctx.ephemeral<pid::update_pid_bundles>("update_pid");
-
-    auto &solid_enabled = def_ctx.ephemeral<bool>("solid_enabled",
-        params["solid walls"]["enabled"].as<bool>());
-    auto &eval_solid_ = def_ctx.ephemeral<eval_solid_wall_forces>("eval_solid");
-
-    auto &lj_attr_enabled = def_ctx.ephemeral<bool>("lj_attr_enabled",
-        params["LJ attractive walls"]["enabled"].as<bool>());
-    auto &eval_lj_attr_ = def_ctx.ephemeral<eval_lj_attr_wall_forces>("eval_lj_attr");
-
-    auto &vel_afm_enabled = def_ctx.ephemeral<bool>("vel_afm_enabled",
-        params["velocity AFM"]["enabled"].as<bool>());
-    auto &eval_vel_afm_ = def_ctx.ephemeral<eval_velocity_afm_forces>("eval_vel_afm");
-
-    auto &force_afm_enabled = def_ctx.ephemeral<bool>("force_afm_enabled",
-        params["force AFM"]["enabled"].as<bool>());
-    auto &eval_force_afm_ = def_ctx.ephemeral<eval_force_afm_forces>("eval_force_afm");
-
-    auto &export_pdb_enabled = def_ctx.ephemeral<bool>("export_pdb_enabled",
-        params["export pdb"]["enabled"].as<bool>());
-    auto &export_pdb_ = def_ctx.ephemeral<export_pdb>("export_pdb");
-
-    auto &show_pbar_enabled = def_ctx.ephemeral<bool>("show_pbar_enabled",
-        params["progress bar"]["enabled"].as<bool>());
-    auto &show_pbar_ = def_ctx.ephemeral<show_progress_bar>("show_progress_bar");
-
-    auto &report_stats_enabled = def_ctx.ephemeral<bool>("report_stats_enabled",
-        params["report stats"]["enabled"].as<bool>());
-    auto &report_stats_ = def_ctx.ephemeral<report_stats>("report_stats");
-
-    auto &report_structure_enabled = def_ctx.ephemeral<bool>("report_structure_enabled",
-        params["report structure"]["enabled"].as<bool>());
-    auto &report_structure_ = def_ctx.ephemeral<report_structure>(
-        "report_structure");
-
-    auto& create_checkpoint_enabled = def_ctx.ephemeral<bool>("create_checkpoint_enabled",
-        params["checkpoints"]["enabled"].as<bool>());
-    auto& create_checkpoint_ = def_ctx.ephemeral<create_checkpoint>(
-        "create_checkpoint");
-
-    auto &total_time = def_ctx.ephemeral<real>("total_time",
-        params["general"]["total time"].as<quantity>());
-
-    reset_vf_();
-    nl_verify_();
-
-    if (invalid) {
-        legacy_update_();
-
-        if (pauli_enabled)
-            update_pauli_();
-        if (go_enabled)
-            update_go_();
-        if (ss_enabled)
-            update_ss_();
-        if (const_es_enabled)
-            update_const_es_();
-        if (qa_enabled)
-            update_qa_();
-        if (pid_enabled)
-            update_pid_();
-    }
-
-#pragma omp parallel default(shared) firstprivate(eval_chir_,tethers_,nat_ang_,\
-nat_comp_dih_,eval_pauli_,eval_go_,eval_ss_,eval_const_es_,eval_rel_es_,\
-eval_qa_,eval_solid_,eval_lj_attr_,eval_vel_afm_,eval_force_afm_)
+#pragma omp parallel default(none) shared(def_ctx,params)
     {
-        auto thread_ctx = def_ctx;
-        auto& setup_vf_omp_ = thread_ctx.ephemeral<setup_vf_omp>("setup_vf_omp");
-        auto& reduce_vf_omp_ = thread_ctx.ephemeral<reduce_vf_omp>("reduce_vf_omp");
+        auto lang_pc_enabled = params["langevin"]["enabled"].as<bool>();
+        lang_pc_step lang_pc_;
+        if (lang_pc_enabled)
+            lang_pc_.declare_vars(def_ctx);
 
-        eval_chir_.declare_vars(thread_ctx);
-        tethers_.declare_vars(thread_ctx);
-        nat_ang_.declare_vars(thread_ctx);
-        nat_comp_dih_.declare_vars(thread_ctx);
-        nat_simp_dih_.declare_vars(thread_ctx);
-        eval_pauli_.declare_vars(thread_ctx);
-        eval_go_.declare_vars(thread_ctx);
-        eval_ss_.declare_vars(thread_ctx);
-        eval_const_es_.declare_vars(thread_ctx);
-        eval_rel_es_.declare_vars(thread_ctx);
-        eval_qa_.declare_vars(thread_ctx);
-        eval_solid_.declare_vars(thread_ctx);
-        eval_lj_attr_.declare_vars(thread_ctx);
-        eval_vel_afm_.declare_vars(thread_ctx);
-        eval_force_afm_.declare_vars(thread_ctx);
+        reset_vf reset_vf_;
+        reset_vf_.declare_vars(def_ctx);
+
+        reset_thread_vf reset_thread_vf_;
+        reset_thread_vf_.declare_vars(def_ctx);
+
+        reduce_vf reduce_vf_omp_;
+        reduce_vf_omp_.declare_vars(def_ctx);
+
+        auto export_pdb_enabled = params["export pdb"]["enabled"].as<bool>();
+        export_pdb export_pdb_;
+        if (export_pdb_enabled)
+            export_pdb_.declare_vars(def_ctx);
+
+        auto show_pbar_enabled = params["progress bar"]["enabled"].as<bool>();
+        show_progress_bar show_pbar_;
+        if (show_pbar_enabled)
+            show_pbar_.declare_vars(def_ctx);
+
+        auto report_stats_enabled = params["report stats"]["enabled"].as<bool>();
+        report_stats report_stats_;
+        if (report_stats_enabled)
+            report_stats_.declare_vars(def_ctx);
+
+        auto report_structure_enabled = params["report structure"]["enabled"].as<bool>();
+        report_structure report_structure_;
+        if (report_structure_enabled)
+            report_structure_.declare_vars(def_ctx);
+
+        auto chir_enabled = params["chirality"]["enabled"].as<bool>();
+        eval_chiral_forces eval_chir_;
+        if (chir_enabled)
+            eval_chir_.declare_vars(def_ctx);
+
+        auto tethers_enabled = params["tether forces"]["enabled"].as<bool>();
+        eval_tether_forces tethers_;
+        if (tethers_enabled)
+            tethers_.declare_vars(def_ctx);
+
+        auto nat_ang_enabled = params["native angles"]["enabled"].as<bool>();
+        eval_native_angle_forces nat_ang_;
+        if (nat_ang_enabled)
+            nat_ang_.declare_vars(def_ctx);
+
+        auto nat_comp_dih_enabled = params["complex native dihedrals"]["enabled"].as<bool>();
+        eval_cnd_forces nat_comp_dih_;
+        if (nat_comp_dih_enabled)
+            nat_comp_dih_.declare_vars(def_ctx);
+
+        auto nat_simp_dih_enabled = params["simple native dihedrals"]["enabled"].as<bool>();
+        eval_snd_forces nat_simp_dih_;
+        if (nat_simp_dih_enabled)
+            nat_simp_dih_.declare_vars(def_ctx);
+
+        nl::legacy_update legacy_update_;
+        legacy_update_.declare_vars(def_ctx);
+        nl::verify nl_verify_;
+        nl_verify_.declare_vars(def_ctx);
+
+        auto pauli_enabled = params["Pauli exclusion"]["enabled"].as<bool>();
+        eval_pauli_exclusion_forces eval_pauli_;
+        update_pauli_pairs update_pauli_;
+        if (pauli_enabled) {
+            eval_pauli_.declare_vars(def_ctx);
+            update_pauli_.declare_vars(def_ctx);
+        }
+
+        auto go_enabled = params["native contacts"]["enabled"].as<bool>();
+        eval_go_forces eval_go_;
+        update_go_contacts update_go_;
+        if (go_enabled) {
+            eval_go_.declare_vars(def_ctx);
+            update_go_.declare_vars(def_ctx);
+        }
+
+        auto ss_enabled = params["native ssbonds"]["enabled"].as<bool>();
+        eval_nat_ssbond_forces eval_ss_;
+        update_nat_ssbonds update_ss_;
+        if (ss_enabled) {
+            eval_ss_.declare_vars(def_ctx);
+            update_ss_.declare_vars(def_ctx);
+        }
+
+        auto const_es_enabled = params["const ES"]["enabled"].as<bool>();
+        eval_const_es_forces eval_const_es_;
+        update_const_es update_const_es_;
+        if (const_es_enabled) {
+            eval_const_es_.declare_vars(def_ctx);
+            update_const_es_.declare_vars(def_ctx);
+        }
+
+        auto rel_es_enabled = params["relative ES"]["enabled"].as<bool>();
+        eval_relative_es_forces eval_rel_es_;
+        update_relative_es update_rel_es_;
+        if (rel_es_enabled) {
+            eval_rel_es_.declare_vars(def_ctx);
+            update_rel_es_.declare_vars(def_ctx);
+        }
+
+        auto qa_enabled = params["quasi-adiabatic"]["enabled"].as<bool>();
+        qa::eval_qa_forces eval_qa_;
+        qa::update_free_pairs update_qa_;
+        if (qa_enabled) {
+            eval_qa_.declare_vars(def_ctx);
+            update_qa_.declare_vars(def_ctx);
+        }
+
+        auto pid_enabled = params["pseudo-improper dihedral"]["enabled"].as<bool>();
+        pid::eval_pid_forces eval_pid_;
+        pid::update_pid_bundles update_pid_;
+        if (pid_enabled) {
+            eval_pid_.declare_vars(def_ctx);
+            update_pid_.declare_vars(def_ctx);
+        }
+
+        auto solid_enabled = params["solid walls"]["enabled"].as<bool>();
+        eval_solid_wall_forces eval_solid_;
+        if (solid_enabled)
+            eval_solid_.declare_vars(def_ctx);
+
+        auto lj_attr_enabled = params["LJ attractive walls"]["enabled"].as<bool>();
+        eval_lj_attr_wall_forces eval_lj_attr_;
+        if (lj_attr_enabled)
+            eval_lj_attr_.declare_vars(def_ctx);
+
+        auto vel_afm_enabled = params["velocity AFM"]["enabled"].as<bool>();
+        eval_velocity_afm_forces eval_vel_afm_;
+        if (vel_afm_enabled)
+            eval_vel_afm_.declare_vars(def_ctx);
+
+        auto force_afm_enabled = params["force AFM"]["enabled"].as<bool>();
+        eval_force_afm_forces eval_force_afm_;
+        if (force_afm_enabled)
+            eval_force_afm_.declare_vars(def_ctx);
+
+        auto create_checkpoint_enabled = params["checkpoints"]["enabled"].as<bool>();
+        create_checkpoint create_checkpoint_;
+        if (create_checkpoint_enabled)
+            create_checkpoint_.declare_vars(def_ctx);
+
+        auto& t = def_ctx.var<real>("t");
+        auto &total_time = def_ctx.persistent<real>("total_time",
+            params["general"]["total time"].as<quantity>());
+        auto& invalid = def_ctx.var<bool>("invalid");
+
+#pragma omp barrier
+
+#pragma omp single
+        {
+            reset_vf_();
+            nl_verify_();
+
+            if (invalid) {
+                legacy_update_();
+
+                if (pauli_enabled)
+                    update_pauli_();
+                if (go_enabled)
+                    update_go_();
+                if (ss_enabled)
+                    update_ss_();
+                if (const_es_enabled)
+                    update_const_es_();
+                if (qa_enabled)
+                    update_qa_();
+                if (pid_enabled)
+                    update_pid_();
+            }
+        };
+
+#pragma omp barrier
 
         while (t < total_time) {
-            reset_vf_.omp_async();
-            setup_vf_omp_();
+            reset_thread_vf_();
 
             if (chir_enabled)
                 eval_chir_.omp_async();
@@ -304,7 +324,7 @@ eval_qa_,eval_solid_,eval_lj_attr_,eval_vel_afm_,eval_force_afm_)
 
 #pragma omp barrier
         }
-    };
+    }
 
     return EXIT_SUCCESS;
 }

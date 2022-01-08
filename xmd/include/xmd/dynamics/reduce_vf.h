@@ -3,10 +3,10 @@
 #include <xmd/ctx/context.h>
 
 namespace xmd {
-    class reduce_vf_omp: public ctx_aware {
+    class reduce_vf: public ctx_aware {
     public:
-        array<vec3r> shared_F, thread_F;
-        real *shared_V, *thread_V;
+        array<vec3r> F, thread_F;
+        real *V, *thread_V;
         int num_particles;
 
         void declare_vars(context& ctx) override;

@@ -16,8 +16,8 @@ namespace xmd {
             params["native angles"]["k"].as<quantity>());
 
         r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.var<vector<vec3r>>("F").data();
-        V = &ctx.var<real>("V");
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
+        V = &ctx.per_thread().var<real>("V");
 
         angles = ctx.persistent<vector<nat_ang>>("native_angles",
             lazy([&]() -> auto {
@@ -70,7 +70,7 @@ namespace xmd {
     }
 
     void eval_native_angle_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < angles.size(); ++idx) {
             iter(idx);
         }

@@ -58,8 +58,8 @@ namespace xmd {
         }
 
         r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.var<vector<vec3r>>("F").data();
-        V = &ctx.var<real>("V");
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
+        V = &ctx.per_thread().var<real>("V");
 
         dihedrals = ctx.persistent<vector<heur_dih>>("heurestic_dihedrals",
             lazy([&]() -> auto {
@@ -129,7 +129,7 @@ namespace xmd {
     }
 
     void eval_heurestic_dihedral_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < dihedrals.size(); ++idx) {
             iter(idx);
         }

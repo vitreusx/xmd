@@ -5,7 +5,9 @@
 #include <filesystem>
 #include <sstream>
 #include <stdexcept>
-#include "xmd/utils/serialization.h"
+#include <mutex>
+#include <xmd/utils/serialization.h>
+#include <thread>
 
 namespace xmd {
     class context;
@@ -141,6 +143,8 @@ namespace xmd {
 
         template<typename T>
         T& var(std::string const& name) {
+            std::lock_guard guard(access_mut);
+            
             if (auto eph_iter = eph_vars.find(name); eph_iter != eph_vars.end()) {
                 auto &eph_var = eph_iter->second;
                 return eph_var.value<T>();
@@ -156,10 +160,13 @@ namespace xmd {
 
         template<typename T, typename... Args>
         T& ephemeral(std::string const& name, Args&&... args) {
+            std::lock_guard guard(access_mut);
+
             if (auto iter = eph_vars.find(name); iter != eph_vars.end()) {
-                std::string msg = "Variable \"" + name + "\" already exists";
-                throw std::runtime_error(msg);
-            } else {
+                auto &eph_var = iter->second;
+                return eph_var.value<T>();
+            }
+            else {
                 auto& eph_var = eph_vars[name];
                 eph_var.set<T, Args...>(std::forward<Args>(args)...);
 
@@ -174,16 +181,13 @@ namespace xmd {
 
         template<typename T, typename... Args>
         T& persistent(std::string const& name, Args&&... args) {
+            std::lock_guard guard(access_mut);
+
             if (auto iter = per_vars.find(name); iter != per_vars.end()) {
                 auto &per_var = iter->second;
-                if (per_var.has_value()) {
-                    std::string msg = "Persistent variable \"" + name + "\" has value at assignment, whereas it should either not exist or only require restoration.";
-                    throw std::runtime_error(msg);
-                }
-                else {
+                if (!per_var.has_value())
                     per_var.restore_as<T>();
-                    return per_var.value<T>();
-                }
+                return per_var.value<T>();
             }
             else {
                 auto& per_var = per_vars[name];
@@ -199,9 +203,13 @@ namespace xmd {
             }
         }
 
+        context& per_thread();
+
     private:
+        std::recursive_mutex access_mut;
         std::unordered_map<std::string, ephemeral_var> eph_vars;
         std::unordered_map<std::string, persistent_var> per_vars;
+        std::unordered_map<std::thread::id, std::unique_ptr<context>> thread_contexts;
 
         friend class ::boost::serialization::access;
 

@@ -66,7 +66,7 @@ namespace xmd {
         box = &ctx.var<xmd::box>("box");
         ssbonds = &ctx.persistent<vector<nat_ss>>("ssbonds");
         r = ctx.var<vector<vec3r>>("r").data();
-        V = &ctx.var<real>("V");
+        V = &ctx.per_thread().var<real>("V");
     }
 
     void eval_nat_ssbond_forces::iter(int idx) const {
@@ -86,7 +86,7 @@ namespace xmd {
     }
 
     void eval_nat_ssbond_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < ssbonds->size(); ++idx) {
             iter(idx);
         }

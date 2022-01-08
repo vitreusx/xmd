@@ -3,8 +3,8 @@
 #include <xmd/ctx/context.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/model.h>
-#include <xmd/model/loader.h>
 #include <xmd/forces/qa/qa.h>
+#include <xmd/model/loader.h>
 
 namespace xmd {
     class report_structure: public ctx_aware {

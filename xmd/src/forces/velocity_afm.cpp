@@ -17,7 +17,7 @@ namespace xmd {
             params["velocity AFM"]["H2"].as<quantity>());
 
         r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.var<vector<vec3r>>("F").data();
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
         t = &ctx.var<real>("t");
 
         afm_tips = ctx.persistent<vector<vel_afm_tip>>("vel_afm_tips",
@@ -50,7 +50,7 @@ namespace xmd {
     }
 
     void eval_velocity_afm_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < afm_tips.size(); ++idx) {
             iter(idx);
         }

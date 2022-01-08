@@ -27,7 +27,7 @@ namespace xmd::nl {
         r = ctx.var<vector<vec3r>>("r").data();
         data = &ctx.var<nl_data>("nl_data");
         box = &ctx.var<xmd::box>("box");
-        invalid = &ctx.ephemeral<bool>("invalid", true);
+        invalid = &ctx.var<bool>("invalid");
         first_time = &ctx.ephemeral<bool>("nl_first_time", true);
         num_particles = ctx.var<int>("num_particles");
     }

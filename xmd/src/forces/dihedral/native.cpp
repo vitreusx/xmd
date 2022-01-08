@@ -3,8 +3,8 @@
 namespace xmd {
     void eval_native_dihedral_forces_base::declare_vars(context& ctx) {
         r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.var<vector<vec3r>>("F").data();
-        V = &ctx.var<real>("V");
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
+        V = &ctx.per_thread().var<real>("V");
 
         dihedrals = ctx.persistent<vector<nat_dih>>("native_dihedrals",
             lazy([&]() -> auto {

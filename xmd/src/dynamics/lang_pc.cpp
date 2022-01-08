@@ -55,7 +55,8 @@ namespace xmd {
         mass = ctx.var<vector<real>>("mass").data();
         gen = &ctx.var<rand_gen>("gen");
 
-        F = ctx.persistent<vector<vec3r>>("F",
+        ctx.ephemeral<real>("V", 0.0);
+        F = ctx.ephemeral<vector<vec3r>>("F",
             num_particles).data();
         t = &ctx.persistent<real>("t", (real)0.0);
         mass_inv = ctx.persistent<vector<real>>("mass_inv", lazy([&]() -> auto {

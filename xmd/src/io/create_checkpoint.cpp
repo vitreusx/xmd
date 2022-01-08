@@ -2,12 +2,13 @@
 #include "params/yaml_fs_node.h"
 #include "utils/text.h"
 #include <fstream>
+#include <xmd/utils/units.h>
 
 namespace xmd {
     void create_checkpoint::declare_vars(context &ctx) {
         auto& params = ctx.var<yaml_fs_node>("params");
         period = ctx.persistent<real>("checkpoint_period",
-            params["checkpoints"]["exec period"].as<real>());
+            params["checkpoints"]["exec period"].as<quantity>());
         path_fmt = ctx.persistent<std::string>("path_fmt",
             params["checkpoints"]["path format"].as<std::string>());
 
@@ -18,7 +19,7 @@ namespace xmd {
     }
 
     void create_checkpoint::operator()() const {
-        if (*t - *last_t > period) {
+        if (*t - *last_t >= period) {
             using namespace std::filesystem;
             path fpath = format(path_fmt.c_str(), *t);
             create_directory(fpath.parent_path());

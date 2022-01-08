@@ -49,11 +49,11 @@ namespace xmd::pid {
         conf_.ss_lam.alpha() = ss_params["alpha"].as<quantity>();
 
         r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.var<vector<vec3r>>("F").data();
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
         box = &ctx.var<xmd::box>("box");
         bundles = &ctx.persistent<vector<pid_bundle>>(
             "pid_bundles");
-        V = &ctx.var<real>("V");
+        V = &ctx.per_thread().var<real>("V");
         prev = ctx.var<vector<int>>("prev").data();
         next = ctx.var<vector<int>>("next").data();
     }
@@ -188,7 +188,7 @@ namespace xmd::pid {
     }
 
     void eval_pid_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < bundles->size(); ++idx) {
             iter(idx);
         }

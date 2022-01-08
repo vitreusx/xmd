@@ -27,8 +27,8 @@ namespace xmd::qa {
         sync = ctx.var<vector<sync_data>>("sync").data();
         contacts = &ctx.var<set<contact>>("qa_contacts");
         box = &ctx.var<xmd::box>("box");
-        V = &ctx.var<real>("V");
-        F = ctx.var<vector<vec3r>>("F").data();
+        V = &ctx.per_thread().var<real>("V");
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
         r = ctx.var<vector<vec3r>>("r").data();
         free_pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
     }
@@ -80,7 +80,7 @@ namespace xmd::qa {
     }
 
     void process_contacts::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < contacts->extent(); ++idx) {
             iter(idx);
         }

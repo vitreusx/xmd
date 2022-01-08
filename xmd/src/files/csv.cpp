@@ -162,7 +162,8 @@ namespace xmd {
     csv_file yaml_fs_value_parser<csv_file>::parse(
         const yaml_fs_node &node) {
 
-        if (auto from_file = node["from file"]; from_file) {
+        if (node.IsMap()) {
+            auto from_file = node["from file"];
             auto path = node.resolve(from_file.as<std::string>());
             return csv_file(std::ifstream(path));
         }

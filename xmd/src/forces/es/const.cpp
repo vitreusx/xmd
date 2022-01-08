@@ -23,8 +23,8 @@ namespace xmd {
         screen_dist_inv = (real)1.0 / screening_dist;
 
         r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.var<vector<vec3r>>("F").data();
-        V = &ctx.var<real>("V");
+        F = ctx.per_thread().var<vector<vec3r>>("F").data();
+        V = &ctx.per_thread().var<real>("V");
         box = &ctx.var<xmd::box>("box");
         es_pairs = &ctx.persistent<vector<es_pair>>("es_pairs");
     }
@@ -51,7 +51,7 @@ namespace xmd {
     }
 
     void eval_const_es_forces::omp_async() const {
-#pragma omp for nowait schedule(dynamic, 512)
+#pragma omp for schedule(static) nowait
         for (int idx = 0; idx < es_pairs->size(); ++idx) {
             iter(idx);
         }
@@ -60,10 +60,7 @@ namespace xmd {
     void update_const_es::declare_vars(context& ctx) {
         update_es_base::declare_vars(ctx);
 
-        auto& params = ctx.var<yaml_fs_node>("params");
-        auto const& const_es_params = params["const ES"];
-        auto screening_dist = ctx.persistent<real>("screening_dist",
-            const_es_params["screening distance"].as<quantity>());
+        auto screening_dist = ctx.var<real>("screening_dist");
         cutoff = 2.0 * screening_dist;
 
         auto& max_cutoff = ctx.var<real>("max_cutoff");
