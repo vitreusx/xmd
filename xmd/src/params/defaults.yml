@@ -370,7 +370,7 @@ lj force variants:
         TYR,0,8.60035,9.27035,8.25576,8.01558,8.35846,8.38777,8.5783,8.77521,9.01661,8.96106,9.34604,9.03734,9.47761,9.28102,9.38343,9.56181,9.50922,9.34099,10.0829
         TRP,0,8.73009,9.58092,8.94558,8.6489,8.753,9.22171,9.13956,9.57259,9.78508,9.10847,9.10307,9.20968,9.47919,10.0219,9.65746,10.168,9.82199,10.0829,10.8456
 
-pseudo-improper dihedral:
+pseudo-improper dihedral potential:
   enabled: false
   lambda version: cosine
   bb+:
@@ -387,9 +387,9 @@ pseudo-improper dihedral:
     alpha: 1.2 1/rad
     psi_0: -0.23 rad
 
-quasi-adiabatic:
+quasi-adiabatic potential:
   enabled: true
-  (de)saturation time: 10 tau
+  phase duration: 10 tau
   breaking factor: 1.5
   min |cos(h, r)|: 0.92
   min |cos(h, h)| for bb: 0.75
@@ -402,7 +402,7 @@ chirality:
 native contacts:
   enabled: true
   lj depth: 1 eps
-  active threshold factor: 1.5
+  active threshold: 1.5
 
 native ssbonds:
   enabled: true
@@ -418,7 +418,7 @@ tether forces:
   enabled: true
   H1: 100 eps/A**2
   H2: 0 eps/A**2
-  def_length: 3.8 A
+  default bond length: 3.8 A
 
 export pdb:
   enabled: true
@@ -450,7 +450,7 @@ LJ attractive walls:
   enabled: false
   wall min dist: 5.0 A
   breaking factor: 1.5
-  cycle time: 10 tau
+  phase duration: 10 tau
   planes: []
 
 velocity AFM:

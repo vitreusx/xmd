@@ -2,10 +2,14 @@
 #include "lj.h"
 #include "sink_lj.h"
 #include <xmd/ctx/context.h>
+#include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {
-    class lj_variants: public ctx_aware {
+    class lj_variants {
     public:
+        lj_variants() = default;
+        explicit lj_variants(yaml_fs_node const& p);
+
         lj bb, bs, sb;
         const_span<sink_lj> ss;
 
@@ -17,7 +21,5 @@ namespace xmd {
             default: return ss[idx-3];
             };
         }
-
-        void declare_vars(context& ctx) override;
     };
 }

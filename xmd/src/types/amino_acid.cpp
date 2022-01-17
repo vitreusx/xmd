@@ -65,16 +65,12 @@ namespace xmd {
         return all_aminoacids;
     }
 
-    amino_acid_data yaml_fs_value_parser<amino_acid_data>::parse(
-        const yaml_fs_node &root) {
-
-        auto source = root;
-        if (auto from_file_tag = root["from file"]; from_file_tag) {
-            auto path = root.resolve(from_file_tag.as<std::string>());
+    amino_acid_data::amino_acid_data(const yaml_fs_node &p) {
+        auto source = p;
+        if (auto from_file_tag = p["from file"]; from_file_tag) {
+            auto path = p.resolve(from_file_tag.as<std::string>());
             source = yaml_fs_node(path);
         }
-
-        amino_acid_data parsed;
 
         std::unordered_map<std::string, true_real> def_atom_radii;
         auto def_atom_radii_node = source["default atom radii"];
@@ -89,7 +85,7 @@ namespace xmd {
             auto name = entry.first.as<std::string>();
             auto data_node = entry.second;
 
-            aa_data& res_data = parsed.data[amino_acid(name)];
+            aa_data& res_data = data[amino_acid(name)];
             res_data.mass = quantity(data_node["mass"].as<std::string>(), amu);
             res_data.radius = quantity(data_node["radius"].as<std::string>(), angstrom);
 
@@ -168,8 +164,6 @@ namespace xmd {
         for (auto& [name, res_data]: parsed.data) {
             res_data.mass = (res_data.mass / avg_res_mass) * f77mass;
         }
-
-        return parsed;
     }
 
     aa_data const &amino_acid_data::operator[](const amino_acid &aa) const {

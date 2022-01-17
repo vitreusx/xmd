@@ -81,15 +81,10 @@ namespace xmd {
 
     class amino_acid_data {
     public:
+        amino_acid_data() = default;
+        explicit amino_acid_data(yaml_fs_node const& p);
         std::unordered_map<amino_acid, aa_data> data;
         aa_data const& operator[](amino_acid const& aa) const;
-
-        friend struct yaml_fs_value_parser<amino_acid_data>;
-    };
-
-    template<>
-    struct yaml_fs_value_parser<amino_acid_data> {
-        static amino_acid_data parse(yaml_fs_node const& root);
     };
 }
 

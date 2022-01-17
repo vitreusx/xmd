@@ -5,10 +5,7 @@
 #include <xmd/files/csv.h>
 
 namespace xmd {
-    void lj_variants::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        auto const& lj_params = params["lj force variants"];
-
+    lj_variants::lj_variants(const yaml_fs_node &lj_params) {
         bb.r_min() = lj_params["bb"]["r_min"].as<quantity>();
         bb.depth() = lj_params["bb"]["depth"].as<quantity>();
 
