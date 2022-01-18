@@ -18,6 +18,7 @@ namespace xmd::nl {
         real const *max_cutoff, *t;
         bool *invalid;
         const_array<int> chain_idx, seq_idx;
+        const_span<nl_pair> all_nat_cont, all_nat_ss;
 
         void declare_vars(context& ctx) override;
 

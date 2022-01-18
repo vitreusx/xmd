@@ -7,7 +7,7 @@
 namespace xmd::nl {
     class nl_data {
     public:
-        vector<nl_pair> particle_pairs;
+        vector<nl_pair> native_contacts, native_ssbonds, non_native;
         real orig_pad, ref_t;
         box orig_box;
         vector<vec3r> orig_r;

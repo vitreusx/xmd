@@ -32,24 +32,31 @@ target_compile_options(${TARGET_NAME}
     $<$<CONFIG:Release>:$<$<COMPILE_LANGUAGE:CXX>:-g;-O2;-march=native>>
     $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Wpedantic>)
 
-add_subdirectory(ext/eigen-3.4.0)
+list(APPEND CMAKE_MODULE_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/cmake"
+    "${CMAKE_CURRENT_LIST_DIR}/ext/eigen-3.4.0/cmake"
+    "${CMAKE_CURRENT_LIST_DIR}/ext/yaml-cpp-0.7.0")
+
+set(YAML_CPP_BUILD_TESTS OFF)
+set(YAML_CPP_BUILD_TOOLS OFF)
+set(YAML_CPP_CLANG_FORMAT_EXE OFF)
+
+find_package(Eigen3 3.4)
 add_subdirectory(ext/yaml-cpp-0.7.0)
 find_package(OpenMP REQUIRED)
 add_subdirectory(ext/cparse)
 add_subdirectory(ext/gentypes)
-find_package(Boost REQUIRED COMPONENTS serialization)
+find_package(Boost REQUIRED COMPONENTS serialization program_options)
 
 target_link_libraries(${TARGET_NAME}
     PUBLIC Eigen3::Eigen yaml-cpp cparse OpenMP::OpenMP_CXX
-    gentypes Boost::serialization)
+    gentypes Boost::serialization Boost::program_options)
 
 add_custom_command(
     TARGET ${TARGET_NAME}
     POST_BUILD
     COMMAND /usr/bin/zsh ${PROJECT_SOURCE_DIR}/scripts/gen_asm.zsh
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 add_subdirectory(docs)
 

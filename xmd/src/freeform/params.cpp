@@ -32,7 +32,9 @@ namespace xmd {
 
     model_params::morph_into_saw_params::morph_into_saw_params(
         const yaml_fs_node &p) {
-        bond_distance = p["bond distance"].as<quantity>();
+        if (auto bond_dist_p = p["bond distance"]; bond_dist_p) {
+            bond_distance = bond_dist_p.as<quantity>();
+        }
         residue_density = p["residue density"].as<quantity>();
         infer_box = p["infer box"].as<bool>();
     }
@@ -195,7 +197,7 @@ namespace xmd {
 
     export_pdb_params::export_pdb_params(const yaml_fs_node &p) {
         enabled = p["enabled"].as<bool>();
-        path = p["path"].as<std::string>();
+        path = p.resolve(p["path"].as<std::string>());
         exec_period = p["exec period"].as<quantity>();
     }
 
@@ -207,12 +209,13 @@ namespace xmd {
 
     report_stats_params::report_stats_params(const yaml_fs_node &p) {
         enabled = p["enabled"].as<bool>();
-        path = p["path"].as<std::string>();
+        path = p.resolve(p["path"].as<std::string>());
         exec_period = p["exec period"].as<quantity>();
     }
 
     report_structure_params::report_structure_params(const yaml_fs_node &p) {
         enabled = p["enabled"].as<bool>();
+        root = p.resolve(p["root"].as<std::string>());
         path_fmt = p["path format"].as<std::string>();
         exec_period = p["exec period"].as<quantity>();
     }
@@ -269,6 +272,7 @@ namespace xmd {
     checkpoints_params::checkpoints_params(const yaml_fs_node &p) {
         enabled = p["enabled"].as<bool>();
         exec_period = p["exec period"].as<quantity>();
+        root = p.resolve(p["root"].as<std::string>());
         path_fmt = p["path format"].as<std::string>();
     }
 

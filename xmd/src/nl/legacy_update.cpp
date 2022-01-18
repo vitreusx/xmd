@@ -30,7 +30,12 @@ namespace xmd::nl {
         auto pad = pad_factor * *max_cutoff;
         auto req_r = *max_cutoff + pad;
 
-        data->particle_pairs.clear();
+        data->native_contacts.clear();
+        data->native_ssbonds.clear();
+        data->non_native.clear();
+
+        int nat_cont_idx = 0, nat_ss_idx = 0;
+
         for (int i1 = 0; i1 < num_particles; ++i1) {
             auto r1 = r[i1];
             auto chain1 = chain_idx[i1], seq1 = seq_idx[i1];
@@ -43,8 +48,39 @@ namespace xmd::nl {
                 if (chain1 == chain2 && diff < 3)
                     continue;
 
-                if (norm(box->r_uv(r1, r2)) < req_r)
-                    data->particle_pairs.emplace_back(i1, i2, false);
+                auto orig_dist = norm(box->r_uv(r1, r2));
+                if (orig_dist < req_r) {
+                    bool non_native = true;
+                    auto p = nl_pair(i1, i2, orig_dist);
+
+                    while (nat_cont_idx < all_nat_cont.size()) {
+                        auto cur_nat_cont = all_nat_cont[nat_cont_idx];
+
+                        if (cur_nat_cont == p) {
+                            data->native_contacts.push_back(p);
+                            non_native = false;
+                        }
+
+                        if (cur_nat_cont >= p)
+                            break;
+                    }
+
+                    while (nat_ss_idx < all_nat_ss.size()) {
+                        auto cur_nat_ss = all_nat_ss[nat_ss_idx];
+
+                        if (cur_nat_ss == p) {
+                            data->native_ssbonds.push_back(p);
+                            non_native = false;
+                        }
+
+                        if (cur_nat_ss >= p)
+                            break;
+                    }
+
+                    if (non_native) {
+                        data->native_contacts.push_back(p);
+                    }
+                }
             }
         }
 

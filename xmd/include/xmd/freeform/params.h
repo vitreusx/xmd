@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <xmd/utils/geometry.h>
 #include <xmd/forces/primitives/lj_variants.h>
+#include <filesystem>
 
 namespace xmd {
     struct general_params {
@@ -42,7 +43,8 @@ namespace xmd {
             morph_into_saw_params() = default;
             explicit morph_into_saw_params(yaml_fs_node const &p);
 
-            real bond_distance, residue_density;
+            std::optional<real> bond_distance;
+            real residue_density;
             bool infer_box;
         };
 
@@ -93,7 +95,6 @@ namespace std {
 }
 
 namespace xmd {
-
     struct heurestic_angles_params {
         heurestic_angles_params() = default;
         explicit heurestic_angles_params(yaml_fs_node const& p);
@@ -220,7 +221,7 @@ namespace xmd {
         export_pdb_params() = default;
         explicit export_pdb_params(yaml_fs_node const& p);
         bool enabled;
-        std::string path;
+        std::filesystem::path path;
         real exec_period;
     };
 
@@ -236,7 +237,7 @@ namespace xmd {
         report_stats_params() = default;
         explicit report_stats_params(yaml_fs_node const& p);
         bool enabled;
-        std::string path;
+        std::filesystem::path path;
         real exec_period;
     };
 
@@ -244,6 +245,7 @@ namespace xmd {
         report_structure_params() = default;
         explicit report_structure_params(yaml_fs_node const& p);
         bool enabled;
+        std::filesystem::path root;
         std::string path_fmt;
         real exec_period;
     };
@@ -295,6 +297,7 @@ namespace xmd {
         explicit checkpoints_params(yaml_fs_node const& p);
         bool enabled;
         real exec_period;
+        std::filesystem::path root;
         std::string path_fmt;
     };
 
