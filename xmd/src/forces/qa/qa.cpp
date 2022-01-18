@@ -8,19 +8,7 @@ namespace xmd::qa {
 
         ctx.persistent<vector<sync_data>>("sync", lazy([&]() -> auto {
             auto num_particles = ctx.var<int>("num_particles");
-            vector<sync_data> sync_vec_(num_particles);
 
-            auto& aa_data_ = ctx.var<amino_acid_data>(
-                "amino_acid_data");
-            auto& atype = ctx.var<vector<amino_acid>>("atype");
-
-            for (int idx = 0; idx < num_particles; ++idx) {
-                auto const& lim = aa_data_[atype[idx]].limits;
-                sync_vec_.emplace_back((int8_t)lim.back, (int8_t)lim.side_all,
-                    (int8_t)lim.side_polar, (int8_t)lim.side_hydrophobic);
-            }
-
-            return sync_vec_;
         }));
 
         precompute_nh_t.declare_vars(ctx);

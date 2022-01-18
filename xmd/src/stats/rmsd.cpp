@@ -4,17 +4,6 @@
 #include <Eigen/SVD>
 
 namespace xmd {
-    void compute_rmsd::declare_vars(context& ctx) {
-        rmsd = &ctx.var<real>("rmsd");
-        r = ctx.var<vector<vec3r>>("r").data();
-        ref_r = ctx.persistent<vector<vec3r>>("rmsd_ref_r").data();
-        num_particles = ctx.var<int>("num_particles");
-
-        for (int idx = 0; idx < num_particles; ++idx) {
-            ref_r[idx] = r[idx];
-        }
-    }
-
     void compute_rmsd::operator()() const {
         using matrix_t = Eigen::Matrix<real, Eigen::Dynamic, 3>;
         matrix_t P = matrix_t::Zero(num_particles, 3);

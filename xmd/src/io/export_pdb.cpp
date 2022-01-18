@@ -29,20 +29,4 @@ namespace xmd {
             *last_t = *t;
         }
     }
-
-    void export_pdb::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        out_file_path = ctx.persistent<std::filesystem::path>(
-            "export_pdb_path", params["export pdb"]["path"].as<std::string>());
-        period = ctx.persistent<real>("export_pdb_period",
-            params["export pdb"]["exec period"].as<quantity>());
-
-        true_r = ctx.var<vector<vec3tr>>("true_r").data();
-        ref_model = &ctx.var<xmd::model>("model");
-        res_map = &ctx.var<res_map_t>("res_map");
-        serial = &ctx.persistent<int>("serial", 1);
-        last_t = &ctx.ephemeral<real>("export_pdb_last_t",
-            std::numeric_limits<real>::lowest());
-        t = &ctx.var<real>("t");
-    };
 }

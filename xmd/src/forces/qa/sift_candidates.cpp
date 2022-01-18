@@ -12,43 +12,6 @@ namespace xmd::qa {
         }
     }
 
-    void sift_candidates::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        auto const& sift_params = params["quasi-adiabatic"];
-
-        min_abs_cos_hr = sift_params["min |cos(h, r)|"].as<quantity>();
-        min_abs_cos_hh = sift_params["min |cos(h, h)| for bb"].as<quantity>();
-        max_cos_nr = sift_params["max cos(n, r)"].as<quantity>();
-
-        auto& ljs = ctx.var<lj_variants>("lj_variants");
-
-        req_min_dist[(short)contact_type::BACK_BACK()] = ljs.bb.r_min();
-        req_min_dist[(short)contact_type::BACK_SIDE()] = ljs.bs.r_min();
-        req_min_dist[(short)contact_type::SIDE_BACK()] = ljs.sb.r_min();
-        for (auto const& aa1: amino_acid::all()) {
-            for (auto const& aa2: amino_acid::all()) {
-                int ss_idx = (int)aa1 * amino_acid::NUM_AA + (int)aa2;
-                req_min_dist[(short)contact_type::SIDE_SIDE(aa1, aa2)] =
-                    ljs.ss[ss_idx].r_max();
-            }
-        }
-
-        auto& aa_data_ = ctx.var<amino_acid_data>(
-            "amino_acid_data");
-        for (auto const& aa: amino_acid::all()) {
-            ptype[(int)aa] = aa_data_[aa].polarization;
-        }
-
-        candidates = &ctx.var<set<candidate>>("qa_candidates");
-        atype = ctx.var<vector<amino_acid>>("atype").data();
-        box = &ctx.var<xmd::box>("box");
-        r = ctx.var<vector<vec3r>>("r").data();
-        free_pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
-        sync = ctx.var<vector<sync_data>>("sync").data();
-        n = ctx.var<vector<vec3r>>("qa_n").data();
-        h = ctx.var<vector<vec3r>>("qa_h").data();
-    }
-
     void sift_candidates::iter(int idx) const {
         auto node = free_pairs->at(idx);
         if (node.vacant()) return;

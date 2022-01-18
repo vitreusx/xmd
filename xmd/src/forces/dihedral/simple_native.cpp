@@ -10,14 +10,6 @@ namespace xmd {
         }
     }
 
-    void eval_snd_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        CDH = ctx.persistent<real>("CDH",
-            params["simple native dihedrals"]["CDH"].as<quantity>());
-
-        eval_native_dihedral_forces_base::declare_vars(ctx);
-    }
-
     void eval_snd_forces::iter(int idx) const {
         auto dihedral = dihedrals[idx];
         int i1 = dihedral.i1(), i2 = dihedral.i2(),

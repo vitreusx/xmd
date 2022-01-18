@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/forces/primitives/harmonic.h>
-#include <xmd/ctx/context.h>
+
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -16,7 +16,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_velocity_afm_forces: public ctx_aware {
+    class eval_velocity_afm_forces {
     public:
         harmonic afm_force;
 
@@ -25,8 +25,6 @@ namespace xmd {
         array<vec3r> F;
         real *t;
         const_span<vel_afm_tip> afm_tips;
-
-        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

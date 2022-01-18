@@ -23,35 +23,10 @@ namespace xmd {
         }
     }
 
-    void update_pauli_pairs::declare_vars(context& ctx) {
-        r = ctx.var<vector<vec3r>>("r").data();
-        box = &ctx.var<xmd::box>("box");
-        nl = &ctx.var<nl::nl_data>("nl_data");
-        pairs = &ctx.var<vector<pauli_pair>>("pauli_pairs");
-
-        auto& max_cutoff = ctx.var<real>("max_cutoff");
-        r_excl = ctx.var<real>("pauli_r_excl");
-        max_cutoff = max(max_cutoff, r_excl);
-    }
-
     void eval_pauli_exclusion_forces::operator()() const {
         for (int idx = 0; idx < pairs->size(); ++idx) {
             iter(idx);
         }
-    }
-
-    void eval_pauli_exclusion_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        r_excl = ctx.persistent<real>("pauli_r_excl",
-            params["Pauli exclusion"]["r_excl"].as<quantity>());
-        depth = ctx.persistent<real>("pauli_depth",
-            params["Pauli exclusion"]["depth"].as<quantity>());
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-        box = &ctx.var<xmd::box>("box");
-        pairs = &ctx.persistent<vector<pauli_pair>>("pauli_pairs");
     }
 
     void eval_pauli_exclusion_forces::iter(int idx) const {

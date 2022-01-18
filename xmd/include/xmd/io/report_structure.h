@@ -1,13 +1,13 @@
 #pragma once
 #include <optional>
-#include <xmd/ctx/context.h>
+
 #include <xmd/types/vec3.h>
 #include <xmd/model/model.h>
 #include <xmd/forces/qa/qa.h>
 #include <xmd/model/loader.h>
 
 namespace xmd {
-    class report_structure: public ctx_aware {
+    class report_structure {
     public:
         std::string path_fmt;
         real period, nat_active_thr;
@@ -20,7 +20,7 @@ namespace xmd {
         std::optional<const_array<qa::sync_data>> sync;
         real *t, *last_t;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;

@@ -4,53 +4,6 @@
 #include <xmd/forces/primitives/lj.h>
 
 namespace xmd {
-    void eval_lj_attr_wall_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        wall_min_dist = ctx.persistent<real>("lj_attr_wall_min_dist",
-            params["LJ attractive walls"]["wall min dist"].as<quantity>());
-        breaking_factor = ctx.persistent<real>("lj_attr_breaking_factor",
-            params["LJ attractive walls"]["breaking factor"].as<quantity>());
-        factor = pow(2.0, -1.0/6.0) * breaking_factor;
-        cycle_time = ctx.persistent<real>("lj_attr_cycle_time",
-            params["LJ attractive walls"]["cycle time"].as<quantity>());
-        cycle_time_inv = 1.0 / cycle_time;
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-        box = &ctx.var<xmd::box>("box");
-        num_particles = ctx.var<int>("num_particles");
-        t = &ctx.var<real>("r");
-
-        pairs = ctx.persistent<vector<lj_attr_pair>>("lj_attr_pairs", lazy([&]() -> auto {
-            vector<lj_attr_pair> pairs_;
-
-            for (int wall_idx = 0; wall_idx < walls.size(); ++wall_idx) {
-                for (int part_idx = 0; part_idx < num_particles; ++part_idx) {
-                    pairs_.emplace_back(part_idx, wall_idx, FREE,
-                        vec3r::Zero(),0.0f);
-                }
-            }
-
-            return pairs_;
-        })).view();
-
-        walls = ctx.persistent<vector<plane>>("lj_attr_walls", lazy([&]() -> auto {
-            vector<plane> walls_;
-
-            for (auto const& plane_node: params["LJ attractive walls"]["planes"]) {
-                auto origin = plane_node["origin"].as<vec3r>();
-                auto normal = plane_node["normal"].as<vec3r>();
-                walls_.emplace_back(origin, normal);
-            }
-
-            return walls_;
-        })).view();
-
-        wall_F = ctx.persistent<vector<vec3r>>("lj_attr_wall_F",
-            walls.size()).data();
-    }
-
     void eval_lj_attr_wall_forces::loop(int idx) const {
         auto pair = pairs[idx];
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/types/amino_acid.h>
-#include <xmd/ctx/context.h>
+
 
 namespace xmd {
     class heur_ang_type {
@@ -37,7 +37,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_heurestic_angle_forces: public ctx_aware {
+    class eval_heurestic_angle_forces {
     public:
         static constexpr int POLY_DEG = 6, NUM_TYPES = 9;
         real poly_coeffs[POLY_DEG+1][NUM_TYPES];
@@ -47,8 +47,6 @@ namespace xmd {
         array<vec3r> F;
         const_span<heur_ang> angles;
         real *V;
-
-        void declare_vars(context& ctx) override;
 
     public:
         void iter(int idx) const;

@@ -2,11 +2,11 @@
 
 
 #include <xmd/utils/geometry.h>
-#include <xmd/ctx/context.h>
+
 #include <xmd/model/box.h>
 
 namespace xmd {
-    class eval_solid_wall_forces: public ctx_aware {
+    class eval_solid_wall_forces {
     public:
         real eps, cutoff;
 
@@ -18,7 +18,7 @@ namespace xmd {
         real *V;
         int num_particles;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

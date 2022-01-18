@@ -9,19 +9,6 @@ namespace xmd::qa {
         }
     }
 
-    void precompute_nh::declare_vars(context& ctx) {
-        r = ctx.var<vector<vec3r>>("r").data();
-        num_particles = ctx.var<int>("num_particles");
-
-        n = ctx.ephemeral<vector<vec3r>>("qa_n",
-            num_particles).data();
-        h = ctx.ephemeral<vector<vec3r>>("qa_h",
-            num_particles).data();
-
-        prev = ctx.var<vector<int>>("prev").data();
-        next = ctx.var<vector<int>>("next").data();
-    }
-
     void precompute_nh::iter(int idx) const {
         auto iprev = prev[idx], icur = idx, inext = next[idx];
         if (iprev < 0 || inext < 0) return;

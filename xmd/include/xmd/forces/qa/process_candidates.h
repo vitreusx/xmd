@@ -3,10 +3,10 @@
 #include "sync_data.h"
 #include "contact.h"
 #include "free_pair.h"
-#include <xmd/ctx/context.h>
+
 
 namespace xmd::qa {
-    class process_candidates: public ctx_aware {
+    class process_candidates {
     public:
         set<candidate> *candidates;
         array<sync_data> sync;
@@ -14,7 +14,7 @@ namespace xmd::qa {
         set<contact> *contacts;
         set<free_pair> *free_pairs;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

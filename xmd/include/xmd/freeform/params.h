@@ -17,6 +17,7 @@ namespace xmd {
 
         real total_time;
         uint64_t seed;
+        int num_of_threads;
     };
 
     struct model_params {
@@ -245,7 +246,6 @@ namespace xmd {
         report_structure_params() = default;
         explicit report_structure_params(yaml_fs_node const& p);
         bool enabled;
-        std::filesystem::path root;
         std::string path_fmt;
         real exec_period;
     };
@@ -297,7 +297,6 @@ namespace xmd {
         explicit checkpoints_params(yaml_fs_node const& p);
         bool enabled;
         real exec_period;
-        std::filesystem::path root;
         std::string path_fmt;
     };
 

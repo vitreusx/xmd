@@ -22,59 +22,10 @@ namespace xmd {
         }
     }
 
-    void update_go_contacts::declare_vars(context& ctx) {
-        r = ctx.var<vector<vec3r>>("r").data();
-        box = &ctx.var<xmd::box>("box");
-        nl = &ctx.var<nl::nl_data>("nl_data");
-        all_contacts = &ctx.persistent<vector<nat_cont>>("go_all_contacts",
-            lazy([&]() -> auto {
-                auto& xmd_model = ctx.var<xmd::model>("model");
-                using res_map_t = std::unordered_map<
-                    xmd::model::residue*, int>;
-                auto& res_map = ctx.var<res_map_t>("res_map");
-
-                vector<nat_cont> all_contacts_;
-
-                for (auto const& cont: xmd_model.contacts) {
-                    if (cont.type != model::NAT_SS) {
-                        auto i1 = res_map[cont.res1], i2 = res_map[cont.res2];
-                        auto nat_dist = (real)cont.length;
-                        all_contacts_.emplace_back(i1, i2, nat_dist);
-                    }
-                }
-
-                return all_contacts_;
-            }));
-
-        contacts = &ctx.var<vector<nat_cont>>("go_contacts");
-
-        real cutoff = 0.0;
-        for (int cont_idx = 0; cont_idx < all_contacts->size(); ++cont_idx) {
-            auto cont_dist = all_contacts->at(cont_idx).nat_dist();
-            cutoff = max(cutoff, lj::cutoff(cont_dist));
-        }
-
-        auto& max_cutoff = ctx.var<real>("max_cutoff");
-        max_cutoff = max(max_cutoff, cutoff);
-    }
-
     void eval_go_forces::operator()() const {
         for (int idx = 0; idx < contacts->size(); ++idx) {
             iter(idx);
         }
-    }
-
-    void eval_go_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        depth = ctx.persistent<real>("go_depth",
-            params["native contacts"]["lj depth"].as<quantity>());
-
-        box = &ctx.var<xmd::box>("box");
-        contacts = &ctx.persistent<vector<nat_cont>>(
-            "go_contacts");
-        r = ctx.var<vector<vec3r>>("r").data();
-        V = &ctx.per_thread().var<real>("V");
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
     }
 
     void eval_go_forces::iter(int idx) const {

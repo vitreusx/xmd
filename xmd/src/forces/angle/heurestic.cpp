@@ -26,68 +26,6 @@ namespace xmd {
             iter(idx);
         }
     }
-
-    void eval_heurestic_angle_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-
-        using stored_coeffs_t = std::array<std::array<real, POLY_DEG+1>, NUM_TYPES>;
-        auto& stored_poly_coeffs = ctx.persistent<stored_coeffs_t>("heur_ang_coeffs",
-            lazy([&]() -> auto {
-                auto coeffs_csv = params["heurestic angles"]["coefficients"].as<csv_file>();
-                stored_coeffs_t stored_poly_coeffs_;
-
-                for (auto const& record: coeffs_csv.records) {
-                    auto type1 = record["type1"], type2 = record["type2"];
-                    auto ord1 = type1 == "G" ? 0 : (type1 == "P" ? 1 : 2);
-                    auto ord2 = type2 == "G" ? 0 : (type2 == "P" ? 1 : 2);
-                    auto ord = 3*ord1+ord2;
-
-                    for (int d = 0; d <= POLY_DEG; ++d) {
-                        std::stringstream sstr;
-                        sstr << "a" << d;
-                        auto col_name = sstr.str();
-
-                        stored_poly_coeffs_[d][ord] = quantity(
-                            record[col_name], eps/pow(rad, d));
-                    }
-                }
-
-                return stored_poly_coeffs_;
-            }));
-
-        for (int d = 0; d <= POLY_DEG; ++d) {
-            for (int t = 0; t < NUM_TYPES; ++t) {
-                poly_coeffs[d][t] = stored_poly_coeffs[d][t];
-            }
-        }
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-
-        angles = ctx.persistent<vector<heur_ang>>("heurestic_angles",
-            lazy([&]() -> auto {
-                auto& xmd_model = ctx.var<model>("model");
-                using res_map_t = std::unordered_map<xmd::model::residue*, int>;
-                auto& res_map = ctx.var<res_map_t>("res_map");
-                auto atypes = ctx.var<vector<amino_acid>>("atype").data();
-
-                vector<heur_ang> angles_;
-
-                for (auto const& angle: xmd_model.angles) {
-                    if (!angle.theta.has_value()) {
-                        auto i1 = res_map[angle.res1], i2 = res_map[angle.res2],
-                            i3 = res_map[angle.res3];
-                        auto type = heur_ang_type(atypes[i1], atypes[i2]);
-
-                        angles_.emplace_back(i1, i2, i3, type);
-                    }
-                }
-
-                return angles_;
-            })).view();
-    }
-
     void eval_heurestic_angle_forces::iter(int idx) const {
         auto angle = angles[idx];
         auto i1 = angle.i1(), i2 = angle.i2(), i3 = angle.i3();

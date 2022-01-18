@@ -4,8 +4,9 @@
 #include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
-#include <xmd/ctx/context.h>
+
 #include <xmd/types/amino_acid.h>
+#include <array>
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -20,7 +21,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class update_es_base: public ctx_aware {
+    class update_es_base {
     public:
         real cutoff;
         real q[amino_acid::NUM_AA];
@@ -32,7 +33,7 @@ namespace xmd {
         vector<es_pair> *pairs;
         const_array<amino_acid> atype;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;

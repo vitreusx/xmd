@@ -18,37 +18,6 @@ namespace xmd {
         }
     }
 
-    void eval_tether_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        H1 = ctx.persistent<real>("tether_H1",
-            params["tether forces"]["H1"].as<quantity>());
-        H2 = ctx.persistent<real>("tether_H2",
-            params["tether forces"]["H2"].as<quantity>());
-        def_length = ctx.persistent<real>("tether_def_length",
-            params["tether forces"]["def_length"].as<quantity>());
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-
-        tethers = ctx.persistent<vector<tether_pair>>("tethers",
-            lazy([&]() -> auto {
-                auto& xmd_model = ctx.var<model>("model");
-                using res_map_t = std::unordered_map<xmd::model::residue*, int>;
-                auto& res_map = ctx.var<res_map_t>("res_map");
-
-                vector<tether_pair> tethers_;
-
-                for (auto const& tether: xmd_model.tethers) {
-                    auto i1 = res_map[tether.res1], i2 = res_map[tether.res2];
-                    auto nat_dist = (real)tether.length.value_or(def_length);
-                    tethers_.emplace_back(i1, i2, nat_dist);
-                }
-
-                return tethers_;
-            })).view();
-    }
-
     void eval_tether_forces::iter(int idx) const {
         auto tether = tethers[idx];
         auto i1 = tether.i1(), i2 = tether.i2();

@@ -1,6 +1,7 @@
 general:
   total time: 20e3 tau
   seed: 42
+  number of threads: 2
 
 amino acid data:
   default atom radii:
@@ -437,7 +438,6 @@ report stats:
 
 report structure:
   enabled: true
-  root: "."
   path format: "structure/%.3f.yml"
   exec period: 50 tau
 
@@ -467,5 +467,4 @@ force AFM:
 checkpoints:
   enabled: true
   exec period: 100 tau
-  root: "."
   path format: "checkpoints/%.3f.yml"

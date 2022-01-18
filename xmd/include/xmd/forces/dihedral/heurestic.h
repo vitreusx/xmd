@@ -2,7 +2,7 @@
 #include <xmd/types/amino_acid.h>
 #include <xmd/types/vec3.h>
 
-#include <xmd/ctx/context.h>
+
 
 namespace xmd {
     class heur_dih_type {
@@ -38,7 +38,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_heurestic_dihedral_forces: public ctx_aware {
+    class eval_heurestic_dihedral_forces {
     public:
         static constexpr int NUM_TERMS = 6, NUM_TYPES = 9;
         real coeffs[NUM_TERMS][NUM_TYPES];
@@ -48,7 +48,7 @@ namespace xmd {
         const_span<heur_dih> dihedrals;
         real *V;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

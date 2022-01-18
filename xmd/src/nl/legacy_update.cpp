@@ -3,29 +3,6 @@
 #include <xmd/utils/units.h>
 
 namespace xmd::nl {
-    void legacy_update::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        pad_factor = ctx.persistent<real>("pad_factor",
-            params["neighbor list"]["pad factor"].as<quantity>());
-        r = ctx.var<vector<vec3r>>("r").data();
-        box = &ctx.var<xmd::box>("box");
-        t = &ctx.var<float>("t");
-        chain_idx = ctx.var<vector<int>>("chain_idx").data();
-        seq_idx = ctx.var<vector<int>>("seq_idx").data();
-
-        num_particles = ctx.var<int>("num_particles");
-
-        data = &ctx.ephemeral<nl_data>("nl_data",
-            lazy([&]() -> auto {
-                nl_data data_;
-                data_.orig_r = vector<vec3r>(num_particles);
-                return data_;
-            }));
-
-        max_cutoff = &ctx.persistent<real>("max_cutoff");
-        invalid = &ctx.ephemeral<bool>("invalid", true);
-    }
-
     void legacy_update::operator()() const {
         auto pad = pad_factor * *max_cutoff;
         auto req_r = *max_cutoff + pad;

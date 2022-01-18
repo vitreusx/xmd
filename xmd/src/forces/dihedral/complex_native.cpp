@@ -10,16 +10,6 @@ namespace xmd {
         }
     }
 
-    void eval_cnd_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        CDA = ctx.persistent<real>("CDA",
-            params["complex native dihedrals"]["CDA"].as<quantity>());
-        CDA = ctx.persistent<real>("CDB",
-            params["complex native dihedrals"]["CDB"].as<quantity>());
-
-        eval_native_dihedral_forces_base::declare_vars(ctx);
-    }
-
     void eval_cnd_forces::iter(int idx) const {
         auto nat_dih = dihedrals[idx];
         auto i1 = nat_dih.i1(), i2 = nat_dih.i2(), i3 = nat_dih.i3(),
@@ -41,7 +31,6 @@ namespace xmd {
         auto sin_diff = sin(diff), cos_diff = cos(diff);
         auto sin_3diff = sin(3.0f*diff), cos_3diff = cos(3.0f*diff);
 
-//#pragma omp atomic update
         *V += CDA * (1.0f - cos_diff) + CDB * (1.0f - cos_3diff);
         auto dV_dphi = CDA * sin_diff + CDB * 3.0f * sin_3diff;
 

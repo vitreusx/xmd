@@ -7,14 +7,6 @@ namespace xmd::qa {
         }
     }
 
-    void process_candidates::declare_vars(context& ctx) {
-        candidates = &ctx.var<set<candidate>>("qa_candidates");
-        contacts = &ctx.var<set<contact>>("qa_contacts");
-        sync = ctx.var<vector<sync_data>>("sync").data();
-        free_pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
-        t = &ctx.var<real>("t");
-    }
-
     void process_candidates::iter(int idx) const {
         auto candidate = candidates->at(idx).value();
         auto i1 = candidate.i1(), i2 = candidate.i2();

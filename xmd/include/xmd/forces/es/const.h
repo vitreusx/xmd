@@ -2,10 +2,10 @@
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
 #include "es_pair.h"
-#include <xmd/ctx/context.h>
+
 
 namespace xmd {
-    class eval_const_es_forces: public ctx_aware {
+    class eval_const_es_forces {
     public:
         real permittivity, screen_dist_inv;
         real V_factor;
@@ -17,7 +17,7 @@ namespace xmd {
         vector<es_pair> const *es_pairs;
         real *V;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;
@@ -27,7 +27,7 @@ namespace xmd {
 
     class update_const_es: public update_es_base {
     public:
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;

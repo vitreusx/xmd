@@ -5,24 +5,6 @@
 #include <fstream>
 
 namespace xmd {
-    void report_stats::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        period = ctx.persistent<real>("stats_period",
-            params["report stats"]["exec period"].as<quantity>());
-        csv_path = ctx.persistent<std::filesystem::path>("stats_path",
-            params["report stats"]["path"].as<std::string>());
-
-        t = &ctx.var<real>("t");
-        last_t = &ctx.ephemeral<real>("stats_last_t",
-            std::numeric_limits<real>::lowest());
-        first_time = &ctx.ephemeral<bool>("stats_first_time", true);
-
-        V = &ctx.per_thread().var<real>("V");
-        comp_tot_ene_t.declare_vars(ctx);
-        comp_asph_t.declare_vars(ctx);
-        comp_gyr_t.declare_vars(ctx);
-    }
-
     void report_stats::operator()() const {
         if (*t - *last_t >= period) {
             csv_file stats_csv;

@@ -1,6 +1,6 @@
 #pragma once
 #include <xmd/types/vec3.h>
-#include <xmd/ctx/context.h>
+
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -15,12 +15,12 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_force_afm_forces: public ctx_aware {
+    class eval_force_afm_forces {
     public:
         array<vec3r> F;
         span<force_afm_tip> afm_tips;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

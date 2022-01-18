@@ -1,7 +1,7 @@
 #pragma once
 #include "lj.h"
 #include "sink_lj.h"
-#include <xmd/ctx/context.h>
+
 #include <xmd/params/yaml_fs_node.h>
 
 namespace xmd {

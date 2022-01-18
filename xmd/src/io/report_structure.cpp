@@ -8,31 +8,6 @@
 #include <xmd/utils/units.h>
 
 namespace xmd {
-    void report_structure::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        path_fmt = ctx.persistent<std::string>("rep_struct_path",
-            params["report structure"]["path format"].as<std::string>());
-        period = ctx.persistent<real>("rep_struct_period",
-            params["report structure"]["exec period"].as<quantity>());
-
-        nat_active_thr = ctx.persistent<real>("nat_active_thr",
-            params["native contacts"]["active threshold factor"].as<real>());
-
-        xmd_model = &ctx.var<xmd::model>("model");
-        res_map = &ctx.var<res_map_t>("res_map");
-        r = ctx.var<vector<vec3r>>("r").data();
-
-        if (ctx.has("sync"))
-            sync = ctx.var<vector<qa::sync_data>>("sync").data();
-
-        if (ctx.has("qa_contacts"))
-            qa_cont = &ctx.var<set<qa::contact>>("qa_contacts");
-
-        t = &ctx.var<real>("t");
-        last_t = &ctx.ephemeral<real>("rep_struct_last_t",
-            std::numeric_limits<real>::lowest());
-    }
-
     static std::ostream& emit_csv(std::ostream& os, csv_file const& csv) {
         os << "|-";
         if (csv.header)

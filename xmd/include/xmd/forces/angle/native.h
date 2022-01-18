@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/types/amino_acid.h>
-#include <xmd/ctx/context.h>
+
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define NAME() nat_ang
@@ -16,7 +16,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_native_angle_forces: public ctx_aware {
+    class eval_native_angle_forces {
     public:
         real k;
 
@@ -26,7 +26,7 @@ namespace xmd {
         array<vec3r> F;
         const_span<nat_ang> angles;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

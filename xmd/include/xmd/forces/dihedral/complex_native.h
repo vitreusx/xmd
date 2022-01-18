@@ -3,12 +3,15 @@
 #include "native.h"
 
 namespace xmd {
-    class eval_cnd_forces:
-        public eval_native_dihedral_forces_base {
+    class eval_cnd_forces {
     public:
         real CDA, CDB;
+        const_array<vec3r> r;
+        array<vec3r> F;
+        const_span<nat_dih> dihedrals;
+        real *V;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

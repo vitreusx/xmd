@@ -17,12 +17,4 @@ namespace xmd {
 
         *gyration_radius = sqrt(gyration_r / num_particles);
     }
-
-    void compute_gyration_radius::declare_vars(context& ctx) {
-        r = ctx.var<vector<vec3r>>("r").data();
-        mass = ctx.var<vector<real>>("mass").data();
-        num_particles = ctx.var<int>("num_particles");
-        gyration_radius = &ctx.persistent<real>(
-            "gyration_radius");
-    }
 }

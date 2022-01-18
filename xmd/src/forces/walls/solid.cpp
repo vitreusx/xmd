@@ -9,35 +9,6 @@ namespace xmd {
             iter(idx);
     }
 
-    void eval_solid_wall_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        eps = ctx.persistent<real>("solid_wall_eps",
-            params["solid walls"]["depth"].as<quantity>());
-        cutoff = ctx.persistent<real>("solid_wall_cutoff",
-            params["solid walls"]["cutoff"].as<quantity>());
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-        num_particles = ctx.var<int>("num_particles");
-        box = &ctx.var<xmd::box>("box");
-
-        walls = ctx.persistent<vector<plane>>("solid_walls", lazy([&]() -> auto {
-            vector<plane> walls_;
-
-            for (auto const& plane_node: params["solid walls"]["planes"]) {
-                auto origin = plane_node["origin"].as<vec3r>();
-                auto normal = plane_node["normal"].as<vec3r>();
-                walls_.emplace_back(origin, normal);
-            }
-
-            return walls_;
-        })).view();
-
-        wall_F = ctx.persistent<vector<vec3r>>("solid_wall_F",
-            walls.size()).data();
-    }
-
     void eval_solid_wall_forces::omp_async() const {
 #pragma omp for schedule(static) nowait
         for (int idx = 0; idx < num_particles; ++idx)

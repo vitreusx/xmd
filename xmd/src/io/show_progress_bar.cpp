@@ -36,10 +36,11 @@ namespace xmd {
             auto progress = *t / total_time;
 
             auto now = high_resolution_clock::now();
-            auto diff_ms = duration_cast<milliseconds>(now - *start_wall_time).count();
+            auto diff_ms = duration_cast<milliseconds>(
+                now - *start_wall_time).count();
 
             cout << "\r" << "[";
-            auto pos = (int)floor(width * progress);
+            auto pos = (int) floor(width * progress);
             for (int i = 0; i < width; ++i) {
                 if (i < pos) cout << "=";
                 else if (i == pos) cout << ">";
@@ -53,21 +54,5 @@ namespace xmd {
 
             *last_t = *t;
         }
-    }
-
-    void show_progress_bar::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        width = ctx.persistent<int>("pbar_width",
-            params["progress bar"]["width"].as<int>());
-        total_time = ctx.var<real>("total_time");
-        period = ctx.persistent<real>("pbar_period",
-            params["progress bar"]["update period"].as<quantity>());
-
-        t = &ctx.var<real>("t");
-        V = &ctx.var<real>("V");
-        first_time = &ctx.ephemeral<bool>("pbar_first_time", true);
-        start_wall_time = &ctx.ephemeral<time_point_t>("start_wall_time");
-        start_t = &ctx.ephemeral<real>("pbar_start_t");
-        last_t = &ctx.ephemeral<real>("pbar_last_t");
     }
 }

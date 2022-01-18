@@ -10,37 +10,6 @@ namespace xmd {
         }
     }
 
-    void eval_native_angle_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        k = ctx.persistent<real>("nat_ang_k",
-            params["native angles"]["k"].as<quantity>());
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-
-        angles = ctx.persistent<vector<nat_ang>>("native_angles",
-            lazy([&]() -> auto {
-                auto& xmd_model = ctx.var<model>("model");
-                using res_map_t = std::unordered_map<xmd::model::residue*, int>;
-                auto& res_map = ctx.var<res_map_t>("res_map");
-
-                vector<nat_ang> angles_;
-
-                for (auto const& angle: xmd_model.angles) {
-                    if (angle.theta.has_value()) {
-                        auto i1 = res_map[angle.res1], i2 = res_map[angle.res2],
-                            i3 = res_map[angle.res3];
-                        auto nat_theta = (real)angle.theta.value();
-
-                        angles_.emplace_back(i1, i2, i3, nat_theta);
-                    }
-                }
-
-                return angles_;
-            })).view();
-    }
-
     void eval_native_angle_forces::iter(int idx) const {
         auto angle = angles[idx];
 

@@ -1,19 +1,9 @@
 #include "stats/asphericity.h"
 #include <Eigen/Core>
 #include <Eigen/SVD>
+#include <xmd/utils/convert.h>
 
 namespace xmd {
-    void compute_asphericity::declare_vars(context& ctx) {
-        asphericity = &ctx.persistent<real>("asphericity");
-        r = ctx.var<vector<vec3r>>("r").data();
-        mass = ctx.var<vector<real>>("mass").data();
-        num_particles = ctx.var<int>("num_particles");
-    }
-
-    static Eigen::Vector3<real> cast(vec3r const& v) {
-        return { v.x(), v.y(), v.z() };
-    }
-
     void compute_asphericity::operator()() const {
         vec3r center_of_mass = vec3r::Zero();
         real total_mass = 0.0;
@@ -26,7 +16,7 @@ namespace xmd {
         using matrix_t = Eigen::Matrix<real, 3, Eigen::Dynamic>;
         matrix_t R = matrix_t::Zero(3, num_particles);
         for (int idx = 0; idx < num_particles; ++idx) {
-            R.col(idx) = cast(r[idx] - center_of_mass);
+            R.col(idx) = convert(r[idx] - center_of_mass);
         }
 
         auto lambda = Eigen::JacobiSVD<decltype(R)>(R).singularValues();

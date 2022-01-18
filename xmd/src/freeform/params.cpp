@@ -6,7 +6,8 @@ namespace xmd {
 
     general_params::general_params(const yaml_fs_node &p) {
         total_time = p["total time"].as<quantity>();
-        seed = p["seed"].as<int>();
+        seed = p["seed"].as<uint64_t>();
+        num_of_threads = p["number of threads"].as<int>();
     }
 
     model_params::model_params(const yaml_fs_node &p) {
@@ -215,7 +216,6 @@ namespace xmd {
 
     report_structure_params::report_structure_params(const yaml_fs_node &p) {
         enabled = p["enabled"].as<bool>();
-        root = p.resolve(p["root"].as<std::string>());
         path_fmt = p["path format"].as<std::string>();
         exec_period = p["exec period"].as<quantity>();
     }
@@ -272,7 +272,6 @@ namespace xmd {
     checkpoints_params::checkpoints_params(const yaml_fs_node &p) {
         enabled = p["enabled"].as<bool>();
         exec_period = p["exec period"].as<quantity>();
-        root = p.resolve(p["root"].as<std::string>());
         path_fmt = p["path format"].as<std::string>();
     }
 

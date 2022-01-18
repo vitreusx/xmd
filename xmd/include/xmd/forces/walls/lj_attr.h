@@ -2,7 +2,7 @@
 
 
 #include <xmd/utils/geometry.h>
-#include <xmd/ctx/context.h>
+
 #include <xmd/model/box.h>
 
 namespace xmd {
@@ -25,7 +25,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_lj_attr_wall_forces: public ctx_aware {
+    class eval_lj_attr_wall_forces {
     public:
         real wall_min_dist;
         real lj_depth;
@@ -41,7 +41,7 @@ namespace xmd {
         int num_particles;
         span<lj_attr_pair> pairs;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void loop(int idx) const;

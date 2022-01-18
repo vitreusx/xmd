@@ -6,10 +6,10 @@
 #include "free_pair.h"
 #include "sync_data.h"
 #include "candidate.h"
-#include <xmd/ctx/context.h>
+
 
 namespace xmd::qa {
-    class sift_candidates: public ctx_aware {
+    class sift_candidates {
     public:
         real min_abs_cos_hr, min_abs_cos_hh, max_cos_nr;
         real req_min_dist[contact_type::NUM_TYPES];
@@ -24,7 +24,7 @@ namespace xmd::qa {
         set<free_pair> const *free_pairs;
         set<candidate> *candidates;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

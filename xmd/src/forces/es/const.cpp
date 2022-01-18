@@ -10,25 +10,6 @@ namespace xmd {
         }
     }
 
-    void eval_const_es_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        auto const& const_es_params = params["const ES"];
-
-        permittivity = ctx.persistent<real>("permittivity",
-            const_es_params["permittivity"].as<quantity>());
-        V_factor = 1.0f / (4.0f * (real)M_PI * permittivity);
-
-        auto screening_dist = ctx.persistent<real>("screening_dist",
-            const_es_params["screening distance"].as<quantity>());
-        screen_dist_inv = (real)1.0 / screening_dist;
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-        box = &ctx.var<xmd::box>("box");
-        es_pairs = &ctx.persistent<vector<es_pair>>("es_pairs");
-    }
-
     void eval_const_es_forces::iter(int idx) const {
         auto es = es_pairs->at(idx);
         auto i1 = es.i1(), i2 = es.i2();
@@ -55,16 +36,6 @@ namespace xmd {
         for (int idx = 0; idx < es_pairs->size(); ++idx) {
             iter(idx);
         }
-    }
-
-    void update_const_es::declare_vars(context& ctx) {
-        update_es_base::declare_vars(ctx);
-
-        auto screening_dist = ctx.var<real>("screening_dist");
-        cutoff = 2.0 * screening_dist;
-
-        auto& max_cutoff = ctx.var<real>("max_cutoff");
-        max_cutoff = max(max_cutoff, cutoff);
     }
 
     void update_const_es::operator()() const {

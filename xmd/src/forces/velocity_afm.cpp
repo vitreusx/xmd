@@ -9,33 +9,6 @@ namespace xmd {
         }
     }
 
-    void eval_velocity_afm_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        afm_force.H1 = ctx.persistent<real>("vel_afm_H1",
-            params["velocity AFM"]["H1"].as<quantity>());
-        afm_force.H2 = ctx.persistent<real>("vel_afm_H2",
-            params["velocity AFM"]["H2"].as<quantity>());
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        t = &ctx.var<real>("t");
-
-        afm_tips = ctx.persistent<vector<vel_afm_tip>>("vel_afm_tips",
-            lazy([&]() -> auto {
-                vector<vel_afm_tip> afm_tips_;
-
-                for (auto const& tip_node: params["velocity AFM"]["AFM tips"]) {
-                    auto res_idx = tip_node["residue idx"].as<int>();
-                    auto afm_orig = tip_node["origin"].as<vec3r>();
-                    auto afm_vel = tip_node["velocity"].as<vec3r>();
-
-                    afm_tips_.emplace_back(res_idx, afm_orig, afm_vel);
-                }
-
-                return afm_tips_;
-            })).view();
-    }
-
     void eval_velocity_afm_forces::iter(int idx) const {
         auto tip = afm_tips[idx];
         auto r_ = r[tip.res_idx()];

@@ -12,44 +12,6 @@ namespace xmd {
         }
     }
 
-    void eval_chiral_forces::declare_vars(context& ctx) {
-        auto& params = ctx.var<yaml_fs_node>("params");
-        e_chi = ctx.persistent<real>("e_chi",
-            params["chirality"]["e_chi"].as<quantity>());
-
-        r = ctx.var<vector<vec3r>>("r").data();
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        V = &ctx.per_thread().var<real>("V");
-
-        quads = ctx.persistent<vector<chiral_quad>>("chiral_quads",
-            lazy([&]() -> auto {
-                auto& xmd_model = ctx.var<xmd::model>("model");
-                using res_map_t = std::unordered_map<
-                    xmd::model::residue*, int>;
-                auto& res_map = ctx.var<res_map_t>("res_map");
-
-                vector<chiral_quad> quads_;
-
-                for (auto const& dihedral: xmd_model.dihedrals) {
-                    auto i1 = res_map[dihedral.res1], i2 = res_map[dihedral.res2],
-                        i3 = res_map[dihedral.res3], i4 = res_map[dihedral.res4];
-
-                    vec3r nat_r1 = dihedral.res1->pos, nat_r2 = dihedral.res2->pos,
-                        nat_r3 = dihedral.res3->pos, nat_r4 = dihedral.res4->pos;
-
-                    auto nat_r12 = nat_r2 - nat_r1, nat_r23 = nat_r3 - nat_r2,
-                        nat_r34 = nat_r4 - nat_r3;
-
-                    auto nat_factor = ipow<3>(norm_inv(nat_r23));
-                    auto nat_chir = dot(nat_r12, cross(nat_r23, nat_r34)) * nat_factor;
-
-                    quads_.emplace_back(i1, i2, i3, i4, nat_factor, nat_chir);
-                }
-
-                return quads_;
-            })).view();
-    }
-
     void eval_chiral_forces::iter(int idx) const {
         auto quad = quads[idx];
 

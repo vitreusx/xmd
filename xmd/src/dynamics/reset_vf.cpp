@@ -1,11 +1,6 @@
 #include "dynamics/reset_vf.h"
 
 namespace xmd {
-    void reset_vf::declare_vars(context& ctx) {
-        F = ctx.var<vector<vec3r>>("F").view();
-        V = &ctx.var<real>("V");
-    }
-
     void reset_vf::operator()() const {
         *V = (real)0.0;
         for (int idx = 0; idx < F.size(); ++idx)

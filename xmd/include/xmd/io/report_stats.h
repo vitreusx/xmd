@@ -1,5 +1,5 @@
 #pragma once
-#include <xmd/ctx/context.h>
+
 #include <xmd/types/scalar.h>
 #include <optional>
 #include <vector>
@@ -10,7 +10,7 @@
 #include <xmd/stats/gyration.h>
 
 namespace xmd {
-    class report_stats: public ctx_aware {
+    class report_stats {
     public:
         real period;
         std::filesystem::path csv_path;
@@ -22,7 +22,7 @@ namespace xmd {
         compute_asphericity comp_asph_t;
         compute_gyration_radius comp_gyr_t;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;

@@ -1,7 +1,7 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/utils/math.h>
-#include <xmd/ctx/context.h>
+
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -16,7 +16,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_chiral_forces: public ctx_aware {
+    class eval_chiral_forces {
     public:
         real e_chi;
 
@@ -26,7 +26,7 @@ namespace xmd {
         span<chiral_quad> quads;
         real *V;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;

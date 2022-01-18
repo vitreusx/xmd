@@ -10,29 +10,6 @@ namespace xmd::qa {
         }
     }
 
-    void process_contacts::declare_vars(context& ctx) {
-        ljs = ctx.var<lj_variants>("lj_variants");
-
-        auto& params = ctx.var<yaml_fs_node>("params");
-        auto const& contact_params = params["quasi-adiabatic"];
-        cycle_time = ctx.persistent<real>("qa_cycle_time",
-            contact_params["(de)saturation time"].as<quantity>());
-        cycle_time_inv = (real)1.0/cycle_time;
-        breaking_factor = ctx.persistent<real>("qa_breaking_factor",
-            contact_params["breaking factor"].as<quantity>());
-        t = &ctx.var<real>("t");
-
-        factor = breaking_factor * (real)pow(2.0f, -1.0f/6.0f);
-
-        sync = ctx.var<vector<sync_data>>("sync").data();
-        contacts = &ctx.var<set<contact>>("qa_contacts");
-        box = &ctx.var<xmd::box>("box");
-        V = &ctx.per_thread().var<real>("V");
-        F = ctx.per_thread().var<vector<vec3r>>("F").data();
-        r = ctx.var<vector<vec3r>>("r").data();
-        free_pairs = &ctx.var<set<free_pair>>("qa_free_pairs");
-    }
-
     void process_contacts::iter(int idx) const {
         auto node = contacts->at(idx);
         if (node.vacant()) return;

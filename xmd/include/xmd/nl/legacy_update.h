@@ -3,10 +3,10 @@
 
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
-#include <xmd/ctx/context.h>
+
 
 namespace xmd::nl {
-    class legacy_update: public ctx_aware {
+    class legacy_update {
     public:
         real pad_factor;
 
@@ -20,7 +20,7 @@ namespace xmd::nl {
         const_array<int> chain_idx, seq_idx;
         const_span<nl_pair> all_nat_cont, all_nat_ss;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;

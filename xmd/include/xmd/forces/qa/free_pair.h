@@ -3,7 +3,7 @@
 #include <xmd/nl/data.h>
 #include <xmd/types/vec3.h>
 #include <xmd/model/box.h>
-#include <xmd/ctx/context.h>
+
 
 #define NAMESPACE(...) xmd,qa,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -18,7 +18,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd::qa {
-    class update_free_pairs: public ctx_aware {
+    class update_free_pairs {
     public:
         real max_formation_min_dist;
 
@@ -28,7 +28,7 @@ namespace xmd::qa {
         nl::nl_data *nl;
         set<free_pair> *pairs;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;

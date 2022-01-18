@@ -1,10 +1,10 @@
 #pragma once
 #include <xmd/types/vec3.h>
 #include <xmd/random/rand_gen.h>
-#include <xmd/ctx/context.h>
+
 
 namespace xmd {
-    class lang_pc_step: public ctx_aware {
+    class lang_pc_step {
     public:
         real gamma_factor, temperature;
         true_real dt;
@@ -18,7 +18,7 @@ namespace xmd {
         int num_particles;
         rand_gen *gen;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;

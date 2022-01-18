@@ -8,7 +8,6 @@ namespace xmd::nl {
         }
         else {
             real max_r_disp = 0.0f;
-//#pragma omp taskloop default(none) reduction(max:max_r_disp)
             for (int idx = 0; idx < num_particles; ++idx) {
                 auto r_ = r[idx], orig_r_ = data->orig_r[idx];
                 auto dr = box->r_uv(r_, orig_r_);
@@ -21,14 +20,5 @@ namespace xmd::nl {
             if (total_disp > data->orig_pad)
                 *invalid = true;
         }
-    }
-
-    void verify::declare_vars(context& ctx) {
-        r = ctx.var<vector<vec3r>>("r").data();
-        data = &ctx.var<nl_data>("nl_data");
-        box = &ctx.var<xmd::box>("box");
-        invalid = &ctx.var<bool>("invalid");
-        first_time = &ctx.ephemeral<bool>("nl_first_time", true);
-        num_particles = ctx.var<int>("num_particles");
     }
 }

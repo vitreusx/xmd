@@ -4,7 +4,7 @@
 #include <xmd/utils/math.h>
 #include <xmd/nl/data.h>
 #include <xmd/forces/primitives/lj.h>
-#include <xmd/ctx/context.h>
+
 
 #define NAMESPACE(...) xmd,__VA_ARGS__
 #define TEMPLATE_PARAMS(...) __VA_ARGS__
@@ -19,7 +19,7 @@ GENTYPE()
 #undef NAMESPACE
 
 namespace xmd {
-    class eval_pauli_exclusion_forces: public ctx_aware {
+    class eval_pauli_exclusion_forces {
     public:
         real depth, r_excl;
 
@@ -30,7 +30,7 @@ namespace xmd {
         vector<pauli_pair> const *pairs;
         real *V;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void iter(int idx) const;
@@ -38,7 +38,7 @@ namespace xmd {
         void omp_async() const;
     };
 
-    class update_pauli_pairs: public ctx_aware {
+    class update_pauli_pairs {
     public:
         real r_excl;
 
@@ -48,7 +48,7 @@ namespace xmd {
         nl::nl_data const *nl;
         vector<pauli_pair> *pairs;
 
-        void declare_vars(context& ctx) override;
+
 
     public:
         void operator()() const;
